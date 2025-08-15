@@ -80,23 +80,41 @@ const tools = [
 const faqs = [
   {
     question: "What is IEC?",
-    answer: "IEC is the Innovation and Entrepreneurship Cell of ITER SOA that fosters creativity and entrepreneurial spirit among students.",
+    answer: `The Innovation and Entrepreneurship Cell (IEC) is a student-driven initiative at our university aimed at fostering entrepreneurial spirit, innovation, and leadership among students. It serves as a platform for aspiring entrepreneurs to explore their ideas, build on them, and learn real-world business and creative skills through hands-on events and mentorship.`,
   },
   {
-    question: "How can IEC benefit me?",
-    answer: "IEC offers mentorship, resources, and a platform to turn your ideas into real startups or impactful projects.",
+    question: "Why should students choose IEC?",
+    answer: `Students should choose IEC for several reasons:
+             <ul style="margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;">
+              <li>Personality Development</li>
+              <li>Increased Communication and Networking Opportunities</li>
+              <li>Skill Development</li>
+              <li>More Educational and Technical Opportunities</li>
+              <li>Incubation and other methodologies aiding in startup development.</li>
+              <li>Leadership roles and Team experiences that build you up for the future</li>
+             </ul>`,
   },
   {
-    question: "Can students from any campus of SOA join IEC?",
-    answer: "Yes, any students of SOA campus can join IEC.",
+    question: "How does IEC benefit you?",
+    answer: "Any student of the SOA campus can join IEC.",
   },
   {
     question: "What kind of tasks can IEC perform?",
-    answer: "IEC hosts events, hackathons, startup weekends, and facilitates networking with industry experts and alumni.",
+    answer: "IEC helps you develop real skills in teamwork, communication, leadership, and critical thinking. You also get opportunities to organize impactful events, learn from professionals, and connect with like-minded peers—all of which enhances your confidence and clarity about your future goals.",
   },
   {
-    question: "How can I join IEC?",
-    answer: "You can join IEC by applying through our official website or reaching out to one of the team members during recruitment drives.",
+    question: "How to join IEC and what skills do you need?",
+    answer: "Joining IEC is straightforward. Just attend our interview and answer honestly, showing your dedication, passion, and discipline towards the community. <\/ul><br/>Skills:<ul style=\"margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;\"><li>Communication<\/li><li>Teamwork<\/li><li>Creativity<\/li><li>Problem solving<\/li><\/ul>",
+  },
+  {
+    question: "What events has IEC conducted and how has it added value to the students?",
+    answer: `IEC has conducted several impactful events, significantly benefiting students. These include:
+             <ul style="margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;">
+              <li><b>Genovation</b>: Fosters innovation and creative problem-solving skills.</li>
+              <li><b>E-Summit</b>: Enhances entrepreneurial mindset and provides networking opportunities.</li>
+              <li><b>Exa Nova</b>: Develops technical skills and encourages practical application of knowledge.</li>
+             </ul>
+             <p style="margin-top:8px;">Through these hands-on workshops and events, students learn to approach real-world challenges creatively and strategically. Over the years, IEC has also organized pitch competitions, speaker sessions, and case study events, building a vibrant entrepreneurial culture.</p>`,
   },
 ];
 
@@ -146,9 +164,8 @@ export function AIAgentFAQ() {
                   text-sm transition-all duration-300 ease-in-out overflow-hidden
                   ${isOpen ? 'max-h-40 opacity-100 text-black' : 'max-h-0 opacity-0 text-gray-600'}
                 `}
-                  >
-                    Answer: {faq.answer}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: `Answer: ${faq.answer}` }}
+                  />
                 </div>
               </div>
             );
