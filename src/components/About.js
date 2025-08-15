@@ -8,7 +8,7 @@ function About() {
             <div className="bg-gradient-to-t from-[rgba(223,219,255,0)] to-[rgba(223,219,255,1)]">
                 <div>
                     <main className="">
-                        <div className="flex flex-col justify-center items-center h-screen mt-[-5%]">
+                        <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh] sm:h-[70vh] mt-[-5%]">
                             <h1 className="font-bold text-5xl md:text-6xl bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent">Who we are</h1>
                             <p className="mt-4 w-[90%] text-wrap text-center">
                                 Empowering businesses with cutting-edge AI solutions to streamline operations, enhance <br></br>productivity, and drive innovation for a smarter tomorrow.
@@ -16,7 +16,7 @@ function About() {
                         </div>
 
 
-                        <img className="mt-[-10%] w-[70%] block mx-auto rounded-[20px] border border-white border-[3px] max-w-[1500px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] " style={{ transformStyle: "preserve-3d" }} src={image} />
+                        <img className="lg:mt-[-10%] sm:mt-[-20%] max-sm:mt-[-30%] w-[70%] block mx-auto rounded-[20px] border border-white border-[3px] max-w-[1500px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] mb-10" style={{ transformStyle: "preserve-3d" }} src={image} />
 
                         <p className="font-black text-center">
 
