@@ -1,0 +1,248 @@
+.body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  cursor: url(./paw.svg);
+}
+
+.bg {
+  background: linear-gradient(to bottom,#E7E3FF,#CCC4FF 60%, #fff 90%);
+}
+
+html:not([data-scroll='0']) .tilt {
+    rotate: -5deg;
+}
+
+@keyframes pulseDots {
+  0% {
+    background-image: radial-gradient(circle at center,
+        rgba(255 255 255 / 0.5) var(--dot-size),
+        transparent calc(var(--dot-size) + 1px)),
+      radial-gradient(circle at center,
+        rgba(255 255 255 / 0.5) var(--dot-size),
+        transparent calc(var(--dot-size) + 1px));
+  }
+
+  100% {
+    background-image: radial-gradient(circle at center,
+        rgba(255 255 255 / 0.7) var(--dot-size),
+        transparent calc(var(--dot-size) + 1px)),
+      radial-gradient(circle at center,
+        rgba(255 255 255 / 0.7) var(--dot-size),
+        transparent calc(var(--dot-size) + 1px));
+  }
+}
+
+.bgchild {
+  z-index: -1000;
+  margin-top: -3%;
+  padding-top: 3%;
+  --dot-size: 1px;
+  --dot-space: 22px;
+
+  background-image: radial-gradient(circle at center,
+      rgba(0 0 0 / 0.05) var(--dot-size),
+      transparent calc(var(--dot-size) + 1px)),
+    radial-gradient(circle at center,
+      rgba(0 0 0/ 0.05) var(--dot-size),
+      transparent calc(var(--dot-size) + 1px));
+  background-position: 0 0,
+    calc(var(--dot-space) / 100) calc(var(--dot-space) / 100);
+  background-size: var(--dot-space) var(--dot-space);
+}
+
+/* .iec {
+  margin-top: 4%;
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+} */
+/* .iecc {
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+  color: black;
+  font-size: 300%;
+  text-shadow: none;
+} */
+.cont {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: normal;
+  font-size: large;
+  text-shadow: none;
+  margin-top: 120px;
+  margin-right: 120px;
+  margin-left: 120px;
+}
+
+.image {
+  margin-top: -100px;
+  width: 70%;
+  height: auto;
+  display: block;
+  margin: auto;
+  border-radius: 20px;
+  border-style: solid;
+  border-color: white;
+  border-radius: 20px;
+  border-width: 3px;
+  justify-content: center;
+
+  max-width: 1500px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 10%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+
+  transform: rotateZ(-2deg);
+}
+
+.image:hover {
+  transform: rotateZ(0deg);
+}
+
+.para {
+  padding: 100px;
+  font-weight: 1000;
+}
+
+p {
+  text-shadow: 0 0 7px rgba(255, 255, 255, 0.3),
+    0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.contai {
+  color: #e5e5e5;
+  font-size: 8rem;
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.animation {
+  height: 9rem;
+  overflow: hidden;
+  margin-left: 1rem;
+}
+
+.animation>div:first child {
+  animation: text-animation 9s infinite;
+}
+
+.animation>div>div {
+  height: 9rem;
+  line-height: 9rem;
+  margin-bottom: 2.81rem;
+
+  padding: 0 0.75rem;
+  white-space: nowrap;
+}
+
+.faq-bg {
+  background-color: #f0ebff;
+  background: linear-gradient(to bottom, #E7E3FF, #CCC4FF, #E7E3FF);
+  background-image: radial-gradient(#d1d5db 1.5px, transparent 1px),
+    linear-gradient(to bottom, #f0ebff, #e3dcff);
+  background-size: 20px 20px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+}
+
+@keyframes text-animation {
+  0% {
+    margin-top: 0;
+  }
+
+  10% {
+    margin-top: 0;
+  }
+
+  20% {
+    margin-top: -5.62rem;
+  }
+
+  30% {
+    margin-top: -5.62rem;
+  }
+
+  40% {
+    margin-top: -11.24rem;
+  }
+
+  60% {
+    margin-top: -11.24rem;
+  }
+
+  70% {
+    margin-top: -5.62rem;
+  }
+
+  80% {
+    margin-top: -5.62rem;
+  }
+
+  90% {
+    margin-top: 0;
+  }
+
+  100% {
+    margin-top: 0;
+  }
+}
+
+.slider{
+  position: relative;
+}
+
+.slide-track {
+  animation: slide-animation 20s linear infinite;
+}
+
+.slider:hover .slide-track {
+  animation-play-state: paused;
+}
+
+.slider::before {
+  background: linear-gradient(to right, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+  content: '';
+  height: 100%;
+  width:5%;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+
+.slider::after {
+  background: linear-gradient(to right, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+  content: '';
+  height: 100%;
+  width: 5%;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  rotate: 180deg;
+}
+
+@keyframes slide-animation {
+  to{
+    transform: translateX(-100%);
+  }
+}
+
+.custom-border {
+  border-color: #D2B8EF;
+}
+
+.custom-hover-border:hover {
+  border-width: 1px;
+  border-color: #C392FA;
+}
+
+.box-border:hover {
+  color: #C392FA;
+}
+
+
+
