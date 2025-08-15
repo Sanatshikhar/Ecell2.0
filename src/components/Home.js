@@ -3,18 +3,15 @@ import "./all.css";
 import logo from "./logo.png";
 import React, { useState } from "react";
 import Footer from "./footer.js";
-import Sss from "./Assets/Team Image/Sanat.jpg"
+import Cs from "./Assets/comingSoon.webp";
 import { AnimatedText } from "./animation/homeani.tsx"
-import Kiran from "./Assets/Team Image/Kiran.jpg"
-import Pd from "./Assets/Team Image/IMG_20241004_121433 - Pratikshya Dash.jpg"
 import oblive from "./Assets/oblive.png"
 import Exanova from "./Assets/exanova.png"
 
-
 const agents = [
-  { name: "Pratikshya Dash", role: "Vise-President", image: Pd },
-  { name: "Sanat Sikhar Sinha", role: "Technical lead", image: Sss },
-  { name: "Kiran Panigrahi", role: "President", image: Kiran},
+  { name: "To Be Announced", role: "Speaker", image: Cs },
+  { name: "To Be Announced", role: "Speaker", image: Cs },
+  { name: "To Be Announced", role: "Speaker", image: Cs },
 ];
 
 
