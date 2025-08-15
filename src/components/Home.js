@@ -161,9 +161,11 @@ export function AIAgentFAQ() {
 
                   <div
                     className={`
-                  text-sm transition-all duration-300 ease-in-out overflow-hidden
+                  text-sm transition-all duration-300 ease-in-out
                   ${isOpen ? 'max-h-40 opacity-100 text-black' : 'max-h-0 opacity-0 text-gray-600'}
+                  ${isOpen ? 'overflow-y-auto' : 'overflow-hidden'}
                 `}
+                    style={isOpen ? { maxHeight: '10rem' } : { maxHeight: 0 }}
                     dangerouslySetInnerHTML={{ __html: `Answer: ${faq.answer}` }}
                   />
                 </div>
