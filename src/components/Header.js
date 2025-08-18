@@ -13,14 +13,14 @@ const Header = () => {
 
   return (
     <div>
-      <div className="fixed bg-white rounded-3xl w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] flex items-center justify-center z-50 box-border transition-none">
+      <div className="fixed bg-black bg-opacity-20 backdrop-blur-md rounded-3xl w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] flex items-center justify-center z-50 box-border transition-none">
         {/* Logo */}
         <div className="w-[50%] md:w-1/5 flex items-center absolute left-[5%] top-1/2 -translate-y-1/2 z-20">
           <img src={logo} alt="Logo" className="w-[60%] max-h-[100px] md:max-h-[150px] object-contain" />
         </div>
 
         {/* Menu Links (Tablet/Laptop/Big Screens) */}
-        <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-black font-semibold -translate-y-1/2 z-20 h-[40px]">
+        <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
           <Link to="/">
             Home
           </Link>
@@ -72,7 +72,7 @@ const Header = () => {
         {/* Join Us Button (Tablet/Laptop/Big Screens) */}
         <Link
           to="/Join"
-          className="hidden md:flex bg-black h-[45px] rounded-3xl text-white font-semibold text-center justify-center px-8 items-center transition absolute right-[2%] top-1/2 -translate-y-1/2 z-20"
+          className="hidden md:flex bg-white h-[45px] rounded-3xl text-black font-semibold text-center justify-center px-8 items-center transition absolute right-[2%] top-1/2 -translate-y-1/2 z-20 hover:bg-black hover:text-white hover:scale-105 border-white border-[1px]"
         >
           Join Us
         </Link>
@@ -80,7 +80,7 @@ const Header = () => {
 
       {/* Navbar for Menu */}
       <nav
-        className={`bg-white flex flex-col text-black fixed w-[80%] top-6 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-3xl md:h-[70px] md:pt-0 lg:h-[80px] lg:pt-0
+        className={`bg-white bg-opacity-20 backdrop-blur-md flex flex-col text-black fixed w-[80%] top-6 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-3xl md:h-[70px] md:pt-0 lg:h-[80px] lg:pt-0
           transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] 
           ${isMenuOpen ? `max-h-[${menuHeight}] pt-[60px]` : 'max-h-[60px] md:max-h-[70px] lg:max-h-[80px] pt-[60px]'}`}
       >

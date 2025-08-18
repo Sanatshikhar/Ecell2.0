@@ -1,12 +1,15 @@
 
 import Footer from "./footer";
-
+import Animation from "./Assets/AuroraBackground.js"
 
 
 function Contact() {
     return (
-        <div>
-            <div className="bg-gradient-to-t from-[rgba(223,219,255,0)] to-[rgba(223,219,255,1)]">
+        <div className="bg-black">
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+        <Animation />
+      </div>
+            <div className="bg-black">
                 <div>
                     <main className="relative top-16 mb-20">
                         <div className="flex flex-col justify-center items-center h-screen gap-5">
@@ -14,10 +17,10 @@ function Contact() {
 
 
                             <div className="w-full max-w-md grid gap-5">
-                                <h2 className="text-2xl font-semibold text-center">Send us a message</h2>
+                                <h2 className="text-2xl font-semibold text-center text-white">Send us a message</h2>
                                 <form className="flex flex-col items-center justify-center lg:gap-5">
-                                    <div className="w-[90%]">
-                                        <label className="block text-left font-medium">Name</label>
+                                    <div className="w-[90%] bg-transparent">
+                                        <label className=" text-white block text-left font-medium">Name</label>
                                         <input
                                             type="text"
                                             placeholder="Your Name"
@@ -25,7 +28,7 @@ function Contact() {
                                         />
                                     </div>
                                     <div className="w-[90%]">
-                                        <label className="block text-left font-medium">Email</label>
+                                        <label className="text-white block text-left font-medium">Email</label>
                                         <input
                                             type="email"
                                             placeholder="sample@email.com"
@@ -33,7 +36,7 @@ function Contact() {
                                         />
                                     </div>
                                     <div className="w-[90%]">
-                                        <label className="block text-left font-medium">Message</label>
+                                        <label className="text-white block text-left font-medium">Message</label>
                                         <textarea
                                             placeholder="Enter your message"
                                             className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Footer from "./footer.js";
+import Card3D from "./Card3D";
 import Kiran from "./Assets/Team Image/Kiran.jpg"
 import Pd from "./Assets/Team Image/IMG_20241004_121433 - Pratikshya Dash.jpg"
 import Ns from "./Assets/Team Image/IMG-20241011-WA0082 - Nabhonil Sarkar.jpg"
@@ -14,6 +15,7 @@ import KK from "./Assets/Team Image/KK.jpg"
 import SK from "./Assets/Team Image/SK.jpg"
 import SM from "./Assets/Team Image/SM.jpg"
 import Ms from "./Assets/Team Image/Ms.jpg"
+import Animation from "./Assets/AuroraBackground.js"
 const agents = [
     { name: "Kiran Panigrahi", role: "President", link: "https://www.linkedin.com/in/kiran-panigrahi-996223202/", image: Kiran },
     { name: "Pratikshya Dash", role: "Vice-President", link: "https://www.linkedin.com/in/pratikshya-dash/", image: Pd },
@@ -33,33 +35,40 @@ const agents = [
 function Team() {
     return (
         <div>
-            <div className="bg-gradient-to-t from-[rgba(223,219,255,0)] to-[rgba(223,219,255,1)]">
-                <div>
-                    <main className="">
-                                <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh]  sm:h-[70vh] mt-[-5%]">
+            <div className="team-section-container" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: 'black' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+        <Animation />
+      </div>
+                <div className="bg-black" >
+                    <main>
+                        <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh]  sm:h-[70vh] mt-[-5%]">
                             <h1 className="font-bold text-6xl max-sm:text-5xl bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent">{" "}
                                 The Hall of Fame{" "}</h1>
-                            <p className="mt-4 text-center">
+                            <p className="mt-4 text-center text-white">
                                 Meet the Legends of our Community
                             </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-20 mx-7 w-3/4 mt-[-15%] relative left-1/2 -translate-x-1/2 w-[83%] h-full ml-[-0.2%] mb-20">
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 justify-center items-center mt-[-15%] mb-20" style={{ display: 'grid', placeItems: 'center' }}>
                             {agents.map((agent, index) => (
-                                <div key={index} className="relative cursor-pointer group rounded-2xl overflow-hidden shadow-lg border-4 border-gray-400">
+                                <Card3D key={index} image={agent.image} title={agent.role}>
                                     <Link to={agent.link}>
-                                        <img src={agent.image} alt={agent.name} className="w-full h-full object-cover" />
-                                        <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:text-black group-hover:bg-white transition-all">
+                                        <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:text-white group-hover:bg-[#131313] transition-all w-full">
                                             <h3 className="text-lg font-semibold">{agent.role}</h3>
                                             <p className="text-sm">{agent.name}</p>
                                         </div>
                                     </Link>
-                                </div>
+                                </Card3D>
                             ))}
                         </div>
                     </main>
                 </div>
             </div>
             <Footer />
+                        {/* Ensure footer is above animation */}
+                        <style>{`
+                            footer { position: relative; z-index: 20; }
+                        `}</style>
         </div>
     );
 }

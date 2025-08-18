@@ -1,0 +1,45 @@
+.perspective-500 {
+  perspective: 500px;
+}
+
+.card {
+  transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+  transform-style: preserve-3d;
+  border: 4px solid #9ca3af; /* gray-400 */
+  border-radius: 1rem;
+  position: relative;
+}
+
+.card3d-hover .card {
+  transition: transform 0.8s cubic-bezier(.4,0,.2,1);
+}
+.card3d-hover:hover .card {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-front {
+  z-index: 2;
+}
+.card-back {
+  transform: rotateY(180deg);
+  background: #23272f;
+  color: #e5e7eb;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  border: 4px solid #9ca3af;
+}
+.trigger-6:hover ~ .card { transform: rotateY(8deg) rotateX(0deg); }
+.trigger-7:hover ~ .card { transform: rotateY(-8deg) rotateX(-5deg); }
+.trigger-8:hover ~ .card { transform: rotateY(0deg) rotateX(-5deg); }
+.trigger-9:hover ~ .card { transform: rotateY(8deg) rotateX(-5deg); }

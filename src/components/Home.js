@@ -7,7 +7,7 @@ import Cs from "./Assets/comingSoon.webp";
 import { AnimatedText } from "./animation/homeani.tsx"
 import oblive from "./Assets/oblive.png"
 import Exanova from "./Assets/exanova.png"
-
+import Animation from "./Assets/AuroraBackground.js"
 const agents = [
   { name: "To Be Announced", role: "Speaker", image: Cs },
   { name: "To Be Announced", role: "Speaker", image: Cs },
@@ -126,12 +126,23 @@ export function AIAgentFAQ() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl faq-bg rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900">
+    
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      
+      <div
+        className="w-full max-w-6xl faq-bg rounded-2xl p-8"
+        style={{
+          background: 'rgba(0, 41, 59, 0.25)', // slate-800 with opacity
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
+        }}
+      >
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-white">
           Got questions for us?
         </h1>
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-white mb-8">
           Our team are crafted to think, act and optimize like experts—driving your success
         </p>
         <div className="space-y-4">
@@ -139,36 +150,42 @@ export function AIAgentFAQ() {
             const isOpen = openIndex === index;
             return (
               <div
-                key={index}
-                className={`group border border-gray-200 rounded-2xl overflow-hidden bg-white cursor-pointer`}
-                onClick={() => toggle(index)}
+              key={index}
+              className={`group rounded-2xl overflow-hidden cursor-pointer`}
+              onClick={() => toggle(index)}
+              style={{
+                background: 'rgba(0, 41, 59, 0.35)', // slate-800 with opacity
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+              }}
               >
-                <div className="px-6 py-5 flex flex-col space-y-2">
-                  <div className="flex flow-root justify-between items-center">
-                    <span
-                      className={`
-                    font-medium duration-300
-                    ${isOpen ? 'text-[#C392FA]' : 'text-gray-800'}
-                  `}
-                    >
-                      {faq.question}
-                    </span>
-                    <svg class={`w-6 h-6 text-black float-end transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
-                    </svg>
-
-                  </div>
-
-                  <div
-                    className={`
-                  text-sm transition-all duration-300 ease-in-out
-                  ${isOpen ? 'max-h-40 opacity-100 text-black' : 'max-h-0 opacity-0 text-gray-600'}
-                  ${isOpen ? 'overflow-y-auto' : 'overflow-hidden'}
+              <div className="px-6 py-5 flex flex-col space-y-2">
+                <div className="flex flow-root justify-between items-center">
+                <span
+                  className={`
+                font-medium duration-300
+                ${isOpen ? 'text-[#C392FA]' : 'text-white'}
                 `}
-                    style={isOpen ? { maxHeight: '10rem' } : { maxHeight: 0 }}
-                    dangerouslySetInnerHTML={{ __html: `Answer: ${faq.answer}` }}
-                  />
+                >
+                  {faq.question}
+                </span>
+                <svg class={`w-6 h-6 text-white float-end transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
+                </svg>
+
                 </div>
+
+                <div
+                className={`
+                text-sm transition-all duration-300 ease-in-out
+                ${isOpen ? 'max-h-40 opacity-100 text-white' : 'max-h-0 opacity-0 text-white'}
+                ${isOpen ? 'overflow-y-auto' : 'overflow-hidden'}
+              `}
+                style={isOpen ? { maxHeight: '10rem' } : { maxHeight: 0 }}
+                dangerouslySetInnerHTML={{ __html: `Answer: ${faq.answer}` }}
+                />
+              </div>
               </div>
             );
           })}
@@ -181,8 +198,13 @@ export function AIAgentFAQ() {
 
 function Home() {
   return (
-    <div className="overflow-x-hidden">
-      <div className="bg">
+    
+    <div className="overflow-x-hidden relative" style={{ minHeight: '100vh' }}>
+      
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+        <Animation />
+      </div>
+      <div className="bg-black text-white relative" style={{ zIndex: -1}}>
         <div className="bgchild">
           <main className="">
             <div className="flex flex-col justify-center items-center mt-[15vh] sm:mt-[25vh] min-h-[40vh] pt-2 sm:pt-8">
@@ -212,8 +234,8 @@ function Home() {
               </p>
 
               <div className="w-[90%] h-fit flex overflow-hidden gap-6 md:gap-12 cursor-pointer m-auto slider py-4">
-                <div className="flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track">
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                <div className="flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track ">
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center ">
                     <img
                       className="w-full object-contain"
                       src={logo}
@@ -314,7 +336,7 @@ function Home() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track">
+                <div className=" flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track">
                   <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
                     <img
                       className="w-full object-contain"
@@ -411,12 +433,12 @@ function Home() {
           </main>
         </div>
       </div>
-      <main>
-        <div className="px-6 py-12 max-w-7xl mx-auto text-center overflow-hidden">
+      <main className="bg-black text-white">
+        <div className=" px-6 py-12 max-w-7xl mx-auto text-center overflow-hidden">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 break-words">
             Supercharge Business <br/> Productivity with ECell SOA
           </h1>
-          <p className="text-gray-600 max-w-xl mx-auto mb-10">
+          <p className="text-white max-w-xl mx-auto mb-10">
             Our intelligent leads are crafted to think, act, and optimize like
             experts—driving your success
           </p>
@@ -425,7 +447,7 @@ function Home() {
         <div className="grid w-[90%] md:w-[95%] lg:w-[85%] grid-cols-1 md:grid-cols-3 relative left-1/2 gap-6 md:gap-12 -translate-x-1/2 h-full">
 
           {agents.map((agent, index) => (
-            <div key={index} className="relative group rounded-3xl overflow-hidden h-[50vh] md:h-[65vh] shadow-lg border-gray-100 border-4 md:border-8">
+            <div key={index} className="relative group rounded-3xl overflow-hidden h-[50vh] md:h-[65vh] shadow-lg border-white border-4 md:border-8">
               <img src={agent.image} alt={agent.name} className="h-full w-full object-cover" />
               <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:bg-white group-hover:text-black transition-colors">
                 <h3 className="text-xl font-bold">{agent.name}</h3>
@@ -439,7 +461,7 @@ function Home() {
           <h2 className="text-3xl md:text-5xl font-bold mb-4">
             Past Events
           </h2>
-          <p className="text-gray-600 max-w-xl mx-auto mb-10">
+          <p className="text-white max-w-xl mx-auto mb-10">
             Customizable AI automations that integrate seamlessly with your
             tools.
           </p>
@@ -447,7 +469,7 @@ function Home() {
             {tools.map((tool, index) => (
               <div
                 key={index}
-                className="border border-gray-300 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
+                className=" bg-gray-900 border border-white rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
               >
 
                 <div className="flex items-center gap-4 mb-4">
@@ -458,10 +480,10 @@ function Home() {
                 />
                   <div>
                     <h3 className="text-lg font-semibold mb-2">{tool.name}</h3>
-                    <p className="text-gray-600 mb-4">{tool.year}</p>
+                    <p className="text-white mb-4">{tool.year}</p>
                   </div>
                 </div>
-                <p className="text-gray-700">{tool.description}</p>
+                <p className="text-white">{tool.description}</p>
 
               </div>
             ))}
@@ -472,28 +494,28 @@ function Home() {
           <h2 className="text-3xl md:text-5xl font-bold mb-4">
             ALUMNI REVIEWS
           </h2>
-          <p className="text-gray-600 max-w-xl mx-auto mb-10">
+          <p className="text-white max-w-xl mx-auto mb-10">
             Hear what our alumni has to say
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
             {tools.map((tool, index) => (
               <div
                 key={index}
-                className="border border-gray-300 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
+                className="bg-gray-900 border border-white rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
               >
 
                 <div className="flex items-center gap-4 mb-4">
                   <img
                     src={tool.logo}
                     alt={`${tool.name} Logo`}
-                    className="w-12 h-12 mb-4 border-4 border-gray-200 rounded-full object-cover"
+                    className="w-12 h-12 mb-4 border-4 border-white rounded-full object-cover"
                   />
                   <div>
                     <h3 className="text-lg font-semibold mb-2">{tool.name}</h3>
-                    <p className="text-gray-600 mb-4">{tool.year}</p>
+                    <p className="text-white mb-4">{tool.year}</p>
                   </div>
                 </div>
-                <p className="text-gray-700">{tool.description}</p>
+                <p className="text-white">{tool.description}</p>
                 <a
                   href={tool.learnMore}
                   className="text-blue-500 hover:underline"
@@ -506,6 +528,10 @@ function Home() {
         </div>
       </main>
       <Footer />
+                        {/* Ensure footer is above animation */}
+                        <style>{`
+                            footer { position: relative; z-index: 20; }
+                        `}</style>
     </div>
   );
 }

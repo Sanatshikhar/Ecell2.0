@@ -7,7 +7,7 @@
 }
 
 .bg {
-  background: linear-gradient(to bottom,#E7E3FF,#CCC4FF 60%, #fff 90%);
+  background: linear-gradient(to bottom, #232526, #414345 60%, #000 90%);
 }
 
 html:not([data-scroll='0']) .tilt {
@@ -212,7 +212,7 @@ p {
 }
 
 .slider::before {
-  background: linear-gradient(to right, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
   content: '';
   height: 100%;
   width:5%;
@@ -223,7 +223,7 @@ p {
 }
 
 .slider::after {
-  background: linear-gradient(to right, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
   content: '';
   height: 100%;
   width: 5%;
