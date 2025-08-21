@@ -30,7 +30,7 @@ const AuroraBackground = () => {
       vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
       fragmentShader: `
         uniform float iTime; uniform vec2 iResolution;
-        #define NUM_OCTAVES 3
+        #define NUM_OCTAVES 2
         float rand(vec2 n) { return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453); }
         float noise(vec2 p){ vec2 ip=floor(p);vec2 u=fract(p);u=u*u*(3.0-2.0*u);float res=mix(mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
         mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);return res*res; }
@@ -39,12 +39,12 @@ const AuroraBackground = () => {
         void main() {
           vec2 p=((gl_FragCoord.xy)-iResolution.xy*0.5)/iResolution.y*mat2(6.,-4.,4.,6.);
           vec4 o=vec4(0.);float f=2.+fbm(p+vec2(iTime*5.,0.))*.5;
-          for(float i=0.;i++<35.;){
+          for(float i=0.;i++<20.;){
             vec2 v=p+cos(i*i+(iTime+p.x*.08)*.025+i*vec2(13.,11.))*3.5;
-            float tailNoise=fbm(v+vec2(iTime*.5,i))*.3*(1.-(i/35.));
+            float tailNoise=fbm(v+vec2(iTime*.5,i))*.3*(1.-(i/20.));
             vec4 auroraColors=vec4(.1+.3*sin(i*.2+iTime*.4),.3+.5*cos(i*.3+iTime*.5),.7+.3*sin(i*.4+iTime*.3),1.);
             vec4 currentContribution=auroraColors*exp(sin(i*i+iTime*.8))/length(max(v,vec2(v.x*f*.015,v.y*1.5)));
-            float thinnessFactor=smoothstep(0.,1.,i/35.)*.6;
+            float thinnessFactor=smoothstep(0.,1.,i/20.)*.6;
             o+=currentContribution*(1.+tailNoise*.8)*thinnessFactor;
           }
           o=tanh(pow(o/100.,vec4(1.6)));gl_FragColor=o*1.5;
@@ -60,14 +60,17 @@ const AuroraBackground = () => {
     let isVisible = true; // viewport visibility
     let lastTime = performance.now();
 
+    // Throttle animation to ~30fps
     const animate = () => {
-      if (!isVisible) return; // pause if not visible to user
+      if (!isVisible) return;
       const now = performance.now();
-      // Only update time if visible and enough time has passed
       const delta = (now - lastTime) / 1000;
-      lastTime = now;
-      material.uniforms.iTime.value += delta;
-      renderer.render(scene, camera);
+      // Only update if at least 33ms passed (~30fps)
+      if (delta > 0.033) {
+        lastTime = now;
+        material.uniforms.iTime.value += delta;
+        renderer.render(scene, camera);
+      }
       animationFrameId = requestAnimationFrame(animate);
     };
 

@@ -1,4 +1,4 @@
-import bgimage from "./Assets/comingSoon.webp";
+import bgimage from "./Assets/HomePageImg.JPG";
 import "./all.css";
 import logo from "./logo.png";
 import React, { useState } from "react";
@@ -170,8 +170,8 @@ export function AIAgentFAQ() {
                 >
                   {faq.question}
                 </span>
-                <svg class={`w-6 h-6 text-white float-end transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
+                <svg className={`w-6 h-6 text-white float-end transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 9-7 7-7-7" />
                 </svg>
 
                 </div>
@@ -286,6 +286,111 @@ function Home() {
                       alt="Logo"
                     />
                   </div >
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
+                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
+                    <img
+                      className="w-full object-contain"
+                      src={logo}
+                      alt="Logo"
+                    />
+                  </div>
                   <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
                     <img
                       className="w-full object-contain"
