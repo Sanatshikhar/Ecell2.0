@@ -1,4 +1,108 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;600;700;900&display=swap');
+/* Modal overlay and modal styles for ResonanceForm */
+.formOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.formModal {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(80,40,120,0.18);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 320px;
+  width: 100%;
+  max-width: 465px;
+  position: relative;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border: 1.5px solid #ece6fa;
+  animation: popIn 0.25s cubic-bezier(.4,2,.6,1) 1;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.formClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #a259ff;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.2s;
+}
+.formClose:hover {
+  color: #4b2aad;
+}
+
+.formInput {
+  border: 1px solid #e0d7f7;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  font-family: inherit;
+  background: #faf8ff;
+  box-shadow: 0 1px 4px rgba(162,89,255,0.04);
+  margin-bottom: 0.25rem;
+}
+.formInput:focus {
+  border-color: #a259ff;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.10);
+}
+
+.formLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4b2aad;
+  margin-bottom: 0.15rem;
+  display: block;
+  letter-spacing: 0.01em;
+}
+
+.formButton {
+  background: linear-gradient(90deg, #a259ff 0%, #4b2aad 100%);
+  color: #fff;
+  padding: 0.75rem 0;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.10);
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.formButton:hover {
+  background: linear-gradient(90deg, #4b2aad 0%, #a259ff 100%);
+  box-shadow: 0 4px 16px rgba(162,89,255,0.18);
+}
+
+
+.formSuccess {
+  color: #2ecc71;
+  font-weight: 600;
+  text-align: center;
+  padding: 2rem 0 1rem 0;
+  font-size: 1.2rem;
+}
 
 .techxFont {
   font-family: 'Inter', 'Roboto', Arial, sans-serif;

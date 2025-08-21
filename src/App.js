@@ -6,8 +6,8 @@ import Contact from "./components/Contact";
 import Gallery from "./components/gallery";
 import Team from "./components/Team";
 import TechTeam from "./components/TechTeam";
-import TechXperience from "./components/TechXperience";
-import Join from "./components/Join";
+import Members from "./components/Join";
+import Join from "./components/TechXperience";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
       <Header /> 
       <Routes>
   <Route path="/TechTeam" element={<TechTeam />} />
-  <Route path="/TechXperience" element={<TechXperience />} />
+  <Route path="/Members" element={<Members />} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/gallery" element={<Gallery />} />

@@ -71,7 +71,7 @@ const Header = () => {
 
         {/* Join Us Button (Tablet/Laptop/Big Screens) */}
         <Link
-          to="/Join"
+          to="/members"
           className="hidden md:flex bg-white h-[45px] rounded-3xl text-black font-semibold text-center justify-center px-8 items-center transition absolute right-[2%] top-1/2 -translate-y-1/2 z-20 hover:bg-black hover:text-white hover:scale-105 border-white border-[1px]"
         >
           Join Us

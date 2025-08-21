@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.png';
 import sampleEvent from '../components/Assets/Resonance.png';
 import styles from './TechXperience.module.css';
+
+import ResonanceForm from './ResonanceForm';
 
 const sponsors = [
   { src: logo, alt: 'logoipsum' },
   { src: logo, alt: 'logoipsum' },
   { src: logo, alt: 'logoipsum' },
   { src: logo, alt: 'logoipsum' },
-  { src: logo, alt: 'logoipsum' },
-  { src: logo, alt: 'logoipsum' },
+
 ];
 
 const TechXperience = () => {
+  const [showForm, setShowForm] = useState(false);
+
   return (
     <div className={`min-h-screen bg-gradient-to-br from-[#f8f6ff] to-[#f3e6ff] text-[#222] ${styles.techxFont}`}> 
       <div>
@@ -41,16 +44,14 @@ const TechXperience = () => {
                   <span>📅 August 25, 2025</span>
                   <span>•</span>
                   <span>SOA Campus 2</span>
-                  
                 </div>
                 <div className="flex items-center gap-2 text-sm text-[#a259ff]">
                   <span>📅 August 30, 2025</span>
                   <span>•</span>
                   <span>SOA Campus 4</span>
-
                 </div>
               </div>
-              <button className="bg-[#222] text-white px-6 py-2 rounded-full font-semibold shadow hover:bg-[#a259ff] transition-colors">REGISTER</button>
+              <button className="bg-[#222] text-white px-6 py-2 rounded-full font-semibold shadow hover:bg-[#a259ff] transition-colors" onClick={() => setShowForm(true)}>REGISTER</button>
             </div>
           </div>
         </section>
@@ -67,6 +68,7 @@ const TechXperience = () => {
           </div>
         </section>
       </div>
+      {showForm && <ResonanceForm onClose={() => setShowForm(false)} />}
     </div>
   );
 };
