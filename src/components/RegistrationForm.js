@@ -97,18 +97,18 @@ const RegistrationForm = ({ isOpen, onClose }) => {
                 {errors.phone && <span className="text-red-400 text-xs">Phone Number is required</span>}
               </div>
               {/* Team Preference */}
-              // <div className="flex flex-col w-full">
-              //   <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Team Preference</label>
-              //   <select {...register("team", { required: true })} className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-950 text-white shadow-md transition-all duration-200 mx-auto">
-              //     <option value="">Select Team</option>
-              //     <option value="Tech">Tech</option>
-              //     <option value="Management">Management</option>
-              //     <option value="Design">Design</option>
-              //     <option value="Content">Content</option>
-              //     <option value="Other">Other</option>
-              //   </select>
-              //   {errors.team && <span className="text-red-400 text-xs">Team is required</span>}
-              // </div>
+              <div className="flex flex-col w-full">
+                <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Team Preference</label>
+                <select {...register("team", { required: true })} className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-950 text-white shadow-md transition-all duration-200 mx-auto">
+                  <option value="">Select Team</option>
+                  <option value="Tech">Tech</option>
+                  <option value="Management">Management</option>
+                  <option value="Design">Design</option>
+                  <option value="Content">Content</option>
+                  <option value="Other">Other</option>
+                </select>
+                {errors.team && <span className="text-red-400 text-xs">Team is required</span>}
+              </div>
               {/* Campus */}
               <div className="flex flex-col w-full">
                 <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Campus</label>
