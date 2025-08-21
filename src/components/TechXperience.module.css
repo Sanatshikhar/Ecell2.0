@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;600;700;900&display=swap');
+
+.techxFont {
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+.techxFont h1,
+.techxFont h2,
+.techxFont h3,
+.techxFont h4,
+.techxFont h5,
+.techxFont h6,
+.techxFont .headline,
+.techxFont button,
+.techxFont .btn {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 600;
+}
+
+.techxFont .small-detail {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 500;
+}
