@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "./logo.png";
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,21 +21,21 @@ const Header = () => {
 
         {/* Menu Links (Tablet/Laptop/Big Screens) */}
         <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
-          <Link to="/">
+          <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''} end>
             Home
-          </Link>
-          <Link to="/team">
+          </NavLink>
+          <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
             Team
-          </Link>
-          <Link to="/gallery">
+          </NavLink>
+          <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
             Gallery
-          </Link>
-          <Link to="/about">
+          </NavLink>
+          <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
             About
-          </Link>
-          <Link to="/contact">
+          </NavLink>
+          <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
             Contact
-          </Link>
+          </NavLink>
         </div>
 
         {/* Hamburger/Cross Button */}
@@ -80,7 +80,7 @@ const Header = () => {
 
       {/* Navbar for Menu */}
       <nav
-        className={`bg-white bg-opacity-20 backdrop-blur-md flex flex-col text-black fixed w-[80%] top-6 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-3xl md:h-[70px] md:pt-0 lg:h-[80px] lg:pt-0
+        className={`bg-white bg-opacity-20 backdrop-blur-md flex flex-col text-white fixed w-[80%] top-6 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-3xl md:h-[70px] md:pt-0 lg:h-[80px] lg:pt-0
           transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] 
           ${isMenuOpen ? `max-h-[${menuHeight}] pt-[60px]` : 'max-h-[60px] md:max-h-[70px] lg:max-h-[80px] pt-[60px]'}`}
       >
@@ -95,38 +95,44 @@ const Header = () => {
           <div
             className={`flex flex-col items-center text-black font-semibold space-y-4 ${isMenuOpen ? 'visible' : 'invisible'}`}
           >
-            <Link
+            <NavLink
               to="/"
               onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
+              end
             >
               Home
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/team"
               onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
             >
               Team
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/gallery"
               onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
             >
               Gallery
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/about"
               onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
             >
               About
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/contact"
               onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
             >
               Contact
-            </Link>
+            </NavLink>
             <Link
-              to="/join"
+              to="/members"
               className="bg-black text-white font-semibold py-2 px-4 rounded-3xl transition md:hidden"
               onClick={toggleMenu}
             >
