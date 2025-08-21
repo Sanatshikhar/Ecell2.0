@@ -14,48 +14,68 @@ function About() {
                         <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh] sm:h-[70vh] mt-[-5%]">
                             <h1 className="font-bold text-5xl md:text-6xl bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Who we are</h1>
                             <p className="mt-4 w-[90%] text-wrap text-center text-white/80">
-                                Empowering businesses with cutting-edge AI solutions to streamline operations, enhance <br/>productivity, and drive innovation for a smarter tomorrow.
+                            At E-Cell SOA, we are committed to nurturing the spirit of entrepreneurship by providing
+a platform where ideas transform into impactful ventures. Through interactive
+workshops, inspiring speaker sessions, competitive business plan contests, and year-
+round initiatives, we create an ecosystem that fosters innovation and growth. With the
+support of experienced mentors, access to essential funding opportunities, and a
+strong professional network, we stand as trusted partners in every entrepreneur’s
+journey towards success."
                             </p>
                         </div>
 
                         <img className="lg:mt-[-10%] sm:mt-[-20%] max-sm:mt-[-30%] w-[70%] block mx-auto rounded-[20px] border-white border-2 max-w-[1500px] mb-10" style={{ transformStyle: "preserve-3d" }} src={image} />
 
-                        <p className="font-black text-center text-white">
+                        {/* <p className="font-black text-center text-white">
                             Powered by most advanced AI models. FreeOS integrates top AI models
                             into a simple UX, saving you time on implementation.
-                        </p>
+                        </p> */}
 
 
                         <div className="text-center text-wrap grid gap-5 relative mb-20 top-10">
-                            <h2 className="font-bold text-4xl bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Investors</h2>
-                            <p className="w-[90%] md:w-[70%] max-w-[1500px] mx-auto text-lg text-white/80"> We're proud to be backed by some of the most visionary investors in the industry. Our supporters include top-tier venture firms and world-class founders and product innovators who share our mission of transforming the future with AI-driven solutions.</p>
+                            <h2 className="font-bold text-4xl bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Our Vision</h2>
+                            <p className="w-[90%] md:w-[70%] max-w-[1500px] mx-auto text-lg text-white/80"> Entrepreneurs are visionary thinkers, innovators, and changemakers who shape society for a brighter future. At E-Cell SOA, our vision is to empower these changemakers by
+                            providing them with the right exposure, mentorship, network, funding avenues, and
+                            guidance—enabling them to transform their ideas into impactful enterprises.</p>
+                        </div>
+                        <div className="text-center text-wrap grid gap-5 relative mb-20 top-10">
+                            <h2 className="font-bold text-4xl bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Our Mission</h2>
+                            <p className="w-[90%] md:w-[70%] max-w-[1500px] mx-auto text-lg text-white/80">At E-Cell SOA, our mission is to cultivate an entrepreneurial mindset among students
+                            and professionals by providing them with opportunities to learn, innovate, and lead. We
+                            are committed to nurturing ideas through mentorship, networking, resources, and real-
+                            world exposure—empowering individuals to transform their vision into successful
+                            ventures that create lasting impact.</p>
                         </div>
 
 
                         <div className="p-4 bg-white/10 backdrop-blur-md w-[70%] max-w-[1500px] hidden md:block mx-auto rounded-3xl mt-6 border border-white/20">
                             <div className="mb-4">
-                                <h2 className="text-xl font-bold mt-4 bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Values We Give</h2>
+                                <h2 className="text-xl font-bold mt-4 bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Our Core Values</h2>
                                 <p className="text-sm text-white/80">Building great big things starts with a decision</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
                                 <p className="font-bold text-white">Innovation</p>
-                                <p className="text-white/80"> We are committed to pushing the boundaries of technology, empowering businesses with cutting-edge AI solutions that drive growth and efficiency.</p>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
-                                <p className="font-bold text-white">Empowerment</p>
-                                <p className="text-white/80">We believe in empowering teams by automating repetitive tasks, allowing humans to focus on creativity, strategy, and innovation. </p>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
-                                <p className="font-bold text-white">Integrity</p>
-                                <p className="text-white/80"> Trust is the foundation of our work. We prioritize transparency, ethical AI practices, and data security to build lasting relationships with our clients</p>
+                                <p className="text-white/80"> We believe in fostering creativity and encouraging bold ideas that redefine possibilities.</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
                                 <p className="font-bold text-white">Collaboration</p>
-                                <p className="text-white/80"> Our AI agents are designed to work seamlessly with human teams, fostering collaboration that achieves remarkable results.</p>
+                                <p className="text-white/80"> We value teamwork and partnerships, creating a supportive ecosystem where entrepreneurs can grow together.</p>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
+                                <p className="font-bold text-white">Impact </p>
+                                <p className="text-white/80">  We aim to empower ventures that bring meaningful change to society and the economy.</p>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
+                                <p className="font-bold text-white">Excellence</p>
+                                <p className="text-white/80"> We strive to maintain the highest standards in everything we do—be it events, mentorship, or support.</p>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md p-4 mb-4 rounded-xl border border-white/20">
+                                <p className="font-bold text-white">Learning </p>
+                                <p className="text-white/80"> We promote continuous learning by exposing individuals to real-world challenges, insights, and opportunities.</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20">
-                                <p className="font-bold text-white">Sustainability</p>
-                                <p className="text-white/80">By optimizing resources and processes, we strive to contribute to a more sustainable and efficient digital ecosystem. </p>
+                                <p className="font-bold text-white">Inclusivity  </p>
+                                <p className="text-white/80"> We make entrepreneurship accessible to all, from curious beginners to dedicated founders.</p>
                             </div>
                         </div>
 

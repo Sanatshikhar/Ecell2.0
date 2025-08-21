@@ -34,7 +34,7 @@ const tools = [
     name: "ESummit-2024",
     
     description:
-      "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders. From the Startup EXPO showcasing disruptive ideas to the 24-hour Hackathon turning concepts into prototypes, every session offered actionable insights.",
+      "E-Summit 2024 marked the biggest entrepreneurial conclave organized by the Innovation and Entrepreneurship Cell (IEC) in collaboration with the Atal Incubation Centre (AIC), held on 6–7 April 2024. The summit was preceded by a dynamic flash mob on 4 April, which set the tone for the grand event. Designed as a celebration of innovation and entrepreneurial spirit, E-Summit featured a series of flagship events, including the Ideathon and a 24-hour Hackathon, both conducted in parallel to foster problem-solving and creativity among participants. The summit also hosted an inspiring inauguration ceremony, insightful panel discussions, and interactive sessions with industry leaders. Adding further vibrancy to the occasion, the event included a Marketing Marathon and also witnessed brand promotions by external partners, bringing in a blend of professional exposure and student engagement. With its scale and impact, E-Summit 2024 stood as a landmark initiative of IEC, embodying its mission to nurture entrepreneurship and innovation at SOA.",
     logo: oblive,
     learnMore: "https://www.hubspot.com/",
   },
@@ -80,41 +80,27 @@ const tools = [
 const faqs = [
   {
     question: "What is IEC?",
-    answer: `The Innovation and Entrepreneurship Cell (IEC) is a student-driven initiative at our university aimed at fostering entrepreneurial spirit, innovation, and leadership among students. It serves as a platform for aspiring entrepreneurs to explore their ideas, build on them, and learn real-world business and creative skills through hands-on events and mentorship.`,
+    answer: `The Innovation and Entrepreneurship Cell (IEC) is a student-driven initiative, dedicated to fostering entrepreneurial spirit, innovation, and leadership among students. It provides a platform for aspiring entrepreneurs to explore their ideas, develop them further, and gain real-world business and creative skills. Through hands-on events, workshops, and mentorship, IEC helps students turn their vision into impactful ventures while nurturing their professional growth.`,
   },
   {
     question: "Why should students choose IEC?",
     answer: `Students should choose IEC for several reasons:
              <ul style="margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;">
-              <li>Personality Development</li>
-              <li>Increased Communication and Networking Opportunities</li>
-              <li>Skill Development</li>
-              <li>More Educational and Technical Opportunities</li>
-              <li>Incubation and other methodologies aiding in startup development.</li>
-              <li>Leadership roles and Team experiences that build you up for the future</li>
+              <li>Personality Development – enhancing confidence, creativity, and problem-solving abilities.</li>
+              <li>Communication and Networking Opportunities – connecting with peers, mentors, and industry professionals.</li>
+              <li>Skill Development – gaining practical business, leadership, and entrepreneurial skills.</li>
+              <li>Educational and Technical Exposure – access to workshops, seminars, and hands-on projects.</li>
+              <li>Incubation Support – guidance and resources to nurture startup ideas into reality.</li>
+              <li>Leadership and Team Experiences – preparing students for future professional and entrepreneurial roles.</li>
              </ul>`,
   },
   {
-    question: "How does IEC benefit you?",
-    answer: "Any student of the SOA campus can join IEC.",
-  },
-  {
     question: "What kind of tasks can IEC perform?",
-    answer: "IEC helps you develop real skills in teamwork, communication, leadership, and critical thinking. You also get opportunities to organize impactful events, learn from professionals, and connect with like-minded peers—all of which enhances your confidence and clarity about your future goals.",
+    answer: "IEC is not just a club where tasks are assigned and finished—it’s a family that ideates together, works in teams, debates, quarrels, and from discussing problems to coming up with meaningful solutions, we do it all. Here, you can organize impactful events, learn from professionals, and share your experiences with peers. It’s a space where you build real skills in teamwork, communication, leadership, and critical thinking. At its core, IEC is a body that learns together, grows together, and pushes each member to gain clarity and confidence about their future goals.",
   },
   {
     question: "How to join IEC and what skills do you need?",
-    answer: "Joining IEC is straightforward. Just attend our interview and answer honestly, showing your dedication, passion, and discipline towards the community. <\/ul><br/>Skills:<ul style=\"margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;\"><li>Communication<\/li><li>Teamwork<\/li><li>Creativity<\/li><li>Problem solving<\/li><\/ul>",
-  },
-  {
-    question: "What events has IEC conducted and how has it added value to the students?",
-    answer: `IEC has conducted several impactful events, significantly benefiting students. These include:
-             <ul style="margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;">
-              <li><b>Genovation</b>: Fosters innovation and creative problem-solving skills.</li>
-              <li><b>E-Summit</b>: Enhances entrepreneurial mindset and provides networking opportunities.</li>
-              <li><b>Exa Nova</b>: Develops technical skills and encourages practical application of knowledge.</li>
-             </ul>
-             <p style="margin-top:8px;">Through these hands-on workshops and events, students learn to approach real-world challenges creatively and strategically. Over the years, IEC has also organized pitch competitions, speaker sessions, and case study events, building a vibrant entrepreneurial culture.</p>`,
+    answer: "If you are a student at SOA and have the dedication and the mind to create, you can join IEC. The process is simple—attend our interview and share your thoughts honestly. We are not looking for perfect answers, but for your passion, creativity, and willingness to grow with the community. <\/ul><br/>Skills:<ul style=\"margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;\"><li>Communication<\/li><li>Teamwork<\/li><li>Creativity<\/li><li>Problem solving<\/li><\/ul>",
   },
 ];
 
@@ -212,7 +198,7 @@ function Home() {
               <div className="text-10">
                 <section className="animation">
                   <div className="first text-base sm:text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 mb-1 sm:mb-2">
-                    <div>Think Big, Start Small</div>
+                    <div>Driving ideas Towards Impact</div>
                   </div>
                 </section>
               </div>
@@ -229,8 +215,10 @@ function Home() {
 
             <div className="flex items-center flex-col text-wrap mt-2 sm:mt-[4%] lg:mt-[8%] px-2 sm:px-4">
               <p className="w-full sm:w-4/5 lg:w-[45%] text-wrap text-sm sm:text-lg text-center mb-1 sm:mb-4">
-                Powered by most advanced AI models. FreeOS integrates top AI
-                models into a simple UX, saving you time on implementation.
+              At IEC SOA, we are committed to fostering a culture of innovation, research, and
+              entrepreneurship. By providing mentorship, resources, and opportunities, we empower
+              students to transform ideas into impactful ventures that drive sustainable growth and
+              societal progress.
               </p>
 
               <div className="w-[90%] h-fit flex overflow-hidden gap-6 md:gap-12 cursor-pointer m-auto slider py-4">
@@ -541,11 +529,10 @@ function Home() {
       <main className="bg-black text-white">
         <div className=" px-6 py-12 max-w-7xl mx-auto text-center overflow-hidden">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 break-words">
-            Supercharge Business <br/> Productivity with ECell SOA
+          IDEAS BEGIN AND ENTREPRENEURS EMERGE <br/> 
           </h1>
           <p className="text-white max-w-xl mx-auto mb-10">
-            Our intelligent leads are crafted to think, act, and optimize like
-            experts—driving your success
+          A thriving ecosystem of innovation, research, and entrepreneurship at SOA.
           </p>
         </div>
 
@@ -567,8 +554,7 @@ function Home() {
             Past Events
           </h2>
           <p className="text-white max-w-xl mx-auto mb-10">
-            Customizable AI automations that integrate seamlessly with your
-            tools.
+          “Events That Inspire, Impacts That Last.”
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
             {tools.map((tool, index) => (

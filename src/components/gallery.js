@@ -59,7 +59,7 @@ function Gallery() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center py-20 bg-black">
         <h1 className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent mb-6 tracking-tight text-center drop-shadow-lg uppercase mt-12">Gallery</h1>
-        <p className="text-2xl md:text-3xl text-white/80 max-w-2xl text-center mb-8">A modern showcase of our best moments, events, and creative spirit.</p>
+        <p className="text-2xl md:text-3xl text-white/80 max-w-2xl text-center mb-8">Celebrating creativity, ambition, and changemakers in action.</p>
       </section>
       {/* Carousel Section */}
       <section id="carousel" className="py-16 bg-black ">
