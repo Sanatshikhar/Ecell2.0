@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import pb from "../lib/pocketbase";
 import { sendResendEmail } from "../api/sendResendEmail";
@@ -50,11 +51,11 @@ const RegistrationForm = ({ isOpen, onClose }) => {
     }
   };
 
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-50 min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-4 py-4 bg-gradient-to-br from-blue-800 via-purple-700 to-indigo-900 bg-fixed" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
+      <div className="fixed inset-0 z-[999] min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-4 py-4 bg-gradient-to-br from-blue-800 via-purple-700 to-indigo-900 bg-fixed" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
           <button
-            className="fixed top-6 right-8 text-white hover:text-blue-200 text-4xl font-bold z-50 transition-colors duration-200"
+            className="fixed top-6 right-8 text-white hover:text-blue-200 text-4xl font-bold z-[1000] transition-colors duration-200"
             onClick={onClose}
             aria-label="Close"
             style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
@@ -131,7 +132,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
         </div>
         {/* Success Popup Modal */}
         {showSuccess && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-60">
+          <div className="fixed inset-0 z-[1001] flex items-center justify-center bg-black bg-opacity-60">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto text-center">
               <h3 className="text-2xl font-bold text-green-600 mb-4">Registration Successful!</h3>
               <p className="text-lg text-gray-800 mb-6">For further information, check your mail.</p>
@@ -145,7 +146,8 @@ const RegistrationForm = ({ isOpen, onClose }) => {
           </div>
         )}
       </div>
-    </>
+    </>,
+    document.body
   );
 
 };
