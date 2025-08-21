@@ -1,4 +1,4 @@
-import bgimage from "./pexels-eberhardgross-1287142.png";
+import bgimage from "./Assets/comingSoon.webp";
 import "./all.css";
 import logo from "./logo.png";
 import React, { useState } from "react";
