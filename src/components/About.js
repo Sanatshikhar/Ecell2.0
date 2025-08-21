@@ -14,7 +14,7 @@ function About() {
                         <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh] sm:h-[70vh] mt-[-5%]">
                             <h1 className="font-bold text-5xl md:text-6xl bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent">Who we are</h1>
                             <p className="mt-4 w-[90%] text-wrap text-center text-white/80">
-                                Empowering businesses with cutting-edge AI solutions to streamline operations, enhance <br/>productivity, and drive innovation for a smarter tomorrow.
+                                 businesses with cutting-edge AI solutions to streamline operations, enhance <br/>productivity, and drive innovation for a smarter tomorrow.
                             </p>
                         </div>
 
