@@ -1,0 +1,35 @@
+{
+  "files": {
+    "main.css": "/static/css/main.ae0409a3.css",
+    "main.js": "/static/js/main.2179374e.js",
+    "static/js/453.45d930db.chunk.js": "/static/js/453.45d930db.chunk.js",
+    "static/media/1722692967587 - Shubhangini.jpeg": "/static/media/1722692967587 - Shubhangini.bb275c2d2e0c7e5b9025.jpeg",
+    "static/media/Kiran.jpg": "/static/media/Kiran.5be6c44f7f79cb2f599c.jpg",
+    "static/media/pexels-eberhardgross-1287142.png": "/static/media/pexels-eberhardgross-1287142.07cd3b7d64c10b0e908f.png",
+    "static/media/about.png": "/static/media/about.19896e0bad8e8b644ebe.png",
+    "static/media/Sanat.jpg": "/static/media/Sanat.e7e2ad366a4139a69a60.jpg",
+    "static/media/1728224366006 - Somyashree Nayak.jpg": "/static/media/1728224366006 - Somyashree Nayak.af58eaca393a2f72f186.jpg",
+    "static/media/IMG_20241004_121433 - Pratikshya Dash.jpg": "/static/media/IMG_20241004_121433 - Pratikshya Dash.fa1af8b16ae3d93ffcfc.jpg",
+    "static/media/exanova.png": "/static/media/exanova.4488896d3a69103d7d09.png",
+    "static/media/oblive.png": "/static/media/oblive.1f94a9ccce6ae0b02109.png",
+    "static/media/AB.jpg": "/static/media/AB.bc8a49bcc6cec0279ccd.jpg",
+    "static/media/KK.jpg": "/static/media/KK.b6150e04e57681a0e223.jpg",
+    "static/media/TD.jpg": "/static/media/TD.8daad0f2e5fca5e7b5ee.jpg",
+    "static/media/SM.jpg": "/static/media/SM.dd8acdb588237b9e33b4.jpg",
+    "static/media/SK.jpg": "/static/media/SK.2136bf59c38ab5ab4e39.jpg",
+    "static/media/AS.jpg": "/static/media/AS.eb9336e8235cfe2cf9a2.jpg",
+    "static/media/IMG-20241011-WA0082 - Nabhonil Sarkar.jpg": "/static/media/IMG-20241011-WA0082 - Nabhonil Sarkar.e7449e3e98a0eff403f0.jpg",
+    "static/media/Ms.jpg": "/static/media/Ms.25100e961c624b227a8a.jpg",
+    "static/media/logo.png": "/static/media/logo.f74ad0bd7d4d3fe335ea.png",
+    "static/media/favicon.png": "/static/media/favicon.e4331a8a557ba1646c0d.png",
+    "index.html": "/index.html",
+    "static/media/paw.svg": "/static/media/paw.7f4573e15c6992b18c25.svg",
+    "main.ae0409a3.css.map": "/static/css/main.ae0409a3.css.map",
+    "main.2179374e.js.map": "/static/js/main.2179374e.js.map",
+    "453.45d930db.chunk.js.map": "/static/js/453.45d930db.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ae0409a3.css",
+    "static/js/main.2179374e.js"
+  ]
+}
