@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import pb from '../lib/pocketbase';
@@ -10,6 +9,7 @@ const ResonanceForm = ({ onClose }) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [userType, setUserType] = useState('student');
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -45,12 +45,35 @@ const ResonanceForm = ({ onClose }) => {
   return (
     <div className={styles.formOverlay}>
       <div className={styles.formModal}>
-        <button className={styles.formClose} onClick={onClose}>&times;</button>
-        <h2 className="text-2xl font-bold mb-4 text-[#a259ff]">Resonance Registration</h2>
+  <button className={styles.formClose} onClick={onClose} aria-label="Close">&times;</button>
+  <h2 className="text-2xl font-extrabold mb-4 text-center text-[#4b2aad] tracking-tight">Registration</h2>
         {submitted ? (
           <div className={styles.formSuccess}>Thank you for registering!</div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+            {/* User Type Radio */}
+            <div className="flex gap-6 mb-2">
+              <label className={styles.formLabel} style={{marginBottom:0}}>
+                <input
+                  type="radio"
+                  value="student"
+                  checked={userType === 'student'}
+                  onChange={() => setUserType('student')}
+                  style={{marginRight:'0.5em'}}
+                /> Student
+              </label>
+              <label className={styles.formLabel} style={{marginBottom:0}}>
+                <input
+                  type="radio"
+                  value="faculty"
+                  checked={userType === 'faculty'}
+                  onChange={() => setUserType('faculty')}
+                  style={{marginRight:'0.5em'}}
+                /> Faculty
+              </label>
+            </div>
+
+            {/* Common fields */}
             <label className={styles.formLabel} htmlFor="name">Full Name</label>
             <input
               type="text"
@@ -71,26 +94,6 @@ const ResonanceForm = ({ onClose }) => {
             />
             {errors.email && <span className="text-red-500 text-xs">Email is required</span>}
 
-            <label className={styles.formLabel} htmlFor="course">Course/Branch</label>
-            <input
-              type="text"
-              id="course"
-              {...register("course", { required: true })}
-              placeholder="Course/Branch"
-              className={styles.formInput}
-            />
-            {errors.course && <span className="text-red-500 text-xs">Course/Branch is required</span>}
-
-            <label className={styles.formLabel} htmlFor="regNo">Registration/Application Number</label>
-            <input
-              type="text"
-              id="regNo"
-              {...register("regNo", { required: true })}
-              placeholder="Reg/Application No."
-              className={styles.formInput}
-            />
-            {errors.regNo && <span className="text-red-500 text-xs">Reg/Application No. is required</span>}
-
             <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
             <input
               type="tel"
@@ -101,7 +104,17 @@ const ResonanceForm = ({ onClose }) => {
             />
             {errors.phone && <span className="text-red-500 text-xs">Phone Number is required</span>}
 
+            <label className={styles.formLabel} htmlFor="idCard">Upload Image/College ID</label>
+            <input
+              type="file"
+              id="idCard"
+              accept="image/*,.pdf"
+              {...register("idCard", { required: true })}
+              className={styles.formInput}
+            />
+            {errors.idCard && <span className="text-red-500 text-xs">ID/College Image is required</span>}
 
+            {/* Campus dropdown */}
             <label className={styles.formLabel} htmlFor="campus">Campus</label>
             <select
               id="campus"
@@ -114,24 +127,31 @@ const ResonanceForm = ({ onClose }) => {
             </select>
             {errors.campus && <span className="text-red-500 text-xs">Campus is required</span>}
 
-            <label className={styles.formLabel} htmlFor="idCard">Upload Image/College ID</label>
-            <input
-              type="file"
-              id="idCard"
-              accept="image/*,.pdf"
-              {...register("idCard", { required: true })}
-              className={styles.formInput}
-            />
-            {errors.idCard && <span className="text-red-500 text-xs">ID/College Image is required</span>}
+            {/* Student-only fields */}
+            {userType === 'student' && <>
+              <label className={styles.formLabel} htmlFor="course">Course/Branch</label>
+              <input
+                type="text"
+                id="course"
+                {...register("course", { required: userType === 'student' })}
+                placeholder="Course/Branch"
+                className={styles.formInput}
+              />
+              {errors.course && <span className="text-red-500 text-xs">Course/Branch is required</span>}
 
-            <label className={styles.formLabel} htmlFor="message">Message (optional)</label>
-            <textarea
-              id="message"
-              {...register("message")}
-              placeholder="Message (optional)"
-              className={styles.formInput}
-              rows={3}
-            />
+              <label className={styles.formLabel} htmlFor="regNo">Registration/Application Number</label>
+              <input
+                type="text"
+                id="regNo"
+                {...register("regNo", { required: userType === 'student' })}
+                placeholder="Reg/Application No."
+                className={styles.formInput}
+              />
+              {errors.regNo && <span className="text-red-500 text-xs">Reg/Application No. is required</span>}
+
+              
+            </>}
+
             <button type="submit" className={styles.formButton} disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
           </form>
         )}
