@@ -26,6 +26,8 @@
   margin-right: 1rem;
   border: 1.5px solid #ece6fa;
   animation: popIn 0.25s cubic-bezier(.4,2,.6,1) 1;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 @keyframes popIn {
@@ -55,11 +57,29 @@
   padding: 0.75rem 1rem;
   font-size: 1rem;
   outline: none;
-  transition: border 0.2s;
+  transition: border 0.2s, box-shadow 0.2s;
   font-family: inherit;
   background: #faf8ff;
   box-shadow: 0 1px 4px rgba(162,89,255,0.04);
   margin-bottom: 0.25rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+}
+
+select.formInput {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%234b2aad" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25em;
+  padding-right: 2.5em;
+  cursor: pointer;
+}
+select.formInput:focus {
+  border-color: #a259ff;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.10);
 }
 .formInput:focus {
   border-color: #a259ff;

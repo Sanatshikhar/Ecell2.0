@@ -4,12 +4,18 @@ import sampleEvent from '../components/Assets/Resonance.png';
 import styles from './TechXperience.module.css';
 
 import ResonanceForm from './ResonanceForm';
+import Danza from '../components/Assets/logo/Danza.png';
+import Aic from '../components/Assets/logo/aic.png';
+import Vs from '../components/Assets/logo/VS.png';
+import Spc from '../components/Assets/logo/SPC.png';
+import Smc from '../components/Assets/logo/smc.png';
 
 const sponsors = [
-  { src: logo, alt: 'logoipsum' },
-  { src: logo, alt: 'logoipsum' },
-  { src: logo, alt: 'logoipsum' },
-  { src: logo, alt: 'logoipsum' },
+  { src: Danza, alt: 'Danza' },
+  { src: Aic, alt: 'Aic' },
+  { src: Vs, alt: 'Vs' },
+  { src: Spc, alt: 'Spc' },
+  { src: Smc, alt: 'Smc' },
 
 ];
 
@@ -32,7 +38,7 @@ const TechXperience = () => {
           <div className="mt-20 ml-[-4%] w-full md:w-1/2 flex flex-col gap-4 md:pl-8">
             <span className="text-[#a259ff] font-semibold text-lg md:text-xl">Resonance 2025</span>
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-2">
-              Fuel <span className="text-[#a259ff]">Innovation</span>,<br />Spark Futures
+              Mega <span className="text-[#a259ff]">Orientation</span><br />Session
             </h1>
             <p className="text-base md:text-lg text-[#444] mb-2">
               Discover breakthrough ideas, connect with experts, and unlock the future of technology.
@@ -61,8 +67,8 @@ const TechXperience = () => {
           <h3 className="text-center text-lg md:text-xl font-semibold text-[#a259ff] mb-6">Our Collaborations</h3>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 px-4">
             {sponsors.map((s, i) => (
-              <div key={i} className="bg-white rounded-xl shadow flex items-center justify-center px-8 py-4 min-w-[120px] min-h-[60px]">
-                <img src={s.src} alt={s.alt} className="h-8 object-contain" />
+              <div key={i} className="bg-[#1f1f21] rounded-xl shadow flex items-center justify-center px-8 py-4 min-w-[120px] min-h-[60px]">
+                <img src={s.src} alt={s.alt} className="h-12 object-contain" />
               </div>
             ))}
           </div>

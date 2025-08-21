@@ -1,24 +1,45 @@
-import React, { useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import pb from '../lib/pocketbase';
+import { sendResendEmail } from '../api/sendResendEmail';
 import styles from './TechXperience.module.css';
 
+
 const ResonanceForm = ({ onClose }) => {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    campus: '',
-    message: '',
-  });
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      // Prepare form data for PocketBase
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "idCard" && value && value[0]) {
+          formData.append(key, value[0]);
+        } else {
+          formData.append(key, value);
+        }
+      });
+  await pb.collection('iecReg').create(formData);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    // TODO: Add actual submission logic here
+      // Send email using Resend API
+      try {
+        await sendResendEmail({ to: data.email, name: data.name });
+      } catch (emailErr) {
+        // Optionally log or show error, but don't block registration
+        console.error("Resend email error:", emailErr);
+      }
+
+      setSubmitted(true);
+      reset();
+    } catch (err) {
+      alert("Error submitting registration: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,66 +48,91 @@ const ResonanceForm = ({ onClose }) => {
         <button className={styles.formClose} onClick={onClose}>&times;</button>
         <h2 className="text-2xl font-bold mb-4 text-[#a259ff]">Resonance Registration</h2>
         {submitted ? (
-          <div className="text-green-600 font-semibold text-center py-8">Thank you for registering!</div>
+          <div className={styles.formSuccess}>Thank you for registering!</div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
             <label className={styles.formLabel} htmlFor="name">Full Name</label>
             <input
               type="text"
               id="name"
-              name="name"
+              {...register("name", { required: true })}
               placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
               className={styles.formInput}
             />
+            {errors.name && <span className="text-red-500 text-xs">Name is required</span>}
+
             <label className={styles.formLabel} htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
-              name="email"
+              {...register("email", { required: true })}
               placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
               className={styles.formInput}
             />
+            {errors.email && <span className="text-red-500 text-xs">Email is required</span>}
+
+            <label className={styles.formLabel} htmlFor="course">Course/Branch</label>
+            <input
+              type="text"
+              id="course"
+              {...register("course", { required: true })}
+              placeholder="Course/Branch"
+              className={styles.formInput}
+            />
+            {errors.course && <span className="text-red-500 text-xs">Course/Branch is required</span>}
+
+            <label className={styles.formLabel} htmlFor="regNo">Registration/Application Number</label>
+            <input
+              type="text"
+              id="regNo"
+              {...register("regNo", { required: true })}
+              placeholder="Reg/Application No."
+              className={styles.formInput}
+            />
+            {errors.regNo && <span className="text-red-500 text-xs">Reg/Application No. is required</span>}
+
             <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
             <input
               type="tel"
               id="phone"
-              name="phone"
+              {...register("phone", { required: true })}
               placeholder="Phone Number"
-              value={form.phone}
-              onChange={handleChange}
-              required
               className={styles.formInput}
             />
+            {errors.phone && <span className="text-red-500 text-xs">Phone Number is required</span>}
+
+
             <label className={styles.formLabel} htmlFor="campus">Campus</label>
             <select
               id="campus"
-              name="campus"
-              value={form.campus}
-              onChange={handleChange}
-              required
+              {...register("campus", { required: true })}
               className={styles.formInput}
             >
               <option value="">Select Campus</option>
               <option value="SOA Campus 2">SOA Campus 2</option>
               <option value="SOA Campus 4">SOA Campus 4</option>
             </select>
+            {errors.campus && <span className="text-red-500 text-xs">Campus is required</span>}
+
+            <label className={styles.formLabel} htmlFor="idCard">Upload Image/College ID</label>
+            <input
+              type="file"
+              id="idCard"
+              accept="image/*,.pdf"
+              {...register("idCard", { required: true })}
+              className={styles.formInput}
+            />
+            {errors.idCard && <span className="text-red-500 text-xs">ID/College Image is required</span>}
+
             <label className={styles.formLabel} htmlFor="message">Message (optional)</label>
             <textarea
               id="message"
-              name="message"
+              {...register("message")}
               placeholder="Message (optional)"
-              value={form.message}
-              onChange={handleChange}
               className={styles.formInput}
               rows={3}
             />
-            <button type="submit" className={styles.formButton}>Submit</button>
+            <button type="submit" className={styles.formButton} disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
           </form>
         )}
       </div>
