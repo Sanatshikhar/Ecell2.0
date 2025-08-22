@@ -5,7 +5,7 @@ import styles from './TechXperience.module.css';
 
 import ResonanceForm from './ResonanceForm';
 import Danza from '../components/Assets/logo/Danza.png';
-import Aic from '../components/Assets/logo/aic.png';
+// import Aic from '../components/Assets/logo/aic.png';
 import Vs from '../components/Assets/logo/VS.png';
 import Spc from '../components/Assets/logo/SPC.png';
 import Smc from '../components/Assets/logo/smc.png';
@@ -13,7 +13,7 @@ import Odanza from '../components/Assets/logo/Odanza.jpg';
 
 const sponsors = [
   { src: Danza, alt: 'Danza' },
-  { src: Aic, alt: 'Aic' },
+  // { src: Aic, alt: 'Aic' },
   { src: Vs, alt: 'Vs' },
   { src: Spc, alt: 'Spc' },
   { src: Smc, alt: 'Smc' },
@@ -66,7 +66,7 @@ const TechXperience = () => {
 
         {/* Trusted By Section */}
         <section className="py-8">
-          <h3 className="text-center text-lg md:text-xl font-semibold text-[#a259ff] mb-6">Our Collaborations</h3>
+          <h3 className="text-center text-lg md:text-xl font-semibold text-[#a259ff] mb-6">In Association With</h3>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 px-4">
             {sponsors.map((s, i) => (
               <div key={i} className="bg-[#1f1f21] rounded-xl shadow flex items-center justify-center px-8 py-4 min-w-[120px] min-h-[60px]">
