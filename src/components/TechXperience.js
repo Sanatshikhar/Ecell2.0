@@ -9,6 +9,7 @@ import Aic from '../components/Assets/logo/aic.png';
 import Vs from '../components/Assets/logo/VS.png';
 import Spc from '../components/Assets/logo/SPC.png';
 import Smc from '../components/Assets/logo/smc.png';
+import Odanza from '../components/Assets/logo/Odanza.jpg';
 
 const sponsors = [
   { src: Danza, alt: 'Danza' },
@@ -16,6 +17,7 @@ const sponsors = [
   { src: Vs, alt: 'Vs' },
   { src: Spc, alt: 'Spc' },
   { src: Smc, alt: 'Smc' },
+  { src: Odanza, alt: 'Odanza' }
 
 ];
 
