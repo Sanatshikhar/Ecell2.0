@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import pb from '../lib/pocketbase';
-import { sendResendEmail } from '../api/sendResendEmail';
+// ...existing code...
 import styles from './TechXperience.module.css';
 
 
@@ -25,12 +25,15 @@ const ResonanceForm = ({ onClose }) => {
       });
   await pb.collection('iecReg').create(formData);
 
-      // Send email using Resend API
+      // Send email using Python backend
       try {
-        await sendResendEmail({ to: data.email, name: data.name });
+        await fetch('http://localhost:5000/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: data.email, name: data.name })
+        });
       } catch (emailErr) {
-        // Optionally log or show error, but don't block registration
-        console.error("Resend email error:", emailErr);
+        console.error("Email error:", emailErr);
       }
 
       setSubmitted(true);
