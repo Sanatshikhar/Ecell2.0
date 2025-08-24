@@ -92,22 +92,22 @@ const Home = () => {
 
   const alumni = [
     {
-      name: "Rajesh Kumar",
-      role: "Founder at TechStart",
-      review: "IEC provided me with the platform and resources to transform my idea into a successful startup. The mentorship and networking opportunities were invaluable.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+      name: "Sachin Kumar",
+      role: "Assistant Manager at JSW Group",
+      review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an \"OUT OF THE BOX \" Journey",
+      avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1681490671010?e=1758758400&v=beta&t=NPCw5SlTYTkNsAGbs4AJDPBAPlRmvBSltNGVdHGJ_0w"
     },
     {
-      name: "Priya Sharma",
-      role: "Product Manager at InnovateX",
-      review: "My experience at IEC taught me leadership, teamwork, and problem-solving skills that I use every day in my professional career.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+      name: "Ayush Pattnaik",
+      role: "Software Engineer at Comviva",
+      review: "IEC gave me the platform to explore, learn, and grow beyond the classroom. The guidance, opportunities, and exposure I received here have truly shaped my journey and boosted my confidence. And the best part — I found a cool team for life.",
+      avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1758758400&v=beta&t=Ly9e0rzinvLNhai1jOHxmwJdJOFdHuM07PBfAWTUtwo"
     },
     {
-      name: "Amit Patel",
-      role: "Software Engineer at FutureTech",
-      review: "The hackathons and workshops organized by IEC gave me practical experience that complemented my academic learning and helped me secure my dream job.",
-      avatar: "https://randomuser.me/api/portraits/men/67.jpg"
+      name: "Sanskar Pani",
+      role: "Founder and CEO at SCALE",
+      review: "The Startup Awareness and Mentorship Program at IEC has been a true game-changer for me. Most importantly, it connected me with a passionate and like-minded team that feels like family for life.",
+      avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_200_200/B4EZU4ekvhGgAg-/0/1740409294803?e=2147483647&v=beta&t=iQvTgQZwauemDFRrox8aZJaW54Ez2dc0tHXTiSt6WEs"
     }
   ];
 
@@ -180,7 +180,7 @@ const Home = () => {
                   {/* Logo slider */}
           <div className="w-full mt-6 sm:mt-12 md:mt-20 overflow-x-hidden overflow-y-hidden">
             <div className="flex flex-col items-center">
-              <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent animate-pulse tracking-tight text-center uppercase">Our Partners</h2>
+              <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent  tracking-tight text-center uppercase">In Association With</h2>
               <div className="relative w-full overflow-hidden">
                 <div className="flex items-center gap-8 animate-logo-ticker whitespace-nowrap min-w-max" style={{animation: 'logo-ticker 20s linear infinite'}}>
                   {Array.from({length: 32}).map((_, i) => (
@@ -212,17 +212,17 @@ const Home = () => {
           {/* Speaker slider/grid */}
           <div className="flex flex-nowrap gap-8 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:gap-10 md:overflow-x-visible">
             {[{
-              name: "Dr. Arjun Mehta",
-              role: "Founder, InnovateX",
-              img: "https://randomuser.me/api/portraits/men/45.jpg"
+              name: "Biraja Prasad Rout",
+              role: "Founder, Biggies Burger",
+              img: "https://media.licdn.com/dms/image/v2/D5603AQGrHRyevP3vKA/profile-displayphoto-shrink_400_400/B56ZVwzixiGsAk-/0/1741354316408?e=1758758400&v=beta&t=XLn9I5scZYXS2vQdFP0vQv_-7pg5hPJOu7scIx7Oq9I"
             }, {
-              name: "Ms. Priya Sinha",
-              role: "CEO, FutureMinds",
-              img: "https://randomuser.me/api/portraits/women/65.jpg"
+              name: "Dr. Abhishek Gautam",
+              role: "Founder, Ambula",
+              img: "https://media.licdn.com/dms/image/v2/D5603AQHWw1uKJ4llfA/profile-displayphoto-scale_400_400/B56ZhCT_0GH0Ag-/0/1753459197026?e=1758758400&v=beta&t=ptmPYG811O2MXUoJQ36ndPmMyKY_u_VapdIUBS4I_Ow"
             }, {
-              name: "Mr. Rakesh Verma",
-              role: "CTO, TechBridge",
-              img: "https://randomuser.me/api/portraits/men/32.jpg"
+              name: "Mr.Bibhu Bahalia",
+              role: "Co-Founder, Assava",
+              img: "https://media.licdn.com/dms/image/v2/C5603AQGoXkOXqrA_OQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1588930901707?e=1758758400&v=beta&t=PasaVRel-JoZTeRVyOBjbbBnz8Lx4DbnYsJQEiRRhYA"
             }].map((sp, i) => (
               <div key={i} className="group bg-black rounded-3xl shadow-xl min-w-[260px] max-w-xs mx-auto p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30">
                 <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
