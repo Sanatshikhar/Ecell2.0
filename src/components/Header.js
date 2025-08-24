@@ -45,7 +45,7 @@ const Header = () => {
         className="bg-white h-[45px] w-[110px] md:w-[130px] lg:w-[150px] rounded-3xl text-black font-semibold text-center justify-center px-4 md:px-6 lg:px-8 items-center transition hover:bg-black hover:text-white hover:scale-105 border-white border-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#a259ff] flex"
         style={{fontSize:'1rem',letterSpacing:'0.02em',boxSizing:'border-box'}}
       >
-        Join Us
+        Resonance
       </Link>
     </div>
 
@@ -140,7 +140,7 @@ const Header = () => {
               style={{fontSize:'1rem',letterSpacing:'0.02em',marginTop:'8px'}}
               onClick={toggleMenu}
             >
-              Join Us
+              Resonance
             </Link>
           </div>
         </div>
