@@ -44,7 +44,7 @@ function App() {
         <Route path="/join" element={<Join />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
-        <Route path="/coomingsonn" element={<ComingSoon />} />
+        <Route path="/comingsoon" element={<ComingSoon />} />
       </Routes>
     </Router>
   );

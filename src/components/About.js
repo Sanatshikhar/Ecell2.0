@@ -40,7 +40,7 @@ function About() {
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
                 <div className="absolute top-3/4 right-1/4 w-40 h-40 sm:w-60 sm:h-60 lg:w-80 lg:h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                <div className="absolute bottom-1/4 left-1/3 w-36 h-36 sm:w-54 sm:h-54 lg:w-72 lg:h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+                <div className="absolute bottom-1/4 left-1/3 w-36 h-36 sm:w-54 sm:h-54 lg:w-72 lg:h-72 rounded-full blur-3xl animate-pulse delay-2000" style={{backgroundColor: '#B909F01A'}}></div>
             </div>
 
             <div className="relative z-10">
@@ -48,11 +48,11 @@ function About() {
                     {/* Hero Section */}
                     <section className="flex flex-col justify-center items-center min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 pt-20 sm:pt-24 md:pt-28 lg:pt-32">
                         <div className="text-center max-w-7xl mx-auto w-full">
-                            <h1 className="font-bold text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400 bg-clip-text text-transparent mb-4 sm:mb-6 md:mb-8 animate-fade-in leading-tight">
+                            <h1 className="font-bold text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl bg-gradient-to-r from-[#7F5AF0] via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-4 sm:mb-6 md:mb-8 animate-fade-in leading-tight">
                                 Who we are
                             </h1>
                             <div className="relative max-w-5xl mx-auto">
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-orange-500/20 blur-xl rounded-2xl"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#7F5AF0]/20 via-purple-500/20 to-[#B909F0]/20 blur-xl rounded-2xl"></div>
                                 <p className="relative text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed text-gray-300 bg-black/40 backdrop-blur-sm p-3 xs:p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl animate-slide-up">
                                     At E-Cell SOA, we are committed to nurturing the spirit of entrepreneurship by providing
                                     a platform where ideas transform into impactful ventures. Through interactive
@@ -81,13 +81,13 @@ function About() {
                                 >
                                     <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-xl p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl h-full transition-all duration-300 hover:shadow-blue-500/20 hover:border-blue-500/30">
                                         <div className="flex flex-col sm:flex-row items-start sm:items-center mb-3 sm:mb-4 md:mb-6">
-                                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 md:mr-4 flex-shrink-0 transition-transform duration-300 hover:scale-110">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-[#7F5AF0] to-[#B909F0] rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 md:mr-4 flex-shrink-0 transition-transform duration-300 hover:scale-110">
                                                 <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </div>
-                                            <h2 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Our Vision</h2>
+                                            <h2 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl bg-gradient-to-r from-[#7F5AF0] to-[#B909F0] bg-clip-text text-transparent">Our Vision</h2>
                                         </div>
                                         <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg lg:text-xl">
                                             Entrepreneurs are visionary thinkers, innovators, and changemakers who shape society for a brighter future. At E-Cell SOA, our vision is to empower these changemakers by
@@ -106,14 +106,14 @@ function About() {
                                             : 'opacity-0 translate-y-10'
                                     }`}
                                 >
-                                    <div className="bg-gradient-to-br from-purple-500/10 to-orange-500/10 backdrop-blur-xl p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl h-full transition-all duration-300 hover:shadow-purple-500/20 hover:border-purple-500/30">
+                                    <div className="bg-gradient-to-br from-purple-500/10 to-[#B909F0]/10 backdrop-blur-xl p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl h-full transition-all duration-300 hover:shadow-purple-500/20 hover:border-purple-500/30">
                                         <div className="flex flex-col sm:flex-row items-start sm:items-center mb-3 sm:mb-4 md:mb-6">
-                                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 md:mr-4 flex-shrink-0 transition-transform duration-300 hover:scale-110">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-[#B909F0] rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 md:mr-4 flex-shrink-0 transition-transform duration-300 hover:scale-110">
                                                 <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                 </svg>
                                             </div>
-                                            <h2 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl bg-gradient-to-r from-purple-400 to-orange-400 bg-clip-text text-transparent">Our Mission</h2>
+                                            <h2 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl bg-gradient-to-r from-purple-400 to-[#B909F0] bg-clip-text text-transparent">Our Mission</h2>
                                         </div>
                                         <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg lg:text-xl">
                                             At E-Cell SOA, our mission is to cultivate an entrepreneurial mindset among students
@@ -139,7 +139,7 @@ function About() {
                                         : 'opacity-0 translate-y-10'
                                 }`}
                             >
-                                <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400 bg-clip-text text-transparent mb-3 sm:mb-4 md:mb-6">
+                                <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#7F5AF0] via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-3 sm:mb-4 md:mb-6">
                                     Our Core Values
                                 </h2>
                                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400">Building great big things starts with a decision</p>
@@ -151,37 +151,37 @@ function About() {
                                         title: "Innovation",
                                         description: "We believe in fostering creativity and encouraging bold ideas that redefine possibilities.",
                                         icon: "💡",
-                                        gradient: "from-blue-500 to-cyan-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     },
                                     {
                                         title: "Collaboration",
                                         description: "We value teamwork and partnerships, creating a supportive ecosystem where entrepreneurs can grow together.",
                                         icon: "🤝",
-                                        gradient: "from-purple-500 to-pink-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     },
                                     {
                                         title: "Impact",
                                         description: "We aim to empower ventures that bring meaningful change to society and the economy.",
                                         icon: "🌍",
-                                        gradient: "from-green-500 to-emerald-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     },
                                     {
                                         title: "Excellence",
                                         description: "We strive to maintain the highest standards in everything we do—be it events, mentorship, or support.",
                                         icon: "⭐",
-                                        gradient: "from-yellow-500 to-orange-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     },
                                     {
                                         title: "Learning",
                                         description: "We promote continuous learning by exposing individuals to real-world challenges, insights, and opportunities.",
                                         icon: "📚",
-                                        gradient: "from-indigo-500 to-purple-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     },
                                     {
                                         title: "Inclusivity",
                                         description: "We make entrepreneurship accessible to all, from curious beginners to dedicated founders.",
                                         icon: "🌈",
-                                        gradient: "from-pink-500 to-rose-500"
+                                        gradient: "from-[#7F5AF0] to-[#B909F0]"
                                     }
                                 ].map((value, index) => (
                                     <div 
@@ -230,7 +230,7 @@ function About() {
                                 {[
                                     { number: "50+", label: "Customers", gradient: "from-blue-500 to-cyan-500" },
                                     { number: "20+", label: "Members", gradient: "from-purple-500 to-pink-500" },
-                                    { number: "8", label: "Countries", gradient: "from-orange-500 to-red-500" }
+                                    { number: "8", label: "Countries", gradient: "from-purple-800 to-red-500" }
                                 ].map((stat, index) => (
                                     <div 
                                         key={index}
@@ -265,7 +265,7 @@ function About() {
                                         : 'opacity-0 translate-y-10'
                                 }`}
                             >
-                                <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400 bg-clip-text text-transparent mb-6 sm:mb-8 md:mb-12 lg:mb-16">
+                                <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-purple-700 bg-clip-text text-transparent mb-6 sm:mb-8 md:mb-12 lg:mb-16">
                                     On a way towards AGI
                                 </h3>
                             </div>
