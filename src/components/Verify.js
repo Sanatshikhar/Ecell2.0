@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import pb from '../lib/pocketbase';
 import QrScanner from 'qr-scanner';
+import axios from 'axios';
 
 const Verify = () => {
   const [status, setStatus] = useState(null); // 'verified', 'already', 'invalid'
@@ -10,6 +11,8 @@ const Verify = () => {
   const [scannerActive, setScannerActive] = useState(false);
   const [verifiedName, setVerifiedName] = useState('');
   const [inputDevices, setInputDevices] = useState([]);
+  const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
+  const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
   const videoRef = useRef(null);
   const scannerRef = useRef(null);
 
@@ -178,6 +181,51 @@ const Verify = () => {
   setScannerActive(true); // Resume scanner only after user clicks Next
   };
 
+  // Bulk email function
+  const sendBulkEmails = async () => {
+    setBulkMailStatus({ step: 'fetching', count: 0, sent: 0 });
+    // Fetch all registrations (or filter as needed)
+    const registrations = await pb.collection('iecReg').getFullList();
+    const unsent = registrations.filter(r => !r.mailSent);
+    if (unsent.length === 0) {
+      setBulkMailStatus({ step: 'none', count: 0, sent: 0 });
+      return;
+    }
+    setBulkMailStatus({ step: 'found', count: unsent.length, sent: 0 });
+    await new Promise(res => setTimeout(res, 1000));
+    setBulkMailStatus({ step: 'sending', count: unsent.length, sent: 0 });
+    let sentCount = 0;
+    for (const user of unsent) {
+      let token = user.qr_token;
+      if (!token) {
+        if (window.crypto && window.crypto.randomUUID) {
+          token = window.crypto.randomUUID();
+        } else {
+          token = Math.random().toString(36).substr(2, 16);
+        }
+        try {
+          await pb.collection('iecReg').update(user.id, { qr_token: token });
+        } catch (err) {
+          continue;
+        }
+      }
+      try {
+        const backendUrl = process.env.BACKEND_URL;
+        await fetch(`${backendUrl}/api/send-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: user.email, name: user.name, token })
+        });
+        await pb.collection('iecReg').update(user.id, { mailSent: true });
+        sentCount++;
+        setBulkMailStatus({ step: 'sending', count: unsent.length, sent: sentCount });
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    setBulkMailStatus({ step: 'done', count: unsent.length, sent: sentCount });
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#181a20] px-2 sm:px-4 py-4">
       <div className="bg-[#23263a] rounded-2xl shadow-2xl p-0 sm:p-0 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col items-center relative" style={{boxShadow:'0 8px 32px #0008'}}>
@@ -227,6 +275,56 @@ const Verify = () => {
           </div>
         )}
       </div>
+      <button
+        onClick={() => setShowBulkMailPopup(true)}
+        className="bg-yellow-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg mt-6 hover:bg-yellow-800 transition"
+      >
+        Email not received?
+      </button>
+      {showBulkMailPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
+          <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-xs w-full">
+            {bulkMailStatus.step === 'idle' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Send bulk emails to all users who haven't received one?</span>
+            )}
+            {bulkMailStatus.step === 'fetching' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Checking for unmailed registrations...</span>
+            )}
+            {bulkMailStatus.step === 'none' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4">No unmailed registration found.</span>
+            )}
+            {bulkMailStatus.step === 'found' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-yellow-400 mt-2 mb-4">{bulkMailStatus.count} unmailed registration{bulkMailStatus.count > 1 ? 's' : ''} found.</span>
+            )}
+            {bulkMailStatus.step === 'sending' && (
+              <>
+                <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Sending {bulkMailStatus.count} emails...</span>
+                <div className="w-full bg-gray-700 rounded-full h-4 mb-4">
+                  <div className="bg-violet-700 h-4 rounded-full transition-all duration-300" style={{ width: `${(bulkMailStatus.sent / bulkMailStatus.count) * 100}%` }}></div>
+                </div>
+                <span className="text-sm text-white">{bulkMailStatus.sent} / {bulkMailStatus.count} sent</span>
+              </>
+            )}
+            {bulkMailStatus.step === 'done' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4">{bulkMailStatus.sent} emails sent successfully!</span>
+            )}
+            {bulkMailStatus.step === 'idle' && (
+              <button
+                onClick={sendBulkEmails}
+                className="bg-violet-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg mt-2 hover:bg-violet-900 transition"
+              >
+                Send Bulk Emails
+              </button>
+            )}
+            <button
+              onClick={() => { setShowBulkMailPopup(false); setBulkMailStatus({ step: 'idle', count: 0, sent: 0 }); }}
+              className="bg-gray-600 text-white font-bold px-6 py-2 rounded-xl shadow-lg mt-4 hover:bg-gray-800 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
