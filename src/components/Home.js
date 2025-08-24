@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { CardSpotlight } from "../ui/card-spotlight.jsx";
 import logo from "./logo.png";
 import Footer from "./footer.js";
 import Cs from "./Assets/comingSoon.webp";
 import { AnimatedText } from "./animation/homeani.tsx";
+import Rposter from "./Assets/Resonance.png";
+import resonance from "./Assets/Resonance Campus 2 (9 x 5 in) (4).png";
+import Exanova from "./Assets/Exanova Results.png";
+import PExanova from "./Assets/exanova.png";
 import oblive from "./Assets/oblive.png";
-import Exanova from "./Assets/exanova.png";
+import Boblive from "./Assets/oblive.jpg";
 // Speaker section background refinement
 
 const Home = () => {
+  const navigate = useNavigate();
   const [openIndex, setOpenIndex] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [popupEvent, setPopupEvent] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,47 +35,27 @@ const Home = () => {
 
   const tools = [
     {
-      name: "ESummit-2024",
-      description: "E-Summit 2024 marked the biggest entrepreneurial conclave organized by the Innovation and Entrepreneurship Cell (IEC) in collaboration with the Atal Incubation Centre (AIC), held on 6–7 April 2024.",
-      logo: oblive,
-      image: oblive,
+      name: "Resonance-25",
+      description: `Mega Orientation Session Discover breakthrough ideas, connect with experts, and unlock the future of technology.`,
+      logo: Rposter,
+      image: resonance,
       learnMore: "#",
     },
     {
-      name: "Symposium",
-      description: "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders.",
-      logo: Exanova,
+      name: "Oblive",
+      description: "Oblive was more than a farewell—it was a heartfelt tribute, guiding us to cherish memories, embrace growth, and carry forward the spirit of unity. A night of gratitude, laughter, and inspiration, marking beautiful endings and new beginnings.",
+      logo: oblive,
+      image: Boblive,
+      learnMore: "#",
+    },
+    {
+      name: "Exanova",
+      description: "The event featured dynamic brainstorming, real-world case study challenges, and creative marketing pitches, where participants collaborated, innovated, debated, and showcased skills—celebrating creativity, problem-solving, and entrepreneurial spirit with standout winners.",
+      logo: PExanova,
       image: Exanova,
       learnMore: "#",
     },
-    {
-      name: "Genovation 8.0",
-      description: "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders.",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGKQNpE5KbwgQjYkdxK6sLoEyhPeacS7RKgw&s",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGKQNpE5KbwgQjYkdxK6sLoEyhPeacS7RKgw&s",
-      learnMore: "#",
-    },
-    {
-      name: "Startup Yatra",
-      description: "Optimize Social Engagement & Ads with AI",
-      logo: "https://cdn.pixabay.com/photo/2021/06/15/12/14/instagram-6338393_1280.png",
-      image: "https://cdn.pixabay.com/photo/2021/06/15/12/14/instagram-6338393_1280.png",
-      learnMore: "#",
-    },
-    {
-      name: "Coffee break saturdys",
-      description: "See us on LinkedIn",
-      logo: "https://yt3.googleusercontent.com/i6KNxiy3gME-BulL4WnuGkTGqHuSYF8jl1WRn0rXftcJdSYK7dHKcJ3gLAaPc-KfhmLSYPwf824=s900-c-k-c0x00ffffff-no-rj",
-      image: "https://yt3.googleusercontent.com/i6KNxiy3gME-BulL4WnuGkTGqHuSYF8jl1WRn0rXftcJdSYK7dHKcJ3gLAaPc-KfhmLSYPwf824=s900-c-k-c0x00ffffff-no-rj",
-      learnMore: "#",
-    },
-    {
-      name: "SOA Internship fair",
-      description: "Streamline Workflows with AI-Powered Data Management",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpGgFGW9P4mxFxsH1j-ezX2gn6hnTsYo1fg&s",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpGgFGW9P4mxFxsH1j-ezX2gn6hnTsYo1fg&s",
-      learnMore: "#",
-    },
+    
   ];
 
   const faqs = [
@@ -257,25 +244,41 @@ const Home = () => {
                 style={{
                   background: `linear-gradient(180deg,rgba(96,165,250,0.08) 0%,rgba(0,0,0,0.98) 100%), url('/src/assets/event-card-bg.png') center/cover, #000`
                 }}
+                onClick={() => setPopupEvent(tool)}
               >
                 <div className="absolute inset-0 z-0">
                   <img src={tool.image} alt={tool.name} className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500" style={{opacity:0.7}} />
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 via-purple-500/10 to-transparent group-hover:from-blue-500/30 group-hover:via-purple-500/20 transition-all duration-500"></div>
                 </div>
-                <div className="relative z-10 p-6 flex flex-col items-center justify-end min-h-[180px]">
-                  <img src={tool.logo} alt={tool.name} className="w-16 h-16 rounded-full object-contain mb-2 shadow-lg border-2 border-blue-400/60 bg-black/60" />
+                <div className="relative z-10 p-6 flex flex-col items-center justify-center min-h-[220px]">
+                  <div className="flex justify-center items-center w-full mb-4">
+                    <img src={tool.logo} alt={tool.name} className="w-28 h-28 rounded-full object-contain shadow-lg border-4 border-blue-400/60 bg-black/60" />
+                  </div>
                   <h3 className="text-2xl font-bold text-blue-400 text-center drop-shadow mb-2 group-hover:text-blue-300 transition-colors">{tool.name}</h3>
-                  <p className="text-white/90 text-center text-base font-medium opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-4 transition-all duration-500">
-                    {tool.description}
-                  </p>
                 </div>
               </div>
             ))}
           </div>
+          {/* Popup for event description */}
+          {popupEvent && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setPopupEvent(null)}>
+              <div className="relative max-w-lg w-full mx-4 bg-black rounded-2xl border-4 border-blue-400 shadow-2xl p-8 flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
+                <button onClick={() => setPopupEvent(null)} className="absolute top-2 right-2 text-white text-3xl font-bold bg-black/60 rounded-full px-3 py-1 hover:bg-black/90 transition-colors">&times;</button>
+                <div className="flex justify-center items-center w-full mb-6">
+                  <img src={popupEvent.logo} alt={popupEvent.name} className="w-32 h-32 rounded-full object-contain shadow-lg border-4 border-blue-400/60 bg-black/60" />
+                </div>
+                <h3 className="text-2xl font-bold text-blue-400 text-center mb-4">{popupEvent.name}</h3>
+                <p className="text-white/90 text-center text-base font-medium mb-2">{popupEvent.description}</p>
+              </div>
+            </div>
+          )}
           <div className="flex justify-center mt-10">
-            <a href="#" className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-lg shadow-lg hover:scale-105 transition-transform duration-300">
+            <button
+              className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-lg shadow-lg hover:scale-105 transition-transform duration-300"
+              onClick={() => navigate('/ComingSoon')}
+            >
               Explore All Events &rarr;
-            </a>
+            </button>
           </div>
         </div>
       </section>

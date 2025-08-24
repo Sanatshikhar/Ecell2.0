@@ -52,7 +52,7 @@ function About() {
                                 Who we are
                             </h1>
                             <div className="relative max-w-5xl mx-auto">
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#7F5AF0]/20 via-purple-500/20 to-[#B909F0]/20 blur-xl rounded-2xl"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] blur-2xl opacity-10 rounded-2xl"></div>
                                 <p className="relative text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed text-gray-300 bg-black/40 backdrop-blur-sm p-3 xs:p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl animate-slide-up">
                                     At E-Cell SOA, we are committed to nurturing the spirit of entrepreneurship by providing
                                     a platform where ideas transform into impactful ventures. Through interactive
@@ -228,9 +228,9 @@ function About() {
                             
                             <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 xs:grid-cols-2 md:grid-cols-3">
                                 {[
-                                    { number: "50+", label: "Customers", gradient: "from-blue-500 to-cyan-500" },
-                                    { number: "20+", label: "Members", gradient: "from-purple-500 to-pink-500" },
-                                    { number: "8", label: "Countries", gradient: "from-purple-800 to-red-500" }
+                                    { number: "80+", label: "Members", gradient: "from-blue-500 to-cyan-500" },
+                                    { number: "250+", label: "Alumnies", gradient: "from-purple-500 to-pink-500" },
+                                    { number: "5+", label: "Startups", gradient: "from-purple-800 to-red-500" }
                                 ].map((stat, index) => (
                                     <div 
                                         key={index}

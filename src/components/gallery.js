@@ -1,40 +1,80 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Footer from "./footer";
-import Shubhangini from "./Assets/Team Image/1722692967587 - Shubhangini.jpeg";
-import Somyashree from "./Assets/Team Image/1728224366006 - Somyashree Nayak.jpg";
-import Nabhonil from "./Assets/Team Image/IMG-20241011-WA0082 - Nabhonil Sarkar.jpg";
-import Pratikshya from "./Assets/Team Image/IMG_20241004_121433 - Pratikshya Dash.jpg";
-import Kiran from "./Assets/Team Image/Kiran.jpg";
-import Sanat from "./Assets/Team Image/Sanat.jpg";
-import KK from "./Assets/Team Image/KK.jpg";
-import Ms from "./Assets/Team Image/Ms.jpg";
-import SK from "./Assets/Team Image/SK.jpg";
-import SM from "./Assets/Team Image/SM.jpg";
-import TD from "./Assets/Team Image/TD.jpg";
-import AB from "./Assets/Team Image/AB.jpg";
-import AS from "./Assets/Team Image/AS.jpg";
+// Import images from Gallery directory
+// Explicitly import all images from the Gallery directory
+
+import Img1 from "./Assets/Gallery/Copy of DSC00770.jpg";
+import Img2 from "./Assets/Gallery/Copy of DSC04852.jpg";
+import Img3 from "./Assets/Gallery/Copy of DSC04806.jpg";
+import Img4 from "./Assets/Gallery/20250523_180254.jpg";
+import Img5 from "./Assets/Gallery/20250523_180041.jpg";
+import Img6 from "./Assets/Gallery/1748099946757.jpg";
+import Img7 from "./Assets/Gallery/171A7644.JPG";
+import Img8 from "./Assets/Gallery/Copy of IMG_4094-Enhanced-NR.jpg";
+import Img9 from "./Assets/Gallery/171A7637.JPG";
+import Img10 from "./Assets/Gallery/Copy of IMG_6031.jpg";
+import Img11 from "./Assets/Gallery/Copy of IMG_4101.jpg";
+import Img12 from "./Assets/Gallery/171A7635.JPG";
+import Img13 from "./Assets/Gallery/171A7625.JPG";
+import Img14 from "./Assets/Gallery/DSC03982.JPG";
+import Img15 from "./Assets/Gallery/171A7622.JPG";
+import Img16 from "./Assets/Gallery/171A7614.JPG";
+import Img17 from "./Assets/Gallery/171A7612.JPG";
+import Img18 from "./Assets/Gallery/171A7601.JPG";
+import Img19 from "./Assets/Gallery/171A7535.JPG";
+import Img20 from "./Assets/Gallery/171A7533 (1).JPG";
+import Img21 from "./Assets/Gallery/171A7500.JPG";
+import Img22 from "./Assets/Gallery/DSC04063.JPG";
+import Img23 from "./Assets/Gallery/DSC04007.JPG";
+import Img24 from "./Assets/Gallery/171A7485.JPG";
+import Img25 from "./Assets/Gallery/171A7462.JPG";
+import Img26 from "./Assets/Gallery/171A7446.JPG";
+import Img27 from "./Assets/Gallery/DSC04210.JPG";
+import Img28 from "./Assets/Gallery/171A7443.JPG";
+import Img29 from "./Assets/Gallery/171A7415.JPG";
+import Img30 from "./Assets/Gallery/171A7409.JPG";
+import Img31 from "./Assets/Gallery/IMG_7434.JPG";
+import Img32 from "./Assets/Gallery/IMG_4111.jpg";
+import Img33 from "./Assets/Gallery/IMG_4036.jpg";
+import Img34 from "./Assets/Gallery/IMG_1807.jpg";
+import Img35 from "./Assets/Gallery/IMG-20250529-WA0078.jpg";
+import Img36 from "./Assets/Gallery/IMG-20250529-WA0069.jpg";
+import Img37 from "./Assets/Gallery/IMG-20250529-WA0066.jpg";
+import Img38 from "./Assets/Gallery/IMG-20250529-WA0062.jpg";
+import Img39 from "./Assets/Gallery/EDITTED  (96).JPG";
+import Img40 from "./Assets/Gallery/DSC_0270.jpg";
+import Img41 from "./Assets/Gallery/DSC_0122.jpg";
+import Img42 from "./Assets/Gallery/DSC_0120.jpg";
+import Img43 from "./Assets/Gallery/DSC_0060.jpg";
+import Img44 from "./Assets/Gallery/DSC_0032.jpg";
+import Img45 from "./Assets/Gallery/DSC04971.jpg";
+import Img46 from "./Assets/Gallery/DSC04968.jpg";
+// ...continue for all images in the directory...
+
+const allGalleryImages = [
+  Img1, Img2, Img3, Img4, Img5, Img6, Img7, Img8, Img9, Img10,
+  Img11, Img12, Img13, Img14, Img15, Img16, Img17, Img18, Img19, Img20,
+  Img21, Img22, Img23, Img24, Img25, Img26, Img27, Img28, Img29, Img30,
+  Img31, Img32, Img33, Img34, Img35, Img36, Img37, Img38, Img39, Img40,
+  Img41, Img42, Img43, Img44, Img45, Img46
+].map((img, idx) => ({ name: `Gallery ${idx + 1}`, image: img }));
 // ...existing code...
 
-const galleryImages = [
-  { name: "Shubhangini", image: Shubhangini },
-  { name: "Somyashree Nayak", image: Somyashree },
-  { name: "Nabhonil Sarkar", image: Nabhonil },
-  { name: "Pratikshya Dash", image: Pratikshya },
-  { name: "Kiran Panigrahi", image: Kiran },
-  { name: "Sanat Sikhar Sinha", image: Sanat },
-  { name: "KK", image: KK },
-  { name: "Ms", image: Ms },
-  { name: "SK", image: SK },
-  { name: "SM", image: SM },
-  { name: "TD", image: TD },
-  { name: "AB", image: AB },
-  { name: "AS", image: AS },
-];
 
-const carouselImages = [
-  Shubhangini, Somyashree, Nabhonil, Pratikshya, Kiran, Sanat, KK, Ms, SK, SM, TD, AB, AS
-];
+const galleryImages = allGalleryImages;
+const carouselImages = allGalleryImages.map(img => img.image);
+
+// Filter for landscape images (width > height in filename or by known landscape files)
+// If you want to be more precise, you can manually select landscape images by their filenames
+const landscapeImages = allGalleryImages.filter(imgObj => {
+  // Heuristic: filenames with 'wide', 'landscape', or known landscape files
+  // Or, if you know which are landscape, list them here:
+  const landscapeList = [
+    Img39, Img27, Img33, Img46, Img41, Img31, Img15, Img1, Img2, Img24,
+  ];
+  return landscapeList.includes(imgObj.image);
+});
 
 function getBoxClass(idx) {
   const styles = [
@@ -50,23 +90,35 @@ function getBoxClass(idx) {
   return styles[idx % styles.length];
 }
 
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function Gallery() {
+  const [popupImg, setPopupImg] = useState(null);
+  const [popupAlt, setPopupAlt] = useState("");
+  const closePopup = () => setPopupImg(null);
+  const [shuffledImages] = useState(() => shuffleArray(allGalleryImages));
+  // Only use landscape images for highlights
+  const shuffledHighlights = shuffleArray(landscapeImages.map(img => img.image));
   return (
     <div className="bg-black min-h-screen font-sans">
-  {/* Aurora background removed */}
+      {/* Aurora background removed */}
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center py-20 bg-black">
-  <h1 className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-6 tracking-tight text-center drop-shadow-lg uppercase mt-12">Gallery</h1>
-        <p className="text-2xl md:text-3xl text-white/80 max-w-2xl text-center mb-8">Celebrating creativity, ambition, and changemakers in action.</p>
-      </section>
+
       {/* Carousel Section */}
       <section id="carousel" className="py-16 bg-black ">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-12">Gallery Highlights</h2>
-          <div className="relative w-full overflow-hidden  border-2 border-white">
-            <div className="flex gap-10 animate-carousel">
-              {carouselImages.slice(0, 8).map((img, idx) => (
-                <div key={idx} className="min-w-[400px] h-[260px] rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0]">
+        <div className="w-full">
+          <h2 className="text-7xl font-bold text-center mb-8 pt-20 pb-3 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent ">Highlights</h2>
+          <div className="relative w-full overflow-hidden bg-black">
+            <div className="flex gap-8 animate-logo-ticker whitespace-nowrap min-w-max py-8" style={{ animation: 'logo-ticker 90s linear infinite', minHeight: '320px' }}>
+              {[...shuffledHighlights, ...shuffledHighlights].map((img, idx) => (
+                <div key={idx} className="min-w-[600px] max-w-[600px] h-[300px] flex items-center justify-center rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] mx-2">
                   <img src={img} alt="Highlight" className="object-cover w-full h-full" loading="lazy" />
                 </div>
               ))}
@@ -74,12 +126,12 @@ function Gallery() {
           </div>
         </div>
         <style>{`
-          @keyframes carousel {
+          @keyframes logo-ticker {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
-          .animate-carousel {
-            animation: carousel 30s linear infinite;
+          .animate-logo-ticker {
+            animation: logo-ticker 90s linear infinite;
           }
         `}</style>
       </section>
@@ -87,41 +139,33 @@ function Gallery() {
       <section id="gallery" className="py-20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#3d81f6] to-[#b80bf0] bg-clip-text text-transparent uppercase tracking-wide">Our Collection</h2>
-          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-10 space-y-10">
-            {galleryImages.map((img, idx) => (
-              <div
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
+            {shuffledImages.map((img, idx) => (
+              <img
                 key={idx}
-                className={`gallery-photo-box break-inside-avoid bg-gradient-to-r from-[#232526] via-[#414345] to-[#232526] rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 group relative overflow-hidden`}
-                style={{ marginBottom: '2rem', display: 'inline-block' }}
-              >
-                <img
-                  src={img.image}
-                  alt={img.name}
-                  className={`object-cover w-full rounded-2xl transition-transform duration-500 group-hover:scale-105 ${getBoxClass(idx)}`}
-                  style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.32)" }}
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                  <span className="text-white text-2xl font-bold drop-shadow-lg mb-2">{img.name}</span>
-                </div>
-              </div>
+                src={img.image}
+                alt={img.name}
+                className="w-full mb-4 rounded-xl shadow-lg break-inside-avoid object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
+                style={{ display: 'block', width: '100%', borderRadius: '1rem', boxShadow: '0 4px 24px rgba(0,0,0,0.32)' }}
+                loading="lazy"
+                onClick={() => { setPopupImg(img.image); setPopupAlt(img.name); }}
+              />
             ))}
           </div>
+          {/* Popup Modal */}
+          {popupImg && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={closePopup}>
+              <div className="relative max-w-3xl w-full mx-4" onClick={e => e.stopPropagation()}>
+                <button onClick={closePopup} className="absolute top-2 right-2 text-white text-3xl font-bold bg-black/60 rounded-full px-3 py-1 hover:bg-black/90 transition-colors">&times;</button>
+                <img src={popupImg} alt={popupAlt} className="w-full max-h-[80vh] object-contain rounded-xl border-4 border-white shadow-2xl bg-black" />
+              </div>
+            </div>
+          )}
         </div>
       </section>
-      {/* About Section */}
-      {/* <section id="about" className="py-20 bg-black text-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-5xl font-bold mb-6 uppercase tracking-wide">About IEC Gallery</h2>
-          <p className="text-2xl mb-8">IEC Gallery is a celebration of creativity, innovation, and memories. Our collection features highlights from events, team moments, and the vibrant spirit of our community.</p>
-        </div>
-      </section> */}
-      {/* Footer */}
+      
       <Footer />
-                        {/* Ensure footer is above animation */}
-                        <style>{`
-                            footer { position: relative; z-index: 20; }
-                        `}</style>
+
     </div>
   );
 }
