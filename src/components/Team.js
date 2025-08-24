@@ -2,29 +2,28 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Footer from "./footer.js";
 import Card3D from "./Card3D";
-import Kiran from "./Assets/Team Image/Kiran.jpg"
-import Pd from "./Assets/Team Image/IMG_20241004_121433 - Pratikshya Dash.jpg"
-import Ns from "./Assets/Team Image/IMG-20241011-WA0082 - Nabhonil Sarkar.jpg"
-import Sss from "./Assets/Team Image/Sanat.jpg"
-import Sn from "./Assets/Team Image/1728224366006 - Somyashree Nayak.jpg"
-import S from "./Assets/Team Image/1722692967587 - Shubhangini.jpeg"
-import AP from "./Assets/Team Image/AB.jpg"
-import TD from "./Assets/Team Image/TD.jpg"
-import AS from "./Assets/Team Image/AS.jpg"
-import KK from "./Assets/Team Image/KK.jpg"
-import SK from "./Assets/Team Image/SK.jpg"
-import SM from "./Assets/Team Image/SM.jpg"
-import Ms from "./Assets/Team Image/Ms.jpg"
-// ...existing code...
+import Kiran from "./Assets/Team Image/Kiran.jpg";
+import PD from "./Assets/Team Image/PD.jpg";
+import NS from "./Assets/Team Image/NS.jpg";
+import Sss from "./Assets/Team Image/Sanat.jpg";
+import Sn from "./Assets/Team Image/SN.jpg";
+import S from "./Assets/Team Image/S.jpeg";
+import AP from "./Assets/Team Image/AB.jpg";
+import TD from "./Assets/Team Image/TD.jpg";
+import AS from "./Assets/Team Image/AS.jpg";
+import KK from "./Assets/Team Image/KK.jpg";
+import SK from "./Assets/Team Image/SK.jpg";
+import SM from "./Assets/Team Image/SM.jpg";
+import Ms from "./Assets/Team Image/Ms.jpg";
 const agents = [
     { name: "Kiran Panigrahi", role: "President", link: "https://www.linkedin.com/in/kiran-panigrahi-996223202/", image: Kiran },
-    { name: "Pratikshya Dash", role: "Vice-President", link: "https://www.linkedin.com/in/pratikshya-dash/", image: Pd },
+    { name: "Pratikshya Dash", role: "Vice-President", link: "https://www.linkedin.com/in/pratikshya-dash/", image: PD },
     { name: "Abhay Prakash", role: "Advisor", link: "https://www.linkedin.com/in/abhay-prakash-ab143a262/", image: AP },
     { name: "Mimansa Satpathy", role: "Treasurer", link: "https://www.linkedin.com/in/mimansa-satpathy/", image: Ms },
     { name: "Tiyash Das Gupta", role: "Manager", link: "https://www.linkedin.com/in/tiyash13/++", image: TD },
     { name: "Sanat Sikhar Sinha", role: "Technical Team", link: "/TechTeam", image: Sss },
     { name: "Arnab Sahoo", role: "Design Team", link: "#", image: AS },
-    { name: "Nobhonil Sarkar", role: "Media Team", link: "#", image: Ns },
+    { name: "Nobhonil Sarkar", role: "Media Team", link: "#", image: NS },
     { name: "Samarth Kumar", role: "Event-Management Team", link: "#", image: SK },
     { name: "Stuti Mishra", role: "Content Team", link: "#", image: SM },
     { name: "Kumari Shubhangini", role: "Public-Relations Team", link: "#", image: S },
