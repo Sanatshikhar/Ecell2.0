@@ -16,7 +16,7 @@ const Header = () => {
   <div className="fixed bg-black bg-opacity-20 backdrop-blur-md rounded-3xl w-[80%] md:w-[90%] lg:w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] flex items-center z-50 box-border transition-none px-4 md:px-8 lg:px-12">
     {/* Logo */}
     <div className="flex items-center h-full flex-shrink-0">
-      <img src={logo} alt="Logo" className="w-[60px] md:w-[80px] lg:w-[100px] max-h-[50px] md:max-h-[60px] lg:max-h-[80px] object-contain" />
+      <img src={logo} alt="Logo" className="w-[90px] md:w-[120px] lg:w-[150px] max-h-[80px] md:max-h-[100px] lg:max-h-[120px] object-contain" />
     </div>
 
     {/* Menu Links (Tablet/Laptop/Big Screens) */}
