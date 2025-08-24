@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { CardSpotlight } from "../ui/card-spotlight.jsx";
 import logo from "./logo.png";
 import Footer from "./footer.js";
@@ -166,9 +167,12 @@ const Home = () => {
                     From Sparks to Stars: IEC Welcomes You
                     </p>
                     {/* CTA Button */}
-                  <a href="#" className="inline-block mt-4 sm:mt-8 px-4 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-xs xs:text-sm sm:text-lg shadow-lg hover:scale-105 transition-transform duration-300">
-                  Join IEC Now
-                  </a>
+                  <Link
+                    to="/members"
+                    className="inline-block mt-4 sm:mt-8 px-4 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-xs xs:text-sm sm:text-lg shadow-lg hover:scale-105 transition-transform duration-300"
+                  >
+                    Join IEC Now
+                  </Link>
                   <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm mt-6 sm:mt-10 max-w-full sm:max-w-2xl text-gray-400 px-1 sm:px-0">
                   At IEC SOA, we are committed to fostering a culture of innovation, research, and entrepreneurship. By providing mentorship, resources, and opportunities, we empower students to transform ideas into impactful ventures.
                   </p>

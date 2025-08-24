@@ -41,7 +41,7 @@ const Header = () => {
     {/* Join Us Button (Tablet/Laptop/Big Screens) - right aligned */}
     <div className="hidden md:flex flex-shrink-0 items-center ml-auto">
       <Link
-        to="/members"
+        to="/Join"
         className="bg-white h-[45px] w-[110px] md:w-[130px] lg:w-[150px] rounded-3xl text-black font-semibold text-center justify-center px-4 md:px-6 lg:px-8 items-center transition hover:bg-black hover:text-white hover:scale-105 border-white border-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#a259ff] flex"
         style={{fontSize:'1rem',letterSpacing:'0.02em',boxSizing:'border-box'}}
       >
@@ -135,7 +135,7 @@ const Header = () => {
               Contact
             </NavLink>
             <Link
-              to="/members"
+              to="/Join"
               className="bg-black text-white font-semibold py-2 px-6 rounded-3xl transition md:hidden w-full max-w-[220px] text-center shadow-md focus:outline-none focus:ring-2 focus:ring-[#a259ff]"
               style={{fontSize:'1rem',letterSpacing:'0.02em',marginTop:'8px'}}
               onClick={toggleMenu}
