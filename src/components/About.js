@@ -1,13 +1,11 @@
 
 import image from "./about.png";
-import Animation from "./Assets/AuroraBackground.js"
+// ...existing code...
 import Footer from "./footer.js";
 function About() {
     return (
         <div className="min-h-screen bg-black relative overflow-hidden">
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Animation />
-      </div>
+            {/* Aurora background removed */}
             <div className=" relative z-10">
                 <div>
                     <main className="text-white">

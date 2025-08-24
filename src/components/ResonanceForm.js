@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import pb from '../lib/pocketbase';
-// ...existing code...
 import styles from './TechXperience.module.css';
 
 
@@ -14,7 +13,18 @@ const ResonanceForm = ({ onClose }) => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // Prepare form data for PocketBase
+      // Check for duplicate email in PocketBase
+      const existing = await pb.collection('iecReg').getList(1, 1, { filter: `email="${data.email}"` });
+      if (existing.items.length > 0) {
+        alert("This email is already registered.");
+        setLoading(false);
+        return;
+      }
+
+      // Generate unique token
+      const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 16);
+
+      // Prepare form data for PocketBase, including token and mailSent: false
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         if (key === "idCard" && value && value[0]) {
@@ -23,17 +33,31 @@ const ResonanceForm = ({ onClose }) => {
           formData.append(key, value);
         }
       });
-  await pb.collection('iecReg').create(formData);
+      formData.append('qr_token', token);
+      formData.append('mailSent', 'false');
+      const record = await pb.collection('iecReg').create(formData);
 
-      // Send email using Python backend
+      const verificationUrl = `https://yourdomain.com/verify?token=${token}`;
+
+      // Use BACKEND_URL from environment variables
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+      let emailSuccess = false;
       try {
-        await fetch('http://localhost:5000/api/send-email', {
+        const res = await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to: data.email, name: data.name })
+          body: JSON.stringify({ to: data.email, name: data.name, token })
         });
+        if (res.ok) {
+          emailSuccess = true;
+        }
       } catch (emailErr) {
         console.error("Email error:", emailErr);
+      }
+
+      // If email sent successfully, update mailSent to true
+      if (emailSuccess && record && record.id) {
+        await pb.collection('iecReg').update(record.id, { mailSent: true });
       }
 
       setSubmitted(true);
@@ -62,6 +86,7 @@ const ResonanceForm = ({ onClose }) => {
                   value="student"
                   checked={userType === 'student'}
                   onChange={() => setUserType('student')}
+                  {...register("userType")}
                   style={{marginRight:'0.5em'}}
                 /> Student
               </label>
@@ -71,6 +96,7 @@ const ResonanceForm = ({ onClose }) => {
                   value="faculty"
                   checked={userType === 'faculty'}
                   onChange={() => setUserType('faculty')}
+                  {...register("userType")}
                   style={{marginRight:'0.5em'}}
                 /> Faculty
               </label>

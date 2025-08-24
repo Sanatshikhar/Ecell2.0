@@ -7,7 +7,7 @@ import Cs from "./Assets/comingSoon.webp";
 import { AnimatedText } from "./animation/homeani.tsx"
 import oblive from "./Assets/oblive.png"
 import Exanova from "./Assets/exanova.png"
-import Animation from "./Assets/AuroraBackground.js"
+// ...existing code...
 const agents = [
   { name: "To Be Announced", role: "Speaker", image: Cs },
   { name: "To Be Announced", role: "Speaker", image: Cs },
@@ -187,10 +187,8 @@ function Home() {
     
     <div className="overflow-x-hidden relative" style={{ minHeight: '100vh' }}>
       
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Animation />
-      </div>
-      <div className="bg-black text-white relative" style={{ zIndex: -1}}>
+  {/* Aurora background removed */}
+  <div className="bg-black text-white relative" style={{ zIndex: -1}}>
         <div className="bgchild">
           <main className="">
             <div className="flex flex-col justify-center items-center mt-[15vh] sm:mt-[25vh] min-h-[40vh] pt-2 sm:pt-8">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import pb from "../lib/pocketbase";
-// ...existing code...
 import logo from "./logo.png";
 
 
@@ -34,11 +33,12 @@ const RegistrationForm = ({ isOpen, onClose }) => {
           formData.append(key, value);
         }
       });
-      await pb.collection('iecReg').create(formData);
+      await pb.collection('Reg').create(formData);
 
-      // Send email using Python backend
+      // Send email using Node.js backend (nodemailer)
       try {
-        await fetch('http://localhost:5000/api/send-email', {
+        const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+        await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ to: data.email, name: data.name })

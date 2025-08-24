@@ -2,14 +2,14 @@
 import Footer from "./footer";
 import React, { useState } from "react";
 import RegistrationForm from "./RegistrationForm";
-import AuroraBackground from "./Assets/AuroraBackground";
+// ...existing code...
 function Join() {
     const [showForm, setShowForm] = useState(false);
     return (
         <div className="relative min-h-screen bg-black">
             {/* Aurora background animation */}
             <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
-                <AuroraBackground />
+// ...existing code...
             </div>
             {/* Main content and registration popup */}
             <div className="relative min-h-screen flex flex-col justify-center items-center z-10">

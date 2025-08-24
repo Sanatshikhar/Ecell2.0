@@ -1,14 +1,12 @@
 
 import Footer from "./footer";
-import Animation from "./Assets/AuroraBackground.js"
+// ...existing code...
 
 
 function Contact() {
     return (
         <div className="bg-black">
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Animation />
-      </div>
+            {/* Aurora background removed */}
             <div className="bg-black">
                 <div>
                     <main className="relative top-16 mb-20">

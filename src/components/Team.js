@@ -15,7 +15,7 @@ import KK from "./Assets/Team Image/KK.jpg"
 import SK from "./Assets/Team Image/SK.jpg"
 import SM from "./Assets/Team Image/SM.jpg"
 import Ms from "./Assets/Team Image/Ms.jpg"
-import Animation from "./Assets/AuroraBackground.js"
+// ...existing code...
 const agents = [
     { name: "Kiran Panigrahi", role: "President", link: "https://www.linkedin.com/in/kiran-panigrahi-996223202/", image: Kiran },
     { name: "Pratikshya Dash", role: "Vice-President", link: "https://www.linkedin.com/in/pratikshya-dash/", image: Pd },
@@ -36,9 +36,7 @@ function Team() {
     return (
         <div>
             <div className="team-section-container" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: 'black' }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Animation />
-      </div>
+                {/* Aurora background removed */}
                 <div className="bg-black" >
                     <main>
                         <div className="flex flex-col justify-center items-center lg:h-[100vh] max-sm:h-[70vh]  sm:h-[70vh] mt-[-5%]">

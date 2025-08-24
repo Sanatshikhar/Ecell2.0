@@ -14,7 +14,7 @@ import SM from "./Assets/Team Image/SM.jpg";
 import TD from "./Assets/Team Image/TD.jpg";
 import AB from "./Assets/Team Image/AB.jpg";
 import AS from "./Assets/Team Image/AS.jpg";
-import Animation from "./Assets/AuroraBackground.js"
+// ...existing code...
 
 const galleryImages = [
   { name: "Shubhangini", image: Shubhangini },
@@ -53,9 +53,7 @@ function getBoxClass(idx) {
 function Gallery() {
   return (
     <div className="bg-black min-h-screen font-sans">
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Animation />
-      </div>
+  {/* Aurora background removed */}
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center py-20 bg-black">
         <h1 className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent mb-6 tracking-tight text-center drop-shadow-lg uppercase mt-12">Gallery</h1>
