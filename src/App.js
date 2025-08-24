@@ -9,6 +9,7 @@ import Team from "./components/Team";
 import TechTeam from "./components/TechTeam";
 import Members from "./components/Join";
 import Join from "./components/TechXperience";
+import ComingSoon from "./components/ComingSoon";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Verify from './components/Verify';
@@ -43,6 +44,7 @@ function App() {
         <Route path="/join" element={<Join />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
+        <Route path="/coomingsonn" element={<ComingSoon />} />
       </Routes>
     </Router>
   );
