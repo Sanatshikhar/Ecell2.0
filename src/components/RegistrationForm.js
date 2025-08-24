@@ -37,7 +37,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
 
       // Send email using Node.js backend (nodemailer)
       try {
-        const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
         await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

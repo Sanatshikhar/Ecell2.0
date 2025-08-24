@@ -39,8 +39,8 @@ const ResonanceForm = ({ onClose }) => {
 
       const verificationUrl = `https://yourdomain.com/verify?token=${token}`;
 
-      // Use BACKEND_URL from environment variables
-      const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+  // Use REACT_APP_BACKEND_URL from environment variables
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
       let emailSuccess = false;
       try {
         const res = await fetch(`${backendUrl}/api/send-email`, {
