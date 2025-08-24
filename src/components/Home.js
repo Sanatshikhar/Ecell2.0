@@ -1,627 +1,369 @@
-import bgimage from "./Assets/HomePageImg.JPG";
-import "./all.css";
+import React, { useState, useEffect } from "react";
+import { CardSpotlight } from "../ui/card-spotlight.jsx";
 import logo from "./logo.png";
-import React, { useState } from "react";
 import Footer from "./footer.js";
 import Cs from "./Assets/comingSoon.webp";
-import { AnimatedText } from "./animation/homeani.tsx"
-import oblive from "./Assets/oblive.png"
-import Exanova from "./Assets/exanova.png"
-// ...existing code...
-const agents = [
-  { name: "To Be Announced", role: "Speaker", image: Cs },
-  { name: "To Be Announced", role: "Speaker", image: Cs },
-  { name: "To Be Announced", role: "Speaker", image: Cs },
-];
+import { AnimatedText } from "./animation/homeani.tsx";
+import oblive from "./Assets/oblive.png";
+import Exanova from "./Assets/exanova.png";
+// Speaker section background refinement
 
-
-document.addEventListener('scroll', () => {
-    document.documentElement.dataset.scroll = window.scrollY;
-});
-
-
-
-
-
-
-
-
-
-
-
-const tools = [
-  {
-    name: "ESummit-2024",
-    
-    description:
-      "E-Summit 2024 marked the biggest entrepreneurial conclave organized by the Innovation and Entrepreneurship Cell (IEC) in collaboration with the Atal Incubation Centre (AIC), held on 6–7 April 2024. The summit was preceded by a dynamic flash mob on 4 April, which set the tone for the grand event. Designed as a celebration of innovation and entrepreneurial spirit, E-Summit featured a series of flagship events, including the Ideathon and a 24-hour Hackathon, both conducted in parallel to foster problem-solving and creativity among participants. The summit also hosted an inspiring inauguration ceremony, insightful panel discussions, and interactive sessions with industry leaders. Adding further vibrancy to the occasion, the event included a Marketing Marathon and also witnessed brand promotions by external partners, bringing in a blend of professional exposure and student engagement. With its scale and impact, E-Summit 2024 stood as a landmark initiative of IEC, embodying its mission to nurture entrepreneurship and innovation at SOA.",
-    logo: oblive,
-    learnMore: "https://www.hubspot.com/",
-  },
- {
-    name: "Symposium",
-    
-    description:
-      "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders. From the Startup EXPO showcasing disruptive ideas to the 24-hour Hackathon turning concepts into prototypes, every session offered actionable insights.",
-    logo: Exanova,
-    learnMore: "https://www.hubspot.com/",
-  },
-   {
-    name: "Genovation 8.0",
-    
-    description:
-      "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders. From the Startup EXPO showcasing disruptive ideas to the 24-hour Hackathon turning concepts into prototypes, every session offered actionable insights.",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGKQNpE5KbwgQjYkdxK6sLoEyhPeacS7RKgw&s",
-    learnMore: "https://www.hubspot.com/",
-  },
-  {
-    name: "Startup Yatra",
-    year: "2022 passout",
-    description: "Optimize Social Engagement & Ads with AI",
-    logo: "https://cdn.pixabay.com/photo/2021/06/15/12/14/instagram-6338393_1280.png",
-    learnMore: "https://www.instagram.com/ecellsoau?igsh=MWx5dXRxaTZva2o5cw==",
-  },
-  {
-    name: "Coffee break saturdys",
-    year: "2022 passout",
-    description: "see us on linkedin",
-    logo: "https://yt3.googleusercontent.com/i6KNxiy3gME-BulL4WnuGkTGqHuSYF8jl1WRn0rXftcJdSYK7dHKcJ3gLAaPc-KfhmLSYPwf824=s900-c-k-c0x00ffffff-no-rj",
-    learnMore: "https://www.linkedin.com/company/iecsoa/",
-  },
-  {
-    name: "SOA Internship fair",
-    year: "2022 passout",
-    description: "Streamline Workflows with AI-Powered Data Management",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpGgFGW9P4mxFxsH1j-ezX2gn6hnTsYo1fg&s",
-    learnMore: "https://www.airtable.com/company/trademark-guidelines",
-  },
-];
-
-const faqs = [
-  {
-    question: "What is IEC?",
-    answer: `The Innovation and Entrepreneurship Cell (IEC) is a student-driven initiative, dedicated to fostering entrepreneurial spirit, innovation, and leadership among students. It provides a platform for aspiring entrepreneurs to explore their ideas, develop them further, and gain real-world business and creative skills. Through hands-on events, workshops, and mentorship, IEC helps students turn their vision into impactful ventures while nurturing their professional growth.`,
-  },
-  {
-    question: "Why should students choose IEC?",
-    answer: `Students should choose IEC for several reasons:
-             <ul style="margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;">
-              <li>Personality Development – enhancing confidence, creativity, and problem-solving abilities.</li>
-              <li>Communication and Networking Opportunities – connecting with peers, mentors, and industry professionals.</li>
-              <li>Skill Development – gaining practical business, leadership, and entrepreneurial skills.</li>
-              <li>Educational and Technical Exposure – access to workshops, seminars, and hands-on projects.</li>
-              <li>Incubation Support – guidance and resources to nurture startup ideas into reality.</li>
-              <li>Leadership and Team Experiences – preparing students for future professional and entrepreneurial roles.</li>
-             </ul>`,
-  },
-  {
-    question: "What kind of tasks can IEC perform?",
-    answer: "IEC is not just a club where tasks are assigned and finished—it’s a family that ideates together, works in teams, debates, quarrels, and from discussing problems to coming up with meaningful solutions, we do it all. Here, you can organize impactful events, learn from professionals, and share your experiences with peers. It’s a space where you build real skills in teamwork, communication, leadership, and critical thinking. At its core, IEC is a body that learns together, grows together, and pushes each member to gain clarity and confidence about their future goals.",
-  },
-  {
-    question: "How to join IEC and what skills do you need?",
-    answer: "If you are a student at SOA and have the dedication and the mind to create, you can join IEC. The process is simple—attend our interview and share your thoughts honestly. We are not looking for perfect answers, but for your passion, creativity, and willingness to grow with the community. <\/ul><br/>Skills:<ul style=\"margin-top:8px;margin-bottom:8px;padding-left:20px;list-style-type:disc;\"><li>Communication<\/li><li>Teamwork<\/li><li>Creativity<\/li><li>Problem solving<\/li><\/ul>",
-  },
-];
-
-export function AIAgentFAQ() {
+const Home = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-  const toggle = (index) => {
+  useEffect(() => {
+    const handleScroll = () => {
+      document.documentElement.dataset.scroll = window.scrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const tools = [
+    {
+      name: "ESummit-2024",
+      description: "E-Summit 2024 marked the biggest entrepreneurial conclave organized by the Innovation and Entrepreneurship Cell (IEC) in collaboration with the Atal Incubation Centre (AIC), held on 6–7 April 2024.",
+      logo: oblive,
+      image: oblive,
+      learnMore: "#",
+    },
+    {
+      name: "Symposium",
+      description: "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders.",
+      logo: Exanova,
+      image: Exanova,
+      learnMore: "#",
+    },
+    {
+      name: "Genovation 8.0",
+      description: "The SOA E-Summit 2024 was a powerful convergence of innovation and entrepreneurship, designed to inspire and equip future leaders.",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGKQNpE5KbwgQjYkdxK6sLoEyhPeacS7RKgw&s",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGKQNpE5KbwgQjYkdxK6sLoEyhPeacS7RKgw&s",
+      learnMore: "#",
+    },
+    {
+      name: "Startup Yatra",
+      description: "Optimize Social Engagement & Ads with AI",
+      logo: "https://cdn.pixabay.com/photo/2021/06/15/12/14/instagram-6338393_1280.png",
+      image: "https://cdn.pixabay.com/photo/2021/06/15/12/14/instagram-6338393_1280.png",
+      learnMore: "#",
+    },
+    {
+      name: "Coffee break saturdys",
+      description: "See us on LinkedIn",
+      logo: "https://yt3.googleusercontent.com/i6KNxiy3gME-BulL4WnuGkTGqHuSYF8jl1WRn0rXftcJdSYK7dHKcJ3gLAaPc-KfhmLSYPwf824=s900-c-k-c0x00ffffff-no-rj",
+      image: "https://yt3.googleusercontent.com/i6KNxiy3gME-BulL4WnuGkTGqHuSYF8jl1WRn0rXftcJdSYK7dHKcJ3gLAaPc-KfhmLSYPwf824=s900-c-k-c0x00ffffff-no-rj",
+      learnMore: "#",
+    },
+    {
+      name: "SOA Internship fair",
+      description: "Streamline Workflows with AI-Powered Data Management",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpGgFGW9P4mxFxsH1j-ezX2gn6hnTsYo1fg&s",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpGgFGW9P4mxFxsH1j-ezX2gn6hnTsYo1fg&s",
+      learnMore: "#",
+    },
+  ];
+
+  const faqs = [
+    {
+      question: "What is IEC?",
+      answer: "The Innovation and Entrepreneurship Cell (IEC) is a student-driven initiative, dedicated to fostering entrepreneurial spirit, innovation, and leadership among students.",
+    },
+    {
+      question: "Why should students choose IEC?",
+      answer: "Students should choose IEC for several reasons including Personality Development, Communication and Networking Opportunities, Skill Development, and more.",
+    },
+    {
+      question: "What kind of tasks can IEC perform?",
+      answer: "IEC is not just a club where tasks are assigned and finished—it's a family that ideates together, works in teams, debates, quarrels, and from discussing problems to coming up with meaningful solutions.",
+    },
+    {
+      question: "How to join IEC and what skills do you need?",
+      answer: "If you are a student at SOA and have the dedication and the mind to create, you can join IEC. The process is simple—attend our interview and share your thoughts honestly.",
+    },
+  ];
+
+  const alumni = [
+    {
+      name: "Rajesh Kumar",
+      role: "Founder at TechStart",
+      review: "IEC provided me with the platform and resources to transform my idea into a successful startup. The mentorship and networking opportunities were invaluable.",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+    },
+    {
+      name: "Priya Sharma",
+      role: "Product Manager at InnovateX",
+      review: "My experience at IEC taught me leadership, teamwork, and problem-solving skills that I use every day in my professional career.",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+    },
+    {
+      name: "Amit Patel",
+      role: "Software Engineer at FutureTech",
+      review: "The hackathons and workshops organized by IEC gave me practical experience that complemented my academic learning and helped me secure my dream job.",
+      avatar: "https://randomuser.me/api/portraits/men/67.jpg"
+    }
+  ];
+
   return (
-    
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      
-      <div
-        className="w-full max-w-6xl faq-bg rounded-2xl p-8"
-        style={{
-          background: 'rgba(0, 41, 59, 0.25)', // slate-800 with opacity
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-        }}
-      >
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-white">
-          Got questions for us?
-        </h1>
-        <p className="text-center text-white mb-8">
-          Our team are crafted to think, act and optimize like experts—driving your success
-        </p>
-        <div className="space-y-4">
-          {faqs.map((faq, index) => {
-            const isOpen = openIndex === index;
-            return (
-              <div
-              key={index}
-              className={`group rounded-2xl overflow-hidden cursor-pointer`}
-              onClick={() => toggle(index)}
-              style={{
-                background: 'rgba(0, 41, 59, 0.35)', // slate-800 with opacity
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-              }}
-              >
-              <div className="px-6 py-5 flex flex-col space-y-2">
-                <div className="flex flow-root justify-between items-center">
-                <span
-                  className={`
-                font-medium duration-300
-                ${isOpen ? 'text-[#C392FA]' : 'text-white'}
-                `}
-                >
-                  {faq.question}
-                </span>
-                <svg className={`w-6 h-6 text-white float-end transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 9-7 7-7-7" />
-                </svg>
+  <div className="min-h-screen bg-black text-white overflow-x-hidden text-[12px] sm:text-[14px] md:text-base">
+      {/* Hero Section */}
+  <section className="relative flex items-center justify-center min-h-[60vh] xs:min-h-[70vh] sm:min-h-[80vh] md:min-h-screen overflow-hidden bg-black pt-16 xs:pt-20 sm:pt-24 md:pt-32">
+        {/* Decorative Vectors */}
+        <svg className="absolute top-0 left-0 w-40 h-40 opacity-40 z-0" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="100" fill="url(#paint0_radial)" />
+          <defs>
+            <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientTransform="translate(100 100) scale(100)" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#7F5AF0" stopDriving Ideas Towards ImpactOpacity="0.7" />
+              <stop offset="1" stopColor="#232946" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+        <svg className="absolute bottom-0 right-0 w-56 h-56 opacity-30 z-0" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="110" cy="110" rx="110" ry="80" fill="url(#paint1_radial)" />
+          <defs>
+            <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientTransform="translate(110 110) scale(110 80)" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FCA311" stopOpacity="0.5" />
+              <stop offset="1" stopColor="#232946" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+        <svg className="absolute top-10 right-1/3 w-32 h-32 opacity-20 z-0" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="100" height="100" rx="30" fill="url(#paint2_radial)" />
+          <defs>
+            <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientTransform="translate(60 60) scale(60)" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#00C9A7" stopOpacity="0.4" />
+              <stop offset="1" stopColor="#232946" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+        {/* Background elements */}
+        <div className="absolute top-[-20%] left-[-20%] w-[70vw] h-[70vh] bg-blue-700/30 rounded-full blur-[100px] opacity-80"></div>
+        <div className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vh] bg-blue-700/30 rounded-full blur-[100px] opacity-80"></div>
+        
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
+        {/* Content */}
+  <div className="relative z-10 flex flex-col items-center justify-center mt-8 sm:mt-12 md:mt-20 px-2 sm:px-4 text-center w-full max-w-full">
+          <AnimatedText 
+            text="Innovation and Entrepreneurship Cell" 
+            className="text-base text-white xs:text-lg sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-2 sm:mb-4 px-1 sm:px-0"
+          />
+           {/* Animated subtitle */}
+                    {/* <div className="text-4xl xs:text-xl sm:text-3xl md:text-4xl font-bold text-purple-300 animate-pulse mb-1 sm:mb-2 px-1 sm:px-0">
+                    Innovation and Entrepreneurship Cell
+                    </div> */}
+                    <div className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-2 sm:mb-3 px-1 sm:px-0 pb-3">
+                    Driving Ideas Towards Impact
+                    </div>
+                    <p className="text-lg xs:text-xl sm:text-3xl md:text-4xl font-semibold mt-0 sm:mt-4 max-w-full sm:max-w-3xl px-1 sm:px-0">
+                    From Sparks to Stars: IEC Welcomes You
+                    </p>
+                    {/* CTA Button */}
+                  <a href="#" className="inline-block mt-4 sm:mt-8 px-4 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-xs xs:text-sm sm:text-lg shadow-lg hover:scale-105 transition-transform duration-300">
+                  Join IEC Now
+                  </a>
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm mt-6 sm:mt-10 max-w-full sm:max-w-2xl text-gray-400 px-1 sm:px-0">
+                  At IEC SOA, we are committed to fostering a culture of innovation, research, and entrepreneurship. By providing mentorship, resources, and opportunities, we empower students to transform ideas into impactful ventures.
+                  </p>
+
+                  {/* Logo slider */}
+          <div className="w-full mt-6 sm:mt-12 md:mt-20 overflow-x-hidden overflow-y-hidden">
+            <div className="flex flex-col items-center">
+              <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent animate-pulse tracking-tight text-center uppercase">Our Partners</h2>
+              <div className="relative w-full overflow-hidden">
+                <div className="flex items-center gap-8 animate-logo-ticker whitespace-nowrap min-w-max" style={{animation: 'logo-ticker 20s linear infinite'}}>
+                  {Array.from({length: 32}).map((_, i) => (
+                    <div key={i} className="w-12 xs:w-16 sm:w-24 h-10 xs:h-14 sm:h-20 md:w-40 md:h-32 flex-shrink-0">
+                      <img
+                        src={logo}
+                        alt="Partner logo"
+                        className="w-full h-full object-contain opacity-50 hover:opacity-100 transition-opacity duration-300"
+                      />
+                    </div>
+                  ))}
                 </div>
-
-                <div
-                className={`
-                text-sm transition-all duration-300 ease-in-out
-                ${isOpen ? 'max-h-40 opacity-100 text-white' : 'max-h-0 opacity-0 text-white'}
-                ${isOpen ? 'overflow-y-auto' : 'overflow-hidden'}
-              `}
-                style={isOpen ? { maxHeight: '10rem' } : { maxHeight: 0 }}
-                dangerouslySetInnerHTML={{ __html: `Answer: ${faq.answer}` }}
-                />
               </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-
-  );
-}
-
-function Home() {
-  return (
-    
-    <div className="overflow-x-hidden relative" style={{ minHeight: '100vh' }}>
-      
-  {/* Aurora background removed */}
-  <div className="bg-black text-white relative" style={{ zIndex: -1}}>
-        <div className="bgchild">
-          <main className="">
-            <div className="flex flex-col justify-center items-center mt-[15vh] sm:mt-[25vh] min-h-[40vh] pt-2 sm:pt-8">
-              <AnimatedText text="Innovation and Entrepreneurship Cell" className="text-xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-4 break-words text-center"/>
-              <div className="text-10">
-                <section className="animation">
-                  <div className="first text-base sm:text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 mb-1 sm:mb-2">
-                    <div>Driving ideas Towards Impact</div>
-                  </div>
-                </section>
-              </div>
-              <p className="text-sm sm:text-lg md:text-3xl mt-1 sm:mt-1 font-bold mx-2 sm:mx-[6%] text-center">
-                From Sparks to Stars: IEC Welcomes You
-              </p>
             </div>
-
-            <img
-              className="w-[95%] max-sm:w-[75%] sm:w-[80%] mt-2 sm:mt-[8%] h-[32vh] sm:h-[50vh] lg:h-auto lg:w-[70%] border-white border-2 block m-auto rounded-xl max-w-[1500px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] transition-all duration-1000 ease-in-out tilt"
-              style={{ transformStyle: "preserve-3d" }}
-              src={bgimage}
-            />
-
-            <div className="flex items-center flex-col text-wrap mt-2 sm:mt-[4%] lg:mt-[8%] px-2 sm:px-4">
-              <p className="w-full sm:w-4/5 lg:w-[45%] text-wrap text-sm sm:text-lg text-center mb-1 sm:mb-4">
-              At IEC SOA, we are committed to fostering a culture of innovation, research, and
-              entrepreneurship. By providing mentorship, resources, and opportunities, we empower
-              students to transform ideas into impactful ventures that drive sustainable growth and
-              societal progress.
-              </p>
-
-              <div className="w-[90%] h-fit flex overflow-hidden gap-6 md:gap-12 cursor-pointer m-auto slider py-4">
-                <div className="flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track ">
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center ">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div >
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-
-                  
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div >
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                </div>
-                <div className=" flex flex-shrink-0 min-w-full justify-between items-center gap-6 md:gap-12 slide-track">
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div >
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-
-                    
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div >
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-                  </div>
-                  <div className="w-[150px] h-[120px] md:w-[250px] md:h-[200px] flex justify-center">
-                    <img
-                      className="w-full object-contain"
-                      src={logo}
-                      alt="Logo"
-                    />
-
-                    
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </main>
+          </div>
         </div>
-      </div>
-      <main className="bg-black text-white">
-        <div className=" px-6 py-12 max-w-7xl mx-auto text-center overflow-hidden">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 break-words">
-          IDEAS BEGIN AND ENTREPRENEURS EMERGE <br/> 
-          </h1>
-          <p className="text-white max-w-xl mx-auto mb-10">
-          A thriving ecosystem of innovation, research, and entrepreneurship at SOA.
+      </section>
+
+      {/* Past Events Section - Modern Dark Redesign */}
+  <section className="relative py-20 px-4 md:px-8 bg-black overflow-hidden">
+        {/* Abstract shapes */}
+  <svg className="absolute left-0 top-0 w-96 h-96 opacity-20 z-0" viewBox="0 0 400 400" fill="none"><circle cx="200" cy="200" r="200" fill="#60a5fa" fillOpacity="0.08" /></svg>
+  <svg className="absolute right-0 bottom-0 w-96 h-96 opacity-10 z-0" viewBox="0 0 400 400" fill="none"><ellipse cx="200" cy="200" rx="200" ry="140" fill="#60a5fa" fillOpacity="0.06" /></svg>
+        <div className="max-w-7xl mx-auto relative z-10">
+  <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent drop-shadow-lg">Past Event Speakers</h2>
+          <p className="text-center text-gray-200 mb-12 max-w-xl mx-auto text-lg font-medium drop-shadow-lg">
+            Meet the visionaries and leaders who inspire us at IEC events.
           </p>
-        </div>
-
-        <div className="grid w-[90%] md:w-[95%] lg:w-[85%] grid-cols-1 md:grid-cols-3 relative left-1/2 gap-6 md:gap-12 -translate-x-1/2 h-full">
-
-          {agents.map((agent, index) => (
-            <div key={index} className="relative group rounded-3xl overflow-hidden h-[50vh] md:h-[65vh] shadow-lg border-white border-4 md:border-8">
-              <img src={agent.image} alt={agent.name} className="h-full w-full object-cover" />
-              <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:bg-white group-hover:text-black transition-colors">
-                <h3 className="text-xl font-bold">{agent.name}</h3>
-                <p className="text-lg font-medium">{agent.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="px-6 py-12 max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Past Events
-          </h2>
-          <p className="text-white max-w-xl mx-auto mb-10">
-          “Events That Inspire, Impacts That Last.”
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
-            {tools.map((tool, index) => (
-              <div
-                key={index}
-                className=" bg-gray-900 border border-white rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
-              >
-
-                <div className="flex items-center gap-4 mb-4">
-                  <img
-                  src={tool.logo}
-                  alt={`${tool.name} Logo`}
-                  className="w-12 h-12 mb-4"
-                />
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">{tool.name}</h3>
-                    <p className="text-white mb-4">{tool.year}</p>
-                  </div>
+          {/* Speaker slider/grid */}
+          <div className="flex flex-nowrap gap-8 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:gap-10 md:overflow-x-visible">
+            {[{
+              name: "Dr. Arjun Mehta",
+              role: "Founder, InnovateX",
+              img: "https://randomuser.me/api/portraits/men/45.jpg"
+            }, {
+              name: "Ms. Priya Sinha",
+              role: "CEO, FutureMinds",
+              img: "https://randomuser.me/api/portraits/women/65.jpg"
+            }, {
+              name: "Mr. Rakesh Verma",
+              role: "CTO, TechBridge",
+              img: "https://randomuser.me/api/portraits/men/32.jpg"
+            }].map((sp, i) => (
+              <div key={i} className="group bg-black rounded-3xl shadow-xl min-w-[260px] max-w-xs mx-auto p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30">
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
+                  <img src={sp.img} alt={sp.name} className="w-full h-full object-cover" />
                 </div>
-                <p className="text-white">{tool.description}</p>
-
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-white transition-colors">{sp.name}</h3>
+                <p className="text-white font-semibold mb-2">{sp.role}</p>
+                <div className="absolute inset-0 pointer-events-none rounded-3xl group-hover:bg-blue-400/10 transition-all duration-300"></div>
               </div>
             ))}
           </div>
+          <div className="flex justify-center mt-10">
+           
+          </div>
         </div>
-        <AIAgentFAQ />
-        <div className="px-6 py-12 max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            ALUMNI REVIEWS
+      </section>
+      {/* Event Showcase - Modern Dark Feature Cards */}
+  <section className="relative py-20 px-4 md:px-8 bg-black overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(96,165,250,0.10)_0%,_rgba(0,0,0,1)_80%)]"></div>
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent drop-shadow-lg">Event Showcase</h2>
+          <p className="text-center text-gray-200 mb-12 max-w-xl mx-auto text-lg font-medium drop-shadow-lg">
+            "Events That Inspire, Impacts That Last."
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {tools.slice(0, 3).map((tool, index) => (
+              <div
+                key={index}
+                className="relative group rounded-3xl overflow-hidden shadow-xl bg-black border border-blue-400/30 cursor-pointer min-h-[320px] flex flex-col justify-end transition-transform duration-300 hover:scale-105 hover:shadow-2xl"
+                style={{
+                  background: `linear-gradient(180deg,rgba(96,165,250,0.08) 0%,rgba(0,0,0,0.98) 100%), url('/src/assets/event-card-bg.png') center/cover, #000`
+                }}
+              >
+                <div className="absolute inset-0 z-0">
+                  <img src={tool.image} alt={tool.name} className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500" style={{opacity:0.7}} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 via-purple-500/10 to-transparent group-hover:from-blue-500/30 group-hover:via-purple-500/20 transition-all duration-500"></div>
+                </div>
+                <div className="relative z-10 p-6 flex flex-col items-center justify-end min-h-[180px]">
+                  <img src={tool.logo} alt={tool.name} className="w-16 h-16 rounded-full object-contain mb-2 shadow-lg border-2 border-blue-400/60 bg-black/60" />
+                  <h3 className="text-2xl font-bold text-blue-400 text-center drop-shadow mb-2 group-hover:text-blue-300 transition-colors">{tool.name}</h3>
+                  <p className="text-white/90 text-center text-base font-medium opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-4 transition-all duration-500">
+                    {tool.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center mt-10">
+            <a href="#" className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold text-lg shadow-lg hover:scale-105 transition-transform duration-300">
+              Explore All Events &rarr;
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Modern Dark Accordion */}
+  <section className="py-16 px-4 md:px-8 bg-black">
+  <div className="max-w-4xl mx-auto bg-black/90 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-blue-400/30 shadow-xl relative overflow-hidden">
+          {/* Abstract wave */}
+          <svg className="absolute left-0 bottom-0 w-64 h-32 opacity-10 z-0" viewBox="0 0 256 128" fill="none"><path d="M0 64C64 128 192 0 256 64V128H0V64Z" fill="url(#faqwave)" /><defs><linearGradient id="faqwave" x1="0" y1="0" x2="256" y2="128" gradientUnits="userSpaceOnUse"><stop stopColor="#7F5AF0" stopOpacity="0.12" /><stop offset="1" stopColor="#00C9A7" stopOpacity="0.10" /></linearGradient></defs></svg>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent">
+            Got questions for us?
           </h2>
-          <p className="text-white max-w-xl mx-auto mb-10">
+          <p className="text-center text-gray-200 mb-8">
+            Our team are crafted to think, act and optimize like experts—driving your success
+          </p>
+          <div className="space-y-4 relative z-10">
+            {faqs.map((faq, index) => {
+              const isOpen = openIndex === index;
+              return (
+                <div
+                  key={index}
+                  className={`rounded-2xl overflow-hidden cursor-pointer border transition-all duration-300 ${
+                    isOpen ? 'bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-black border-blue-500 shadow-lg' : 'bg-black/80 border-blue-400/30 shadow'
+                  }`}
+                  onClick={() => toggleFAQ(index)}
+                >
+                  <div className="flex items-center px-6 py-5">
+                    <span className="mr-4 text-purple-400">
+                      <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#7F5AF0" fillOpacity="0.12"/><path d="M12 8v4m0 4h.01" stroke="#7F5AF0" strokeWidth="2" strokeLinecap="round"/></svg>
+                    </span>
+                    <span className={`font-medium flex-1 text-lg ${isOpen ? 'text-white' : 'text-white'}`}>{faq.question}</span>
+                    <svg className={`w-6 h-6 text-purple-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out px-6 ${isOpen ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                    <p className="text-blue-300 pb-4">{faq.answer}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Alumni Reviews - Elegant Dark Testimonials */}
+  <section className="py-16 px-4 md:px-8 bg-black">
+  <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent">ALUMNI REVIEWS</h2>
+          <p className="text-center text-gray-200 mb-12 max-w-xl mx-auto">
             Hear what our alumni has to say
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
-            {tools.map((tool, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {alumni.map((alum, index) => (
               <div
                 key={index}
-                className="bg-gray-900 border border-white rounded-2xl p-6 text-left hover:shadow-lg transition-shadow duration-300"
+                className="relative bg-black border border-blue-400/30 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center min-h-[260px]"
               >
-
-                <div className="flex items-center gap-4 mb-4">
-                  <img
-                    src={tool.logo}
-                    alt={`${tool.name} Logo`}
-                    className="w-12 h-12 mb-4 border-4 border-white rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">{tool.name}</h3>
-                    <p className="text-white mb-4">{tool.year}</p>
-                  </div>
+                {/* Decorative quote icon */}
+                <svg className="absolute left-4 top-4 w-12 h-12 opacity-10 z-0" viewBox="0 0 48 48" fill="none"><path d="M16 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8z" fill="#7F5AF0"/><path d="M12 28c0-6.627 5.373-12 12-12s12 5.373 12 12-5.373 12-12 12S12 34.627 12 28z" fill="#7F5AF0" fillOpacity="0.2"/></svg>
+                <img
+                  src={alum.avatar}
+                  alt={alum.name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-blue-400 shadow-lg mb-4 z-10"
+                />
+                <p className="italic text-white text-center mb-4 z-10">“{alum.review}”</p>
+                <div className="text-center z-10">
+                  <h3 className="font-bold text-lg text-blue-400">{alum.name}</h3>
+                  <p className="text-blue-400 text-sm font-medium">{alum.role}</p>
                 </div>
-                <p className="text-white">{tool.description}</p>
-                <a
-                  href={tool.learnMore}
-                  className="text-blue-500 hover:underline"
-                >
-                  Learn more &rarr;
-                </a>
               </div>
             ))}
           </div>
         </div>
-      </main>
+      </section>
+
       <Footer />
-                        {/* Ensure footer is above animation */}
-                        <style>{`
-                            footer { position: relative; z-index: 20; }
-                        `}</style>
     </div>
   );
-}
+};
+
 export default Home;
+
+// Add global style for logo-ticker animation
+if (typeof window !== 'undefined') {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes logo-ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  `;
+  if (!document.head.querySelector('style[data-logo-ticker]')) {
+    style.setAttribute('data-logo-ticker', 'true');
+    document.head.appendChild(style);
+  }
+}

@@ -17,7 +17,7 @@ function TechTeam() {
     <div className="bg-gradient-to-t from-[rgba(223,219,255,0)] to-[rgba(223,219,255,1)] min-h-screen flex flex-col">
       <main className="flex-grow">
         <div className="flex flex-col justify-center items-center h-screen mt-[-5%]">
-          <h1 className="font-bold text-6xl bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent">
+          <h1 className="font-bold text-6xl bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent">
             Teams
           </h1>
           <p className="mt-4 text-center max-w-xl">

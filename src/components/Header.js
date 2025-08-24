@@ -21,19 +21,19 @@ const Header = () => {
 
         {/* Menu Links (Tablet/Laptop/Big Screens) */}
         <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
-          <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''} end>
+          <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''} end>
             Home
           </NavLink>
-          <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
+          <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
             Team
           </NavLink>
-          <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
+          <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
             Gallery
           </NavLink>
-          <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
+          <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
             About
           </NavLink>
-          <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}>
+          <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
             Contact
           </NavLink>
         </div>
@@ -98,7 +98,7 @@ const Header = () => {
             <NavLink
               to="/"
               onClick={toggleMenu}
-              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
+              className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}
               end
             >
               Home

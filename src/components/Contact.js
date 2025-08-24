@@ -11,7 +11,7 @@ function Contact() {
                 <div>
                     <main className="relative top-16 mb-20">
                         <div className="flex flex-col justify-center items-center h-screen gap-5">
-                            <h1 className="font-bold text-5xl text-center bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent p-2"> Let's explore how we can<br /> work for you</h1>
+                            <h1 className="font-bold text-5xl text-center bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent p-2"> Let's explore how we can<br /> work for you</h1>
 
 
                             <div className="w-full max-w-md grid gap-5">

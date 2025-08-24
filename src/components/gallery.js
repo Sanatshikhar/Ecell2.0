@@ -56,17 +56,17 @@ function Gallery() {
   {/* Aurora background removed */}
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center py-20 bg-black">
-        <h1 className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent mb-6 tracking-tight text-center drop-shadow-lg uppercase mt-12">Gallery</h1>
+  <h1 className="text-6xl md:text-8xl font-extrabold bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-6 tracking-tight text-center drop-shadow-lg uppercase mt-12">Gallery</h1>
         <p className="text-2xl md:text-3xl text-white/80 max-w-2xl text-center mb-8">Celebrating creativity, ambition, and changemakers in action.</p>
       </section>
       {/* Carousel Section */}
       <section id="carousel" className="py-16 bg-black ">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D] bg-clip-text text-transparent mb-12">Gallery Highlights</h2>
+          <h2 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent mb-12">Gallery Highlights</h2>
           <div className="relative w-full overflow-hidden  border-2 border-white">
             <div className="flex gap-10 animate-carousel">
               {carouselImages.slice(0, 8).map((img, idx) => (
-                <div key={idx} className="min-w-[400px] h-[260px] rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-[#008FF6] via-[#CD5BF4] to-[#F4520D]">
+                <div key={idx} className="min-w-[400px] h-[260px] rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0]">
                   <img src={img} alt="Highlight" className="object-cover w-full h-full" loading="lazy" />
                 </div>
               ))}
@@ -86,7 +86,7 @@ function Gallery() {
       {/* Masonry Gallery Section */}
       <section id="gallery" className="py-20">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#CD5BF4] via-[#008FF6] to-[#F4520D] bg-clip-text text-transparent uppercase tracking-wide">Our Collection</h2>
+          <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#3d81f6] to-[#b80bf0] bg-clip-text text-transparent uppercase tracking-wide">Our Collection</h2>
           <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-10 space-y-10">
             {galleryImages.map((img, idx) => (
               <div

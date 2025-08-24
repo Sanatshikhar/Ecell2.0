@@ -56,7 +56,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[999] min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-4 py-4 bg-gradient-to-br from-blue-800 via-purple-700 to-indigo-900 bg-fixed" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
+  <div className="fixed inset-0 z-[999] min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-4 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-fixed" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
           <button
             className="fixed top-6 right-8 text-white hover:text-blue-200 text-4xl font-bold z-[1000] transition-colors duration-200"
             onClick={onClose}
