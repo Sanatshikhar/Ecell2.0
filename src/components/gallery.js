@@ -50,6 +50,7 @@ import Img43 from "./Assets/Gallery/DSC_0060.jpg";
 import Img44 from "./Assets/Gallery/DSC_0032.jpg";
 import Img45 from "./Assets/Gallery/DSC04971.jpg";
 import Img46 from "./Assets/Gallery/DSC04968.jpg";
+import Img47 from "./Assets/Gallery/WhatsApp Image 2025-08-25 at 03.25.50_aae79243.jpg";
 // ...continue for all images in the directory...
 
 const allGalleryImages = [
@@ -57,7 +58,7 @@ const allGalleryImages = [
   Img11, Img12, Img13, Img14, Img15, Img16, Img17, Img18, Img19, Img20,
   Img21, Img22, Img23, Img24, Img25, Img26, Img27, Img28, Img29, Img30,
   Img31, Img32, Img33, Img34, Img35, Img36, Img37, Img38, Img39, Img40,
-  Img41, Img42, Img43, Img44, Img45, Img46
+  Img41, Img42, Img43, Img44, Img45, Img46, Img47
 ].map((img, idx) => ({ name: `Gallery ${idx + 1}`, image: img }));
 // ...existing code...
 
