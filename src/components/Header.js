@@ -13,14 +13,14 @@ const Header = () => {
 
   return (
     <div>
-      <div className="fixed bg-black bg-opacity-20 backdrop-blur-md rounded-3xl w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] flex items-center justify-center z-50 box-border transition-none">
+  <div className="fixed bg-black bg-opacity-20 backdrop-blur-md rounded-3xl w-[80%] md:w-[90%] lg:w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] flex items-center z-50 box-border transition-none px-4 md:px-8 lg:px-12">
         {/* Logo */}
-        <div className="w-[50%] md:w-1/5 flex items-center absolute left-[5%] top-1/2 -translate-y-1/2 z-20">
-          <img src={logo} alt="Logo" className="w-[60%] max-h-[100px] md:max-h-[150px] object-contain" />
+        <div className="flex items-center h-full flex-shrink-0">
+          <img src={logo} alt="Logo" className="w-[60px] md:w-[80px] lg:w-[100px] max-h-[50px] md:max-h-[60px] lg:max-h-[80px] object-contain" />
         </div>
 
         {/* Menu Links (Tablet/Laptop/Big Screens) */}
-        <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
+        <div className="hidden md:flex items-center flex-grow justify-center space-x-4 md:space-x-6 text-white font-semibold h-full">
           <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''} end>
             Home
           </NavLink>
@@ -38,10 +38,21 @@ const Header = () => {
           </NavLink>
         </div>
 
+        {/* Join Us Button (Tablet/Laptop/Big Screens) */}
+        <div className="flex-shrink-0 flex items-center">
+          <Link
+            to="/members"
+            className="hidden md:flex bg-white h-[45px] w-[110px] md:w-[130px] lg:w-[150px] rounded-3xl text-black font-semibold text-center justify-center px-4 md:px-6 lg:px-8 items-center transition hover:bg-black hover:text-white hover:scale-105 border-white border-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#a259ff]"
+            style={{fontSize:'1rem',letterSpacing:'0.02em',boxSizing:'border-box'}}
+          >
+            Join Us
+          </Link>
+        </div>
+
         {/* Hamburger/Cross Button */}
         <button
           id="menu-toggle"
-          className="md:hidden focus:outline-none absolute right-[5%] top-1/2 -translate-y-1/2 z-20 text-black"
+          className="md:hidden focus:outline-none ml-auto text-black"
           onClick={toggleMenu}
         >
           <svg
@@ -68,14 +79,6 @@ const Header = () => {
             )}
           </svg>
         </button>
-
-        {/* Join Us Button (Tablet/Laptop/Big Screens) */}
-        <Link
-          to="/members"
-          className="hidden md:flex bg-white h-[45px] rounded-3xl text-black font-semibold text-center justify-center px-8 items-center transition absolute right-[2%] top-1/2 -translate-y-1/2 z-20 hover:bg-black hover:text-white hover:scale-105 border-white border-[1px]"
-        >
-          Join Us
-        </Link>
       </div>
 
       {/* Navbar for Menu */}
@@ -133,7 +136,8 @@ const Header = () => {
             </NavLink>
             <Link
               to="/members"
-              className="bg-black text-white font-semibold py-2 px-4 rounded-3xl transition md:hidden"
+              className="bg-black text-white font-semibold py-2 px-6 rounded-3xl transition md:hidden w-full max-w-[220px] text-center shadow-md focus:outline-none focus:ring-2 focus:ring-[#a259ff]"
+              style={{fontSize:'1rem',letterSpacing:'0.02em',marginTop:'8px'}}
               onClick={toggleMenu}
             >
               Join Us
