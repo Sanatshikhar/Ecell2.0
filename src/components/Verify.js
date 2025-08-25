@@ -195,6 +195,8 @@ const Verify = () => {
     await new Promise(res => setTimeout(res, 1000));
     setBulkMailStatus({ step: 'sending', count: unsent.length, sent: 0 });
     let sentCount = 0;
+    // Use REACT_APP_BACKEND_URL from environment variables
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://your-backend-domain.com';
     for (const user of unsent) {
       let token = user.qr_token;
       if (!token) {
@@ -210,7 +212,6 @@ const Verify = () => {
         }
       }
       try {
-        const backendUrl = process.env.BACKEND_URL;
         await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
