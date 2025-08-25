@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Footer from "./footer.js";
 import Card3D from "./Card3D";
 import Kiran from "./Assets/Team Image/Kiran.jpg";
-import PD from "./Assets/Team Image/PD.jpg";
+import PD from "./Assets/Team Image/PD2.jpg";
 import NS from "./Assets/Team Image/NS.jpg";
 import Sss from "./Assets/Team Image/Sanat.jpg";
 import Sn from "./Assets/Team Image/SN.jpg";
@@ -21,15 +21,16 @@ const agents = [
     { name: "Abhay Prakash", role: "Advisor", link: "https://www.linkedin.com/in/abhay-prakash-ab143a262/", image: AP },
     { name: "Mimansa Satpathy", role: "Treasurer", link: "https://www.linkedin.com/in/mimansa-satpathy/", image: Ms },
     { name: "Tiyash Das Gupta", role: "Manager", link: "https://www.linkedin.com/in/tiyash13/++", image: TD },
-    { name: "Sanat Sikhar Sinha", role: "Technical Team", link: "/TechTeam", image: Sss },
-    { name: "Arnab Sahoo", role: "Design Team", link: "#", image: AS },
-    { name: "Nobhonil Sarkar", role: "Media Team", link: "#", image: NS },
-    { name: "Samarth Kumar", role: "Event-Management Team", link: "#", image: SK },
-    { name: "Stuti Mishra", role: "Content Team", link: "#", image: SM },
-    { name: "Kumari Shubhangini", role: "Public-Relations Team", link: "#", image: S },
-    { name: "Ketan Kumar", role: "Operations Team", link: "#", image: KK },
-    { name: "Somyashree Nayak", role: "Marketing & Sponsorships Team", link: "#", image: Sn },
+    { name: "Sanat Sikhar Sinha", role: "Technical Team", link: "https://www.linkedin.com/in/sanatsinhaa/", image: Sss },
+    { name: "Arnab Sahoo", role: "Design Team", link: "https://www.linkedin.com/in/arnab-sahoo-uiux/", image: AS },
+    { name: "Nobhonil Sarkar", role: "Media Team", link: "https://www.linkedin.com/in/nobhonil-sarkar/", image: NS },
+    { name: "Samarth Kumar", role: "Event-Management Team", link: "https://www.linkedin.com/in/samarth-kumar-here/", image: SK },
+    { name: "Stuti Mishra", role: "Content Team", link: "https://www.linkedin.com/in/stuti86/", image: SM },
+    { name: "Kumari Shubhangini", role: "Public-Relations Team", link: "https://www.linkedin.com/in/kumari-shubhangini/", image: S },
+    { name: "Ketan Kumar", role: "Operations Team", link: "https://www.linkedin.com/in/ketan-kumar120203/", image: KK },
+    { name: "Somyashree Nayak", role: "Marketing & Sponsorships Team", link: "https://www.linkedin.com/in/somyashree-nayak-3a974b278/", image: Sn },
 ];
+
 
 function Team() {
     return (
@@ -72,9 +73,9 @@ function Team() {
                             {agents.map((agent, index) => (
                                 <Card3D key={index} image={agent.image} title={agent.role}>
                                     <Link to={agent.link}>
-                                        <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:text-white group-hover:bg-[#131313] transition-all w-full">
-                                            <h3 className="text-lg font-semibold">{agent.role}</h3>
-                                            <p className="text-sm">{agent.name}</p>
+                                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-40 text-white p-4 rounded-xl group-hover:text-white group-hover:bg-[#131313] transition-all w-full" style={{maxWidth:'90%'}}>
+                                            <h3 className="text-lg font-semibold">{agent.name}</h3>
+                                            <p className="text-sm">{agent.role}</p>
                                         </div>
                                     </Link>
                                 </Card3D>

@@ -10,8 +10,8 @@ import Rposter from "./Assets/Resonance.png";
 import resonance from "./Assets/Resonance Campus 2 (9 x 5 in) (4).png";
 import Exanova from "./Assets/Exanova Results.png";
 import PExanova from "./Assets/exanova.png";
-import oblive from "./Assets/oblive.png";
-import Boblive from "./Assets/oblive.jpg";
+import oblive from "./Assets/Register Poster.jpg";
+import Boblive from "./Assets/gradient_1000_800.png";
 // Speaker section background refinement
 
 const Home = () => {
@@ -42,8 +42,8 @@ const Home = () => {
       learnMore: "#",
     },
     {
-      name: "Oblive",
-      description: "Oblive was more than a farewell—it was a heartfelt tribute, guiding us to cherish memories, embrace growth, and carry forward the spirit of unity. A night of gratitude, laughter, and inspiration, marking beautiful endings and new beginnings.",
+      name: "ESummit",
+      description: "The event featured a range of power-packed competitions and activities — from insightful Marketing Research challenges to impactful Pitch Presentations, where aspiring entrepreneurs showcased their groundbreaking ideas. The Ideathon sparked rapid brainstorming and problem-solving, while the highlight of the summit — a grueling 24-hour Mega Hackathon — tested endurance, collaboration, and technical prowess. Together, these events created an electrifying atmosphere of learning, innovation, and entrepreneurial spirit.",
       logo: oblive,
       image: Boblive,
       learnMore: "#",
