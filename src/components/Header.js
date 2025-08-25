@@ -52,7 +52,7 @@ const Header = () => {
         {/* Hamburger/Cross Button */}
         <button
           id="menu-toggle"
-          className="md:hidden focus:outline-none ml-auto text-black"
+          className="md:hidden focus:outline-none absolute right-[5%] top-1/2 -translate-y-1/2 z-20 text-black"
           onClick={toggleMenu}
         >
           <svg
@@ -79,6 +79,8 @@ const Header = () => {
             )}
           </svg>
         </button>
+
+  {/* Join Us Button removed */}
       </div>
 
       {/* Navbar for Menu */}
@@ -101,7 +103,7 @@ const Header = () => {
             <NavLink
               to="/"
               onClick={toggleMenu}
-              className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}
+              className={({ isActive }) => isActive ? 'text-[#a259ff] underline underline-offset-8 font-bold' : ''}
               end
             >
               Home
