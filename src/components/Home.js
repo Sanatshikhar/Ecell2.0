@@ -81,21 +81,18 @@ const Home = () => {
     {
       name: "Sachin Kumar",
       role: "Assistant Manager at JSW Group",
-      link: "https://www.linkedin.com/in/sachin-kumar-0637081a7/",
       review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an \"OUT OF THE BOX \" Journey",
       avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1681490671010?e=1758758400&v=beta&t=NPCw5SlTYTkNsAGbs4AJDPBAPlRmvBSltNGVdHGJ_0w"
     },
     {
       name: "Ayush Pattnaik",
       role: "Software Engineer at Comviva",
-      link: "https://www.linkedin.com/in/ayupattnaik19/",
       review: "IEC gave me the platform to explore, learn, and grow beyond the classroom. The guidance, opportunities, and exposure I received here have truly shaped my journey and boosted my confidence. And the best part — I found a cool team for life.",
       avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1758758400&v=beta&t=Ly9e0rzinvLNhai1jOHxmwJdJOFdHuM07PBfAWTUtwo"
     },
     {
       name: "Sanskar Pani",
       role: "Founder and CEO at SCALE",
-      link: "https://www.linkedin.com/in/sanskarpani/",
       review: "The Startup Awareness and Mentorship Program at IEC has been a true game-changer for me. Most importantly, it connected me with a passionate and like-minded team that feels like family for life.",
       avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_200_200/B4EZU4ekvhGgAg-/0/1740409294803?e=2147483647&v=beta&t=iQvTgQZwauemDFRrox8aZJaW54Ez2dc0tHXTiSt6WEs"
     }
@@ -205,29 +202,24 @@ const Home = () => {
             {[{
               name: "Biraja Prasad Rout",
               role: "Founder, Biggies Burger",
-              link: "https://www.linkedin.com/in/biraja-rout/",
               img: "https://media.licdn.com/dms/image/v2/D5603AQGrHRyevP3vKA/profile-displayphoto-shrink_400_400/B56ZVwzixiGsAk-/0/1741354316408?e=1758758400&v=beta&t=XLn9I5scZYXS2vQdFP0vQv_-7pg5hPJOu7scIx7Oq9I"
             }, {
               name: "Dr. Abhishek Gautam",
               role: "Founder, Ambula",
-              link: "https://www.linkedin.com/in/abhishekkumargautam/",
               img: "https://media.licdn.com/dms/image/v2/D5603AQHWw1uKJ4llfA/profile-displayphoto-scale_400_400/B56ZhCT_0GH0Ag-/0/1753459197026?e=1758758400&v=beta&t=ptmPYG811O2MXUoJQ36ndPmMyKY_u_VapdIUBS4I_Ow"
             }, {
               name: "Mr.Bibhu Bahalia",
               role: "Co-Founder, Assava",
-              link: "https://www.linkedin.com/in/bibhu-bahalia-a9807ba0/",
               img: "https://media.licdn.com/dms/image/v2/C5603AQGoXkOXqrA_OQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1588930901707?e=1758758400&v=beta&t=PasaVRel-JoZTeRVyOBjbbBnz8Lx4DbnYsJQEiRRhYA"
             }].map((sp, i) => (
-              <a key={i} href={sp.link} target="_blank" rel="noopener noreferrer" className="block min-w-[260px] max-w-xs mx-auto">
-                <div className="group bg-black rounded-3xl shadow-xl p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30 h-[260px] xs:h-[260px] sm:h-[260px] md:h-[260px] lg:h-[260px]">
-                  <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
-                    <img src={sp.img} alt={sp.name} className="w-full h-full object-cover" />
-                  </div>
-                  <h3 className="text-base xs:text-lg sm:text-xl font-bold text-white mb-1 group-hover:text-white transition-colors text-center">{sp.name}</h3>
-                  <p className="text-xs xs:text-sm sm:text-base text-white font-semibold mb-2 text-center">{sp.role}</p>
-                  <div className="absolute inset-0 pointer-events-none rounded-3xl group-hover:bg-blue-400/10 transition-all duration-300"></div>
+              <div key={i} className="group bg-black rounded-3xl shadow-xl min-w-[260px] max-w-xs mx-auto p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30">
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
+                  <img src={sp.img} alt={sp.name} className="w-full h-full object-cover" />
                 </div>
-              </a>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-white transition-colors">{sp.name}</h3>
+                <p className="text-white font-semibold mb-2">{sp.role}</p>
+                <div className="absolute inset-0 pointer-events-none rounded-3xl group-hover:bg-blue-400/10 transition-all duration-300"></div>
+              </div>
             ))}
           </div>
           <div className="flex justify-center mt-10">
@@ -345,20 +337,16 @@ const Home = () => {
               >
                 {/* Decorative quote icon */}
                 <svg className="absolute left-4 top-4 w-12 h-12 opacity-10 z-0" viewBox="0 0 48 48" fill="none"><path d="M16 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8z" fill="#7F5AF0" /><path d="M12 28c0-6.627 5.373-12 12-12s12 5.373 12 12-5.373 12-12 12S12 34.627 12 28z" fill="#7F5AF0" fillOpacity="0.2" /></svg>
-                <a href={alum.link} target="_blank" rel="noopener noreferrer" className="block w-full">
-                  <div className="flex justify-center w-full">
-                    <img
-                      src={alum.avatar}
-                      alt={alum.name}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-400 shadow-lg mb-4 z-10"
-                    />
-                  </div>
-                  <p className="italic text-white text-center mb-4 z-10">“{alum.review}”</p>
-                  <div className="text-center z-10">
-                    <h3 className="font-bold text-lg text-blue-400">{alum.name}</h3>
-                    <p className="text-blue-400 text-sm font-medium">{alum.role}</p>
-                  </div>
-                </a>
+                <img
+                  src={alum.avatar}
+                  alt={alum.name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-blue-400 shadow-lg mb-4 z-10"
+                />
+                <p className="italic text-white text-center mb-4 z-10">“{alum.review}”</p>
+                <div className="text-center z-10">
+                  <h3 className="font-bold text-lg text-blue-400">{alum.name}</h3>
+                  <p className="text-blue-400 text-sm font-medium">{alum.role}</p>
+                </div>
               </div>
             ))}
           </div>
