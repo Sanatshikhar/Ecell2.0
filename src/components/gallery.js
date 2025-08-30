@@ -8,8 +8,8 @@ import Img1 from "./Assets/Gallery/Copy of DSC00770.jpg";
 import Img2 from "./Assets/Gallery/Copy of DSC04852.jpg";
 import Img3 from "./Assets/Gallery/Copy of DSC04806.jpg";
 import Img4 from "./Assets/Gallery/20250523_180254.jpg";
-import Img5 from "./Assets/Gallery/20250523_180041.jpg";
-import Img6 from "./Assets/Gallery/1748099946757.jpg";
+
+
 import Img7 from "./Assets/Gallery/171A7644.JPG";
 import Img8 from "./Assets/Gallery/Copy of IMG_4094-Enhanced-NR.jpg";
 import Img9 from "./Assets/Gallery/171A7637.JPG";
@@ -41,7 +41,7 @@ import Img34 from "./Assets/Gallery/IMG_1807.jpg";
 import Img35 from "./Assets/Gallery/IMG-20250529-WA0078.jpg";
 import Img36 from "./Assets/Gallery/IMG-20250529-WA0069.jpg";
 import Img37 from "./Assets/Gallery/IMG-20250529-WA0066.jpg";
-import Img38 from "./Assets/Gallery/IMG-20250529-WA0062.jpg";
+
 import Img39 from "./Assets/Gallery/EDITTED  (96).JPG";
 import Img40 from "./Assets/Gallery/DSC_0270.jpg";
 import Img41 from "./Assets/Gallery/DSC_0122.jpg";
@@ -54,10 +54,10 @@ import Img47 from "./Assets/Gallery/WhatsApp Image 2025-08-25 at 03.25.50_aae792
 // ...continue for all images in the directory...
 
 const allGalleryImages = [
-  Img1, Img2, Img3, Img4, Img5, Img6, Img7, Img8, Img9, Img10,
+  Img1, Img2, Img3, Img4, Img7, Img8, Img9, Img10,
   Img11, Img12, Img13, Img14, Img15, Img16, Img17, Img18, Img19, Img20,
   Img21, Img22, Img23, Img24, Img25, Img26, Img27, Img28, Img29, Img30,
-  Img31, Img32, Img33, Img34, Img35, Img36, Img37, Img38, Img39, Img40,
+  Img31, Img32, Img33, Img34, Img35, Img36, Img37, Img39, Img40,
   Img41, Img42, Img43, Img44, Img45, Img46, Img47
 ].map((img, idx) => ({ name: `Gallery ${idx + 1}`, image: img }));
 // ...existing code...
