@@ -2,7 +2,6 @@
 import Footer from "./footer";
 import React, { useState } from "react";
 import RegistrationForm from "./RegistrationForm";
-// ...existing code...
 function Join() {
     const [showForm, setShowForm] = useState(false);
     return (

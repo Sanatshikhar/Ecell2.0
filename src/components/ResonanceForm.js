@@ -5,10 +5,10 @@ import styles from './TechXperience.module.css';
 
 
 const ResonanceForm = ({ onClose }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState('student');
+  const userType = watch("userType", "student");
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -21,10 +21,8 @@ const ResonanceForm = ({ onClose }) => {
         return;
       }
 
-      // Generate unique token
       const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 16);
 
-      // Prepare form data for PocketBase, including token and mailSent: false
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         if (key === "idCard" && value && value[0]) {
@@ -84,9 +82,7 @@ const ResonanceForm = ({ onClose }) => {
                 <input
                   type="radio"
                   value="student"
-                  checked={userType === 'student'}
-                  onChange={() => setUserType('student')}
-                  {...register("userType")}
+                  {...register("userType", { required: true })}
                   style={{marginRight:'0.5em'}}
                 /> Student
               </label>
@@ -94,13 +90,12 @@ const ResonanceForm = ({ onClose }) => {
                 <input
                   type="radio"
                   value="faculty"
-                  checked={userType === 'faculty'}
-                  onChange={() => setUserType('faculty')}
-                  {...register("userType")}
+                  {...register("userType", { required: true })}
                   style={{marginRight:'0.5em'}}
                 /> Faculty
               </label>
             </div>
+            {errors.userType && <span className="text-red-500 text-xs">Please select a user type</span>}
 
             {/* Common fields */}
             <label className={styles.formLabel} htmlFor="name">Full Name</label>
@@ -151,7 +146,7 @@ const ResonanceForm = ({ onClose }) => {
               className={styles.formInput}
             >
               <option value="">Select Campus</option>
-              <option value="SOA Campus 2">SOA Campus 2</option>
+              <option value="SOA Campus 2" disabled>SOA Campus 2</option>
               <option value="SOA Campus 4">SOA Campus 4</option>
             </select>
             {errors.campus && <span className="text-red-500 text-xs">Campus is required</span>}
