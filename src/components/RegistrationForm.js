@@ -8,6 +8,7 @@ import logo from "./logo.png";
 const RegistrationForm = ({ isOpen, onClose }) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -23,34 +24,57 @@ const RegistrationForm = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
+      // Check for duplicate email in PocketBase
+      const existing = await pb.collection('joiningReg2025').getList(1, 1, { filter: `email="${data.email}"` });
+      if (existing.items.length > 0) {
+        alert("This email is already registered.");
+        setLoading(false);
+        return;
+      }
+
       // If file is present, send as multipart
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (key === "idCard" && value && value[0]) {
+        if (key === "idProof" && value && value[0]) {
           formData.append(key, value[0]);
         } else {
           formData.append(key, value);
         }
       });
-      await pb.collection('Reg').create(formData);
+      formData.append('mailSent', 'false');
+
+      const record = await pb.collection('joiningReg2025').create(formData);
 
       // Send email using Node.js backend (nodemailer)
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      let emailSuccess = false;
       try {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-        await fetch(`${backendUrl}/api/send-email`, {
+        const requestBody = { to: data.email, name: data.name };
+        const res = await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to: data.email, name: data.name })
+          body: JSON.stringify(requestBody)
         });
+        if (res.ok) {
+          emailSuccess = true;
+        }
       } catch (emailErr) {
         console.error("Email error:", emailErr);
+      }
+
+      // If email sent successfully, update mailSent to true
+      if (emailSuccess && record && record.id) {
+        await pb.collection('joiningReg2025').update(record.id, { mailSent: true });
       }
 
       setShowSuccess(true);
       reset();
     } catch (err) {
       alert("Error submitting registration: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,25 +147,33 @@ const RegistrationForm = ({ isOpen, onClose }) => {
                 <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Team Preference</label>
                 <select {...register("team", { required: true })} className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400  text-gray-800 shadow-md transition-all duration-200 mx-auto">
                   <option value="">Select Team</option>
-                  <option value="Tech">Tech</option>
-                  <option value="Management">Management</option>
-                  <option value="Design">Design</option>
-                  <option value="Content">Content</option>
-                  <option value="Other">Other</option>
+                  <option value="Technical Team">Technical Team</option>
+                  <option value="Design Team">Design Team</option>
+                  <option value="Media Team">Media Team</option>
+                  <option value="Event-Management Team">Event-Management Team</option>
+                  <option value="Content Team">Content Team</option>
+                  <option value="Public-Relations Team">Public-Relations Team</option>
+                  <option value="Operations Team">Operations Team</option>
+                  <option value="Marketing & Sponsorships Team">Marketing & Sponsorships Team</option>
                 </select>
                 {errors.team && <span className="text-red-400 text-xs">Team is required</span>}
               </div>
               {/* Campus */}
               <div className="flex flex-col w-full">
                 <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Campus</label>
-                <input {...register("campus", { required: true })} type="text" className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400  text-black placeholder:text-gray-400 shadow-md transition-all duration-200 mx-auto" placeholder="Campus" />
+                <select {...register("campus", { required: true })} className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400  text-gray-800 shadow-md transition-all duration-200 mx-auto">
+                  <option value="">Select Campus</option>
+                  <option value="Campus 1">Campus 1</option>
+                  <option value="Campus 2">Campus 2</option>
+                  <option value="Campus 4">Campus 4</option>
+                </select>
                 {errors.campus && <span className="text-red-400 text-xs">Campus is required</span>}
               </div>
               {/* File Upload */}
               <div className="flex flex-col w-full">
                 <label className="block font-semibold mb-1 text-white w-full text-left px-4 sm:px-0">Upload Image/College ID</label>
                 <div className="relative w-72 sm:w-80 mx-auto">
-                  <input {...register("idCard", { required: true })}
+                  <input {...register("idProof", { required: true })}
                     type="file"
                     accept="image/*,.pdf"
                     className="w-full max-w-xs sm:w-80 px-4 py-3 border border-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400  text-white file:bg-black file:text-blue-400 file: file:border-0 file:rounded-xl file:font-semibold file:cursor-pointer shadow-md transition-all duration-200 mx-auto"
@@ -149,7 +181,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
                 </div>
               </div>
             </div>
-            <button type="submit" className="min-w-60 bg-blue-800 text-white py-3 sm:py-4 rounded-xl font-bold text-lg sm:text-xl shadow-lg border border-cyan-700 hover:bg-blue-900 hover:scale-105 transition mt-6 sm:mt-8">Register</button>
+            <button type="submit" className="min-w-60 bg-blue-800 text-white py-3 sm:py-4 rounded-xl font-bold text-lg sm:text-xl shadow-lg border border-cyan-700 hover:bg-blue-900 hover:scale-105 transition mt-6 sm:mt-8" disabled={loading}>{loading ? 'Submitting...' : 'Register'}</button>
           </form>
         </div>
         {/* Success Popup Modal */}

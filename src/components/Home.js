@@ -10,8 +10,8 @@ import Rposter from "./Assets/Resonance.png";
 import resonance from "./Assets/Resonance Campus 2 (9 x 5 in) (4).png";
 import Exanova from "./Assets/Exanova Results.png";
 import PExanova from "./Assets/exanova.png";
-import oblive from "./Assets/Register Poster.jpg";
-import Boblive from "./Assets/gradient_1000_800.png";
+import oblive from "./Assets/oblive.png";
+import Boblive from "./Assets/oblive.jpg";
 // Speaker section background refinement
 
 const Home = () => {
@@ -42,8 +42,8 @@ const Home = () => {
       learnMore: "#",
     },
     {
-      name: "ESummit",
-      description: "The event featured a range of power-packed competitions and activities — from insightful Marketing Research challenges to impactful Pitch Presentations, where aspiring entrepreneurs showcased their groundbreaking ideas. The Ideathon sparked rapid brainstorming and problem-solving, while the highlight of the summit — a grueling 24-hour Mega Hackathon — tested endurance, collaboration, and technical prowess. Together, these events created an electrifying atmosphere of learning, innovation, and entrepreneurial spirit.",
+      name: "Oblive",
+      description: "Oblive was more than a farewell—it was a heartfelt tribute, guiding us to cherish memories, embrace growth, and carry forward the spirit of unity. A night of gratitude, laughter, and inspiration, marking beautiful endings and new beginnings.",
       logo: oblive,
       image: Boblive,
       learnMore: "#",
@@ -81,20 +81,23 @@ const Home = () => {
     {
       name: "Sachin Kumar",
       role: "Assistant Manager at JSW Group",
+      link: "https://www.linkedin.com/in/sachin-kumar-0637081a7/",
       review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an \"OUT OF THE BOX \" Journey",
-      avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1681490671010?e=1758758400&v=beta&t=NPCw5SlTYTkNsAGbs4AJDPBAPlRmvBSltNGVdHGJ_0w"
+      avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1681490671010?e=1762992000&v=beta&t=DSxxDh2u0qKU-dcK1JCvDm4pAN8oPwSPRF32F_zobog"
     },
     {
       name: "Ayush Pattnaik",
       role: "Software Engineer at Comviva",
+      link: "https://www.linkedin.com/in/ayupattnaik19/",
       review: "IEC gave me the platform to explore, learn, and grow beyond the classroom. The guidance, opportunities, and exposure I received here have truly shaped my journey and boosted my confidence. And the best part — I found a cool team for life.",
-      avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1758758400&v=beta&t=Ly9e0rzinvLNhai1jOHxmwJdJOFdHuM07PBfAWTUtwo"
+      avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1762992000&v=beta&t=GmMU9zHQDJYKQRfm57scRvOLC-8V1oYuYq5kVFW73ec"
     },
     {
       name: "Sanskar Pani",
       role: "Founder and CEO at SCALE",
+      link: "https://www.linkedin.com/in/sanskarpani/",
       review: "The Startup Awareness and Mentorship Program at IEC has been a true game-changer for me. Most importantly, it connected me with a passionate and like-minded team that feels like family for life.",
-      avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_200_200/B4EZU4ekvhGgAg-/0/1740409294803?e=2147483647&v=beta&t=iQvTgQZwauemDFRrox8aZJaW54Ez2dc0tHXTiSt6WEs"
+      avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_400_400/B4EZU4ekvhGgAo-/0/1740409294803?e=1762992000&v=beta&t=blc7vvdLcVbFPwcJLi4BiX4pNzlzva54zzITuT1Nyho"
     }
   ];
 
@@ -202,24 +205,29 @@ const Home = () => {
             {[{
               name: "Biraja Prasad Rout",
               role: "Founder, Biggies Burger",
-              img: "https://media.licdn.com/dms/image/v2/D5603AQGrHRyevP3vKA/profile-displayphoto-shrink_400_400/B56ZVwzixiGsAk-/0/1741354316408?e=1758758400&v=beta&t=XLn9I5scZYXS2vQdFP0vQv_-7pg5hPJOu7scIx7Oq9I"
+              link: "https://www.linkedin.com/in/biraja-rout/",
+              img: "https://media.licdn.com/dms/image/v2/D5603AQGrHRyevP3vKA/profile-displayphoto-shrink_800_800/B56ZVwzixiGsAg-/0/1741354316409?e=1762992000&v=beta&t=1qA77B3fXTIQhE9tiLRtbMcBzwxrVO-Nq6tb0LsOM7s"
             }, {
               name: "Dr. Abhishek Gautam",
               role: "Founder, Ambula",
-              img: "https://media.licdn.com/dms/image/v2/D5603AQHWw1uKJ4llfA/profile-displayphoto-scale_400_400/B56ZhCT_0GH0Ag-/0/1753459197026?e=1758758400&v=beta&t=ptmPYG811O2MXUoJQ36ndPmMyKY_u_VapdIUBS4I_Ow"
+              link: "https://www.linkedin.com/in/abhishekkumargautam/",
+              img: "https://media.licdn.com/dms/image/v2/D5603AQHWw1uKJ4llfA/profile-displayphoto-scale_400_400/B56ZhCT_0GH0Ag-/0/1753459197026?e=1762992000&v=beta&t=eO2WmfPjRWH6WojoVeCX2vzfw29SHrkS3zSg_rK8cJw"
             }, {
               name: "Mr.Bibhu Bahalia",
               role: "Co-Founder, Assava",
-              img: "https://media.licdn.com/dms/image/v2/C5603AQGoXkOXqrA_OQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1588930901707?e=1758758400&v=beta&t=PasaVRel-JoZTeRVyOBjbbBnz8Lx4DbnYsJQEiRRhYA"
+              link: "https://www.linkedin.com/in/bibhu-bahalia-a9807ba0/",
+              img: "https://media.licdn.com/dms/image/v2/C5603AQGoXkOXqrA_OQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1588930901737?e=1762992000&v=beta&t=J2oY0xD7qqNaNa92d-ZFogLiO1eeMrHmwSiih23bnXs"
             }].map((sp, i) => (
-              <div key={i} className="group bg-black rounded-3xl shadow-xl min-w-[260px] max-w-xs mx-auto p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30">
-                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
-                  <img src={sp.img} alt={sp.name} className="w-full h-full object-cover" />
+              <a key={i} href={sp.link} target="_blank" rel="noopener noreferrer" className="block min-w-[260px] max-w-xs mx-auto">
+                <div className="group bg-black rounded-3xl shadow-xl p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30 h-[260px] xs:h-[260px] sm:h-[260px] md:h-[260px] lg:h-[260px]">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-lg mb-4 bg-black">
+                    <img src={sp.img} alt={sp.name} className="w-full h-full object-cover" />
+                  </div>
+                  <h3 className="text-base xs:text-lg sm:text-xl font-bold text-white mb-1 group-hover:text-white transition-colors text-center">{sp.name}</h3>
+                  <p className="text-xs xs:text-sm sm:text-base text-white font-semibold mb-2 text-center">{sp.role}</p>
+                  <div className="absolute inset-0 pointer-events-none rounded-3xl group-hover:bg-blue-400/10 transition-all duration-300"></div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-white transition-colors">{sp.name}</h3>
-                <p className="text-white font-semibold mb-2">{sp.role}</p>
-                <div className="absolute inset-0 pointer-events-none rounded-3xl group-hover:bg-blue-400/10 transition-all duration-300"></div>
-              </div>
+              </a>
             ))}
           </div>
           <div className="flex justify-center mt-10">
@@ -337,16 +345,20 @@ const Home = () => {
               >
                 {/* Decorative quote icon */}
                 <svg className="absolute left-4 top-4 w-12 h-12 opacity-10 z-0" viewBox="0 0 48 48" fill="none"><path d="M16 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8z" fill="#7F5AF0" /><path d="M12 28c0-6.627 5.373-12 12-12s12 5.373 12 12-5.373 12-12 12S12 34.627 12 28z" fill="#7F5AF0" fillOpacity="0.2" /></svg>
-                <img
-                  src={alum.avatar}
-                  alt={alum.name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-blue-400 shadow-lg mb-4 z-10"
-                />
-                <p className="italic text-white text-center mb-4 z-10">“{alum.review}”</p>
-                <div className="text-center z-10">
-                  <h3 className="font-bold text-lg text-blue-400">{alum.name}</h3>
-                  <p className="text-blue-400 text-sm font-medium">{alum.role}</p>
-                </div>
+                <a href={alum.link} target="_blank" rel="noopener noreferrer" className="block w-full">
+                  <div className="flex justify-center w-full">
+                    <img
+                      src={alum.avatar}
+                      alt={alum.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-400 shadow-lg mb-4 z-10"
+                    />
+                  </div>
+                  <p className="italic text-white text-center mb-4 z-10">“{alum.review}”</p>
+                  <div className="text-center z-10">
+                    <h3 className="font-bold text-lg text-blue-400">{alum.name}</h3>
+                    <p className="text-blue-400 text-sm font-medium">{alum.role}</p>
+                  </div>
+                </a>
               </div>
             ))}
           </div>
