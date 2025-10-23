@@ -188,8 +188,22 @@ const RegistrationForm = ({ isOpen, onClose }) => {
               {/* Phone Number */}
               <div className="flex flex-col w-full">
                 <label className="block font-semibold mb-1 sm:mb-2 text-white w-full text-left text-sm sm:text-base">Phone Number</label>
-                <input {...register("phone", { required: true })} type="tel" className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-4 lg:py-3 border border-blue-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-black placeholder:text-gray-400 shadow-md transition-all duration-200 text-sm sm:text-base" placeholder="Phone Number" />
-                {errors.phone && <span className="text-red-400 text-xs sm:text-sm mt-1">Phone Number is required</span>}
+                <input {...register("phone", { 
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^(\+91|91|0)?[6-9]\d{9}$/,
+                    message: "Please enter a valid Indian phone number"
+                  },
+                  minLength: {
+                    value: 10,
+                    message: "Phone number must be at least 10 digits"
+                  },
+                  maxLength: {
+                    value: 13,
+                    message: "Phone number must not exceed 13 digits"
+                  }
+                })} type="tel" className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-4 lg:py-3 border border-blue-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-black placeholder:text-gray-400 shadow-md transition-all duration-200 text-sm sm:text-base" placeholder="Phone Number (e.g., +91 9876543210)" />
+                {errors.phone && <span className="text-red-400 text-xs sm:text-sm mt-1">{errors.phone.message}</span>}
               </div>
               {/* Team Preference - Multi-Select Dropdown */}
               <div className="flex flex-col w-full relative">
