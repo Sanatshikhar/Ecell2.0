@@ -6,9 +6,31 @@ import logo from "./logo.png";
 
 
 const RegistrationForm = ({ isOpen, onClose }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedTeams, setSelectedTeams] = useState([]);
+
+  const teamOptions = [
+    "Technical Team",
+    "Design Team", 
+    "Media Team",
+    "Event-Management Team",
+    "Content Team",
+    "Public-Relations Team",
+    "Operations Team",
+    "Marketing & Sponsorships Team"
+  ];
+
+  const handleTeamSelection = (team) => {
+    const newSelectedTeams = selectedTeams.includes(team)
+      ? selectedTeams.filter(t => t !== team)
+      : [...selectedTeams, team];
+    
+    setSelectedTeams(newSelectedTeams);
+    setValue('team', newSelectedTeams);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -21,11 +43,33 @@ const RegistrationForm = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.team-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   if (!isOpen) return null;
 
   const onSubmit = async (data) => {
     setLoading(true);
     try {
+      // Ensure team data is properly set from selectedTeams state
+      if (selectedTeams.length === 0) {
+        alert("Please select at least one team.");
+        setLoading(false);
+        return;
+      }
+      data.team = selectedTeams;
+
       // Check for duplicate email in PocketBase
       const existing = await pb.collection('joiningReg2025').getList(1, 1, { filter: `email="${data.email}"` });
       if (existing.items.length > 0) {
@@ -39,6 +83,9 @@ const RegistrationForm = ({ isOpen, onClose }) => {
       Object.entries(data).forEach(([key, value]) => {
         if (key === "idProof" && value && value[0]) {
           formData.append(key, value[0]);
+        } else if (key === "team" && Array.isArray(value)) {
+          // PocketBase select field handles arrays natively
+          value.forEach(team => formData.append('team', team));
         } else {
           formData.append(key, value);
         }
@@ -144,21 +191,74 @@ const RegistrationForm = ({ isOpen, onClose }) => {
                 <input {...register("phone", { required: true })} type="tel" className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-4 lg:py-3 border border-blue-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-black placeholder:text-gray-400 shadow-md transition-all duration-200 text-sm sm:text-base" placeholder="Phone Number" />
                 {errors.phone && <span className="text-red-400 text-xs sm:text-sm mt-1">Phone Number is required</span>}
               </div>
-              {/* Team Preference */}
-              <div className="flex flex-col w-full">
-                <label className="block font-semibold mb-1 sm:mb-2 text-white w-full text-left text-sm sm:text-base">Team Preference</label>
-                <select {...register("team", { required: true })} className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-4 lg:py-3 border border-blue-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 shadow-md transition-all duration-200 text-sm sm:text-base">
-                  <option value="">Select Team</option>
-                  <option value="Technical Team">Technical Team</option>
-                  <option value="Design Team">Design Team</option>
-                  <option value="Media Team">Media Team</option>
-                  <option value="Event-Management Team">Event-Management Team</option>
-                  <option value="Content Team">Content Team</option>
-                  <option value="Public-Relations Team">Public-Relations Team</option>
-                  <option value="Operations Team">Operations Team</option>
-                  <option value="Marketing & Sponsorships Team">Marketing & Sponsorships Team</option>
-                </select>
-                {errors.team && <span className="text-red-400 text-xs sm:text-sm mt-1">Team is required</span>}
+              {/* Team Preference - Multi-Select Dropdown */}
+              <div className="flex flex-col w-full relative">
+                <label className="block font-semibold mb-1 sm:mb-2 text-white w-full text-left text-sm sm:text-base">Select Teams</label>
+                <input {...register("team", { required: "Please select at least one team" })} type="hidden" />
+                
+                {/* Custom Dropdown */}
+                <div className="relative team-dropdown">
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-4 lg:py-3 border border-blue-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-800 shadow-md transition-all duration-200 text-sm sm:text-base text-left flex justify-between items-center"
+                  >
+                    <span className="truncate">
+                      {selectedTeams.length === 0 
+                        ? "Select Teams" 
+                        : `${selectedTeams.length} team${selectedTeams.length > 1 ? 's' : ''} selected`
+                      }
+                    </span>
+                    <svg className={`w-4 h-4 transform transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Options */}
+                  {isDropdownOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-blue-700 rounded-lg sm:rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {teamOptions.map((team) => (
+                        <label
+                          key={team}
+                          className="flex items-center px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedTeams.includes(team)}
+                            onChange={() => handleTeamSelection(team)}
+                            className="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-3"
+                          />
+                          <span className="text-gray-800 text-sm sm:text-base flex-1">{team}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected Teams Display */}
+                {selectedTeams.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {selectedTeams.map((team) => (
+                      <span
+                        key={team}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
+                      >
+                        {team}
+                        <button
+                          type="button"
+                          onClick={() => handleTeamSelection(team)}
+                          className="ml-1 hover:bg-blue-200 rounded-full p-1"
+                        >
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {errors.team && <span className="text-red-400 text-xs sm:text-sm mt-1">{errors.team.message}</span>}
               </div>
               {/* Campus */}
               <div className="flex flex-col w-full">
