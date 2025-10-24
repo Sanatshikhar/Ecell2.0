@@ -14,21 +14,33 @@ const defaultOptions = [
   { id: 'D', label: 'Option D' },
 ];
 
-const defaultQuestions = [
-  'Question 1: Which option is best?',
-  'Question 2: Pick the correct answer',
-  'Question 3: Final poll question'
+// Quiz questions with their specific options
+const quizQuestions = [
+  {
+    question: 'YOUR QUESTION HERE',
+    options: [
+      { id: 'A', label: 'YOUR OPTION A' },
+      { id: 'B', label: 'YOUR OPTION B' },
+      { id: 'C', label: 'YOUR OPTION C' },
+      { id: 'D', label: 'YOUR OPTION D' }
+    ]
+  },
+  // Add more questions...
 ];
+
+const defaultQuestions = quizQuestions.map(q => q.question);
 export default function AudiencePoll({ wsUrl, question = 'Which option do you prefer?' }) {
-  const [options] = useState(defaultOptions);
-  const [votes, setVotes] = useState(() => options.map(() => 0));
+  const [options, setOptions] = useState(defaultOptions);
+  const [votes, setVotes] = useState(() => defaultOptions.map(() => 0));
   const [running, setRunning] = useState(true);
   const [pollActive, setPollActive] = useState(false);
   const [questions] = useState(defaultQuestions);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [currentQuestionText, setCurrentQuestionText] = useState('');
+  const [fastestVoters, setFastestVoters] = useState([]);
   const wsRef = useRef(null);
   const fetchingRef = useRef(false);
+  const leaderboardTimerRef = useRef(null);
 
   // Connect to a WebSocket URL if provided (simple optional hook)
   useEffect(() => {
@@ -61,20 +73,57 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       fetchingRef.current = true;
       if (qIndex == null || qIndex < 0) {
         setVotes(options.map(() => 0));
+        setFastestVoters([]);
         return;
       }
-      const all = await pb.collection('poll_system').getFullList({ filter: `type=\"vote\" && questionIndex=${qIndex}` });
+      const all = await pb.collection('poll_system').getFullList({ 
+        filter: `type=\"vote\" && questionIndex=${qIndex}`,
+        sort: 'created',
+        requestKey: null 
+      });
       const counts = options.map(() => 0);
       all.forEach((r) => {
         const index = ['A','B','C','D'].indexOf(r.option);
         if (index >= 0) counts[index] += 1;
       });
       setVotes(counts);
+      
+      // Update leaderboard (debounced to prevent freezing)
+      updateLeaderboard(qIndex);
     } catch (err) {
       console.error('Failed to fetch votes:', err);
     } finally {
       fetchingRef.current = false;
     }
+  };
+
+  // Debounced leaderboard update to prevent freezing
+  const updateLeaderboard = (qIndex) => {
+    if (leaderboardTimerRef.current) {
+      clearTimeout(leaderboardTimerRef.current);
+    }
+    
+    leaderboardTimerRef.current = setTimeout(async () => {
+      try {
+        const all = await pb.collection('poll_system').getFullList({ 
+          filter: `type=\"vote\" && questionIndex=${qIndex}`,
+          sort: 'created',
+          requestKey: null,
+          $autoCancel: false
+        });
+        
+        const fastest = all.slice(0, 10).map((vote, index) => ({
+          rank: index + 1,
+          regNo: vote.regNo,
+          option: vote.option,
+          time: new Date(vote.created).toLocaleTimeString()
+        }));
+        console.log('Fastest voters:', fastest);
+        setFastestVoters(fastest);
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+      }
+    }, 1000); // Update leaderboard max once per second
   };
 
   // PocketBase: subscribe to polls and poll_votes updates
@@ -106,8 +155,30 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       // Check if it's a config update or vote update
       if (e.record?.type === 'config') {
         await refreshPollState();
-      } else if (e.record?.type === 'vote' && !fetchingRef.current) {
-        fetchVotesForCurrentQuestion(currentQuestionIndex);
+      } else if (e.record?.type === 'vote' && e.record.questionIndex === currentQuestionIndex) {
+        // Incrementally update vote count instead of fetching all votes
+        if (e.action === 'create') {
+          const optionIndex = ['A','B','C','D'].indexOf(e.record.option);
+          if (optionIndex >= 0) {
+            setVotes((prev) => {
+              const newVotes = [...prev];
+              newVotes[optionIndex] = newVotes[optionIndex] + 1;
+              return newVotes;
+            });
+          }
+        } else if (e.action === 'delete') {
+          const optionIndex = ['A','B','C','D'].indexOf(e.record.option);
+          if (optionIndex >= 0) {
+            setVotes((prev) => {
+              const newVotes = [...prev];
+              newVotes[optionIndex] = Math.max(0, newVotes[optionIndex] - 1);
+              return newVotes;
+            });
+          }
+        } else if (e.action === 'update') {
+          // If option changed, refetch to be safe
+          fetchVotesForCurrentQuestion(currentQuestionIndex);
+        }
       }
     });
 
@@ -115,7 +186,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       mounted = false;
       try { pb.collection('poll_system').unsubscribe(pollSystemSub); } catch (e) {}
     };
-  }, [options]);
+  }, [currentQuestionIndex]);
 
   // Separate effect to fetch votes when questionIndex changes
   useEffect(() => {
@@ -198,6 +269,9 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       setPollActive(true);
       setCurrentQuestionIndex(0);
       setCurrentQuestionText(questions[0]);
+      // Update options for question 0
+      setOptions(quizQuestions[0].options);
+      setVotes(quizQuestions[0].options.map(() => 0));
       // ensure votes cleared for new question
       await clearVotes();
     } catch (err) {
@@ -227,9 +301,39 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       else await pb.collection('poll_system').create(payload);
       setCurrentQuestionIndex(next);
       setCurrentQuestionText(questions[next]);
+      // Update options for next question
+      setOptions(quizQuestions[next].options);
+      setVotes(quizQuestions[next].options.map(() => 0));
       setPollActive(true);
     } catch (err) {
       console.error('nextQuestion failed', err);
+    }
+  }
+
+  // go back to previous question
+  async function previousQuestion() {
+    try {
+      const prev = currentQuestionIndex - 1;
+      if (prev < 0) {
+        // Can't go before first question
+        return;
+      }
+      // clear current votes
+      await clearVotes();
+      // update poll config record
+      let rec;
+      try { rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); } catch (e) { rec = null; }
+      const payload = { type: 'config', active: true, questionIndex: prev, question: questions[prev] };
+      if (rec && rec.id) await pb.collection('poll_system').update(rec.id, payload);
+      else await pb.collection('poll_system').create(payload);
+      setCurrentQuestionIndex(prev);
+      setCurrentQuestionText(questions[prev]);
+      // Update options for previous question
+      setOptions(quizQuestions[prev].options);
+      setVotes(quizQuestions[prev].options.map(() => 0));
+      setPollActive(true);
+    } catch (err) {
+      console.error('previousQuestion failed', err);
     }
   }
 
@@ -293,10 +397,21 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
           <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center space-x-3">
               <button
-                onClick={startQuiz}
-                className={`px-4 py-2 rounded text-white ${pollActive ? 'bg-green-600' : 'bg-blue-600 hover:brightness-110'}`}
+                onClick={pollActive ? () => setPollActiveState(false) : startQuiz}
+                className={`px-4 py-2 rounded text-white ${pollActive ? 'bg-red-600 hover:brightness-110' : 'bg-blue-600 hover:brightness-110'}`}
               >
-                Start Quiz
+                {pollActive ? 'Stop Quiz' : 'Start Quiz'}
+              </button>
+              <button
+                onClick={previousQuestion}
+                disabled={currentQuestionIndex <= 0}
+                className={`px-4 py-2 rounded text-white ${
+                  currentQuestionIndex <= 0 
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                    : 'bg-orange-600 hover:brightness-110'
+                }`}
+              >
+                Previous Question
               </button>
               <button
                 onClick={nextQuestion}
@@ -311,6 +426,54 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
             </div>
           </div>
         </div>
+
+        {/* Leaderboard - Fastest Voters */}
+        {/* Debug: Show count */}
+        <div className="text-white text-center mt-4">Fastest Voters Count: {fastestVoters.length}</div>
+        
+        {fastestVoters.length > 0 && (
+          <div className="bg-black/90 border border-blue-400/30 shadow-xl rounded-2xl p-6 mt-6">
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <span className="mr-2">🏆</span>
+              Fastest Voters - Top 10
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-blue-400/30">
+                    <th className="pb-2 text-sm font-semibold text-blue-300">Rank</th>
+                    <th className="pb-2 text-sm font-semibold text-blue-300">Reg No.</th>
+                    <th className="pb-2 text-sm font-semibold text-blue-300">Answer</th>
+                    <th className="pb-2 text-sm font-semibold text-blue-300">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fastestVoters.map((voter) => (
+                    <tr key={voter.rank} className="border-b border-white/5">
+                      <td className="py-2 text-white">
+                        <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
+                          voter.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
+                          voter.rank === 2 ? 'bg-gray-400/20 text-gray-300' :
+                          voter.rank === 3 ? 'bg-orange-500/20 text-orange-400' :
+                          'bg-blue-500/20 text-blue-300'
+                        } font-bold text-sm`}>
+                          {voter.rank}
+                        </span>
+                      </td>
+                      <td className="py-2 text-white font-medium">{voter.regNo}</td>
+                      <td className="py-2">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold">
+                          {voter.option}
+                        </span>
+                      </td>
+                      <td className="py-2 text-blue-200 text-sm">{voter.time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         <div className="relative mt-8 h-40">
           {/* Decorative floating bubbles like WhatsApp/KBC vibe */}
