@@ -12,6 +12,8 @@ import Join from "./components/TechXperience";
 import ComingSoon from "./components/ComingSoon";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
+import AudiencePoll from './components/AudiencePoll';
+import AudienceVote from './components/AudienceVote';
 import Verify from './components/Verify';
 import Login from './components/Login';
 import pb from './lib/pocketbase';
@@ -32,7 +34,7 @@ function App() {
 
   return (
     <Router>
-      {!(window.location.pathname === '/registrations' || window.location.pathname === '/verify') && <Header />}
+  {!(window.location.pathname === '/registrations' || window.location.pathname === '/verify' || window.location.pathname === '/audience-poll' || window.location.pathname === '/audience-vote') && <Header />}
       <Routes>
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
@@ -45,6 +47,8 @@ function App() {
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
+        <Route path="/audience-poll" element={<AudiencePoll />} />
+  <Route path="/audience-vote" element={<AudienceVote />} />
       </Routes>
     </Router>
   );

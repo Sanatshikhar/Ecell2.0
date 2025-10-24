@@ -1,0 +1,36 @@
+.bar {
+  transition: width 700ms cubic-bezier(.2,.9,.2,1);
+}
+
+.bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: rgba(124,58,237,0.9); /* purple */
+  border-radius: 9999px;
+  opacity: 0.95;
+  transform: translateY(0) scale(1);
+  animation: rise 2600ms linear infinite;
+}
+
+.bubble:nth-child(2) { left: 18%; width: 14px; height:14px; animation-duration: 3100ms; background: rgba(59,130,246,0.95); /* blue */ }
+.bubble:nth-child(3) { left: 78%; width: 8px; height:8px; animation-duration: 2000ms; background: rgba(124,58,237,0.7); }
+.bubble:nth-child(4) { left: 36%; width: 12px; height:12px; animation-duration: 2800ms; background: rgba(99,102,241,0.6); }
+.bubble:nth-child(5) { left: 66%; width: 9px; height:9px; animation-duration: 2600ms; background: rgba(6,182,212,0.6); }
+
+@keyframes rise {
+  0% { transform: translateY(0) scale(0.9); opacity: 0.95; }
+  30% { transform: translateY(-40%) scale(1.05); opacity: 0.9; }
+  60% { transform: translateY(-90%) scale(1); opacity: 0.6; }
+  100% { transform: translateY(-160%) scale(0.9); opacity: 0; }
+}
