@@ -14,33 +14,62 @@ const defaultOptions = [
   { id: 'D', label: 'Option D' },
 ];
 
-// Quiz questions with their specific options
-const quizQuestions = [
-  {
-    question: 'YOUR QUESTION HERE',
-    options: [
-      { id: 'A', label: 'YOUR OPTION A' },
-      { id: 'B', label: 'YOUR OPTION B' },
-      { id: 'C', label: 'YOUR OPTION C' },
-      { id: 'D', label: 'YOUR OPTION D' }
-    ]
-  },
-  // Add more questions...
-];
-
-const defaultQuestions = quizQuestions.map(q => q.question);
 export default function AudiencePoll({ wsUrl, question = 'Which option do you prefer?' }) {
   const [options, setOptions] = useState(defaultOptions);
   const [votes, setVotes] = useState(() => defaultOptions.map(() => 0));
   const [running, setRunning] = useState(true);
   const [pollActive, setPollActive] = useState(false);
-  const [questions] = useState(defaultQuestions);
+  const [questions, setQuestions] = useState([]);
+  const [quizQuestions, setQuizQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [currentQuestionText, setCurrentQuestionText] = useState('');
   const [fastestVoters, setFastestVoters] = useState([]);
+  const [loading, setLoading] = useState(true);
   const wsRef = useRef(null);
   const fetchingRef = useRef(false);
   const leaderboardTimerRef = useRef(null);
+
+  // Load questions from PocketBase on component mount
+  useEffect(() => {
+    async function loadQuestionsFromDB() {
+      try {
+        setLoading(true);
+        // Fetch all quiz questions from PocketBase
+        const records = await pb.collection('quiz_questions').getFullList({
+          sort: 'questionIndex',
+          requestKey: null
+        });
+
+        if (records.length === 0) {
+          alert('No questions found in database. Please add questions to the quiz_questions collection in PocketBase.');
+          setLoading(false);
+          return;
+        }
+
+        // Transform database records to quiz format
+        const loadedQuestions = records.map(r => ({
+          question: r.questionText || r.question,
+          options: [
+            { id: 'A', label: r.optionA || 'Option A' },
+            { id: 'B', label: r.optionB || 'Option B' },
+            { id: 'C', label: r.optionC || 'Option C' },
+            { id: 'D', label: r.optionD || 'Option D' }
+          ]
+        }));
+
+        setQuizQuestions(loadedQuestions);
+        setQuestions(loadedQuestions.map(q => q.question));
+        console.log('Loaded questions from database:', loadedQuestions);
+      } catch (err) {
+        console.error('Failed to load questions:', err);
+        alert('Failed to load questions from database. Error: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadQuestionsFromDB();
+  }, []);
 
   // Connect to a WebSocket URL if provided (simple optional hook)
   useEffect(() => {
@@ -349,6 +378,16 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   }
 
   const total = votes.reduce((s, v) => s + v, 0) || 1;
+
+  // Show loading state while fetching questions
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden flex flex-col items-center justify-center">
+        <div className="text-white text-3xl font-extrabold tracking-tight mb-4">IEC - Technical</div>
+        <div className="text-blue-300 text-xl">Loading questions from database...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden flex flex-col">
