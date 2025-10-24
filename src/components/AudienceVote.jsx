@@ -8,6 +8,89 @@ export default function AudienceVote() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [currentQuestionText, setCurrentQuestionText] = useState('');
   const [pollActive, setPollActive] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [currentOptions, setCurrentOptions] = useState([
+    { id: 'A', label: 'Option A' },
+    { id: 'B', label: 'Option B' },
+    { id: 'C', label: 'Option C' },
+    { id: 'D', label: 'Option D' },
+  ]);
+  const [timer, setTimer] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [userVote, setUserVote] = useState(null);
+
+  // Load quiz questions from database
+  useEffect(() => {
+    async function loadQuestions() {
+      try {
+        const records = await pb.collection('quiz_questions').getFullList({
+          sort: 'questionIndex',
+          requestKey: null
+        });
+        
+        const loadedQuestions = records.map(r => ({
+          question: r.questionText || r.question,
+          options: [
+            { id: 'A', label: r.optionA || 'Option A' },
+            { id: 'B', label: r.optionB || 'Option B' },
+            { id: 'C', label: r.optionC || 'Option C' },
+            { id: 'D', label: r.optionD || 'Option D' }
+          ]
+        }));
+        
+        setQuizQuestions(loadedQuestions);
+      } catch (error) {
+        console.error('Failed to load quiz questions:', error);
+      }
+    }
+    
+    loadQuestions();
+  }, []);
+
+  // Update current options when question changes
+  useEffect(() => {
+    if (currentQuestionIndex >= 0 && quizQuestions[currentQuestionIndex]) {
+      setCurrentOptions(quizQuestions[currentQuestionIndex].options);
+    }
+    // Reset voting state when question changes
+    setHasVoted(false);
+    setUserVote(null);
+    setMessage(null);
+  }, [currentQuestionIndex, quizQuestions]);
+
+  // Check if user has already voted for current question
+  useEffect(() => {
+    async function checkExistingVote() {
+      if (!regNo || currentQuestionIndex < 0) {
+        setHasVoted(false);
+        setUserVote(null);
+        return;
+      }
+
+      try {
+        const existing = await pb.collection('poll_system').getList(1, 1, { 
+          filter: `type=\"vote\" && regNo=\"${regNo}\" && questionIndex=${currentQuestionIndex}`,
+          requestKey: null 
+        });
+        
+        if (existing.items && existing.items.length > 0) {
+          setHasVoted(true);
+          setUserVote(existing.items[0].option);
+          setMessage({ type: 'success', text: `You have already voted ${existing.items[0].option} for this question.` });
+        } else {
+          setHasVoted(false);
+          setUserVote(null);
+        }
+      } catch (error) {
+        console.error('Error checking existing vote:', error);
+        setHasVoted(false);
+        setUserVote(null);
+      }
+    }
+
+    checkExistingVote();
+  }, [regNo, currentQuestionIndex]);
 
   // Realtime subscription to poll updates
   useEffect(() => {
@@ -21,11 +104,22 @@ export default function AudienceVote() {
         const qIndex = typeof poll.questionIndex === 'number' ? poll.questionIndex : (poll.questionIndex ? Number(poll.questionIndex) : -1);
         setCurrentQuestionIndex(qIndex);
         setCurrentQuestionText(poll.question || '');
+        
+        // Timer sync - only start timer if poll is active AND timer is actually active
+        if (poll.active && poll.timerActive) {
+          setTimer(15);
+          setTimerActive(true);
+        } else {
+          setTimer(0);
+          setTimerActive(false);
+        }
       } catch (err) {
         if (!mounted) return;
         setPollActive(false);
         setCurrentQuestionIndex(-1);
         setCurrentQuestionText('');
+        setTimer(0);
+        setTimerActive(false);
       }
     }
 
@@ -44,6 +138,29 @@ export default function AudienceVote() {
       try { pb.collection('poll_system').unsubscribe(pollSub); } catch (e) {}
     };
   }, []);
+
+  // Timer countdown effect
+  useEffect(() => {
+    let timerInterval;
+    
+    if (timerActive && timer > 0) {
+      timerInterval = setInterval(() => {
+        setTimer(prev => {
+          if (prev <= 1) {
+            setTimerActive(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    };
+  }, [timerActive, timer]);
 
   // Assumptions:
   // - registrations are stored in collection 'iecReg' and the registration number field is 'regNo'
@@ -98,12 +215,16 @@ export default function AudienceVote() {
           type: 'vote', option, regNo, questionIndex: currentQuestionIndex 
         }, { requestKey: null });
         setMessage({ type: 'success', text: `Vote updated to ${option}. Thank you!` });
+        setHasVoted(true);
+        setUserVote(option);
       } else {
         // create
         await pb.collection('poll_system').create({ 
           type: 'vote', option, regNo, questionIndex: currentQuestionIndex 
         }, { requestKey: null });
         setMessage({ type: 'success', text: `Voted ${option}. Thank you!` });
+        setHasVoted(true);
+        setUserVote(option);
       }
     } catch (err) {
       console.error('Vote error:', err);
@@ -134,8 +255,15 @@ export default function AudienceVote() {
         <div className="bg-black/90 border border-blue-400/30 rounded-2xl p-6 shadow-xl w-full">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Audience Voting</h2>
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${pollActive ? 'bg-green-600/20 text-green-400 border border-green-400/30' : 'bg-red-600/20 text-red-400 border border-red-400/30'}`}>
-              {pollActive ? 'LIVE' : 'STOPPED'}
+            <div className="flex flex-col items-end gap-2">
+              <div className={`px-3 py-1 rounded-full text-xs font-semibold ${pollActive ? 'bg-green-600/20 text-green-400 border border-green-400/30' : 'bg-red-600/20 text-red-400 border border-red-400/30'}`}>
+                {pollActive ? 'LIVE' : 'STOPPED'}
+              </div>
+              {timerActive && (
+                <div className={`px-3 py-1 rounded-full text-sm font-bold border ${timer <= 5 ? 'bg-red-600/20 text-red-400 border-red-400/30 animate-pulse' : timer <= 10 ? 'bg-yellow-600/20 text-yellow-400 border-yellow-400/30' : 'bg-green-600/20 text-green-400 border-green-400/30'}`}>
+                  {timer}s
+                </div>
+              )}
             </div>
           </div>
           
@@ -149,7 +277,12 @@ export default function AudienceVote() {
             <p className="text-sm text-blue-200 mb-4">Waiting for question...</p>
           )}
           
-          <p className="text-sm text-blue-200 mb-4">Enter your registration number and choose an option.</p>
+          <p className="text-sm text-blue-200 mb-4">
+            {hasVoted 
+              ? `You have voted ${userVote}. Waiting for next question...` 
+              : 'Enter your registration number and choose an option.'
+            }
+          </p>
 
           <label className="block text-sm font-medium text-white mb-2">Registration Number</label>
           <input
@@ -159,17 +292,36 @@ export default function AudienceVote() {
             placeholder="Reg/Application No."
           />
 
-          <div className="grid grid-cols-4 gap-3">
-            {['A', 'B', 'C', 'D'].map((opt) => (
-              <button
-                key={opt}
-                onClick={() => handleVote(opt)}
-                disabled={loading}
-                className="px-3 py-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white font-bold hover:scale-105 transition"
-              >
-                {opt}
-              </button>
-            ))}
+          <div className="grid grid-cols-1 gap-3">
+            {currentOptions.map((opt) => {
+              const isSelected = userVote === opt.id;
+              const isDisabled = loading || !pollActive || hasVoted;
+              
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => handleVote(opt.id)}
+                  disabled={isDisabled}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
+                    isSelected
+                      ? 'bg-green-600 border-2 border-green-400 text-white' // Highlight selected option
+                      : hasVoted
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed' // Disabled after voting
+                      : isDisabled
+                      ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] opacity-50 cursor-not-allowed text-white'
+                      : 'bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] text-white hover:scale-[1.02] transform'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                    isSelected ? 'bg-green-200 text-green-800' : 'bg-white/20'
+                  }`}>
+                    {opt.id}
+                    {isSelected && <span className="ml-1">✓</span>}
+                  </div>
+                  <span className="text-left flex-1">{opt.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {message && (

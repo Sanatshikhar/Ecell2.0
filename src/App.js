@@ -47,8 +47,8 @@ function App() {
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
-        <Route path="/audience-poll" element={<AudiencePoll />} />
-  <Route path="/audience-vote" element={<AudienceVote />} />
+        <Route path="/audience-poll" element={auth ? <AudiencePoll /> : <Login onLogin={() => setAuth(true)} />} />
+        <Route path="/audience-vote" element={<AudienceVote />} />
       </Routes>
     </Router>
   );

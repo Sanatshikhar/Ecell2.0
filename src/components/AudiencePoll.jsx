@@ -25,9 +25,36 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   const [currentQuestionText, setCurrentQuestionText] = useState('');
   const [fastestVoters, setFastestVoters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [timer, setTimer] = useState(15);
+  const [timerActive, setTimerActive] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
+  const [correctAnswer, setCorrectAnswer] = useState('');
   const wsRef = useRef(null);
   const fetchingRef = useRef(false);
   const leaderboardTimerRef = useRef(null);
+  const pollTimerRef = useRef(null);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = () => {
+      if (!pb.authStore.isValid) {
+        // Redirect to login or show unauthorized message
+        window.location.href = '/audience-poll'; // This will trigger the route protection
+        return;
+      }
+      setIsAuthenticated(true);
+    };
+
+    checkAuth();
+
+    // Listen for auth state changes
+    const unsubscribe = pb.authStore.onChange(() => {
+      checkAuth();
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Load questions from PocketBase on component mount
   useEffect(() => {
@@ -46,16 +73,33 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
           return;
         }
 
+        // Log the first record to see available fields
+        if (records.length > 0) {
+          console.log('First quiz question record fields:', Object.keys(records[0]));
+          console.log('First record data:', records[0]);
+        }
+
         // Transform database records to quiz format
-        const loadedQuestions = records.map(r => ({
-          question: r.questionText || r.question,
-          options: [
-            { id: 'A', label: r.optionA || 'Option A' },
-            { id: 'B', label: r.optionB || 'Option B' },
-            { id: 'C', label: r.optionC || 'Option C' },
-            { id: 'D', label: r.optionD || 'Option D' }
-          ]
-        }));
+        const loadedQuestions = records.map(r => {
+          console.log('Processing record:', r);
+          console.log('Available correct answer fields:', {
+            correct: r.correct,
+            correctAnswer: r.correctAnswer,
+            answer: r.answer,
+            correctOption: r.correctOption
+          });
+          
+          return {
+            question: r.questionText || r.question,
+            options: [
+              { id: 'A', label: r.optionA || 'Option A' },
+              { id: 'B', label: r.optionB || 'Option B' },
+              { id: 'C', label: r.optionC || 'Option C' },
+              { id: 'D', label: r.optionD || 'Option D' }
+            ],
+            correct: r.correct || r.correctAnswer || r.answer || r.correctOption || 'A' // Check multiple field names
+          };
+        });
 
         setQuizQuestions(loadedQuestions);
         setQuestions(loadedQuestions.map(q => q.question));
@@ -68,7 +112,41 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       }
     }
 
-    loadQuestionsFromDB();
+    if (isAuthenticated) {
+      loadQuestionsFromDB();
+    }
+  }, [isAuthenticated]);
+
+  // Timer effect - handles the 15-second countdown
+  useEffect(() => {
+    if (timerActive && timer > 0) {
+      pollTimerRef.current = setTimeout(() => {
+        setTimer(timer - 1);
+      }, 1000);
+    } else if (timerActive && timer === 0) {
+      // Timer reached zero, do exactly what the "Stop Quiz" button does
+      console.log('Timer reached zero, stopping quiz...');
+      console.log('Before stopping - pollActive:', pollActive, 'timerActive:', timerActive);
+      setTimerActive(false);
+      setPollActiveState(false); // Same as "Stop Quiz" button
+      setTimer(15); // Reset timer for next question
+      console.log('After stopping - timer reset to 15');
+    }
+
+    return () => {
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+      }
+    };
+  }, [timer, timerActive]);
+
+  // Cleanup timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+      }
+    };
   }, []);
 
   // Connect to a WebSocket URL if provided (simple optional hook)
@@ -163,12 +241,14 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       try {
         const p = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`);
         if (!mounted) return;
+        console.log('refreshPollState - database state:', { active: p.active, timerActive: p.timerActive, questionIndex: p.questionIndex });
         setPollActive(!!p.active);
         const qi = typeof p.questionIndex === 'number' ? p.questionIndex : (p.questionIndex ? Number(p.questionIndex) : -1);
         setCurrentQuestionIndex(qi ?? -1);
         setCurrentQuestionText(p.question || '');
       } catch (e) {
         if (!mounted) return;
+        console.log('refreshPollState - no config found, setting inactive');
         setPollActive(false);
         setCurrentQuestionIndex(-1);
         setCurrentQuestionText('');
@@ -181,8 +261,10 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
     })();
 
     const pollSystemSub = pb.collection('poll_system').subscribe('*', async (e) => {
+      console.log('PocketBase subscription event:', e);
       // Check if it's a config update or vote update
       if (e.record?.type === 'config') {
+        console.log('Config update detected in subscription');
         await refreshPollState();
       } else if (e.record?.type === 'vote' && e.record.questionIndex === currentQuestionIndex) {
         // Incrementally update vote count instead of fetching all votes
@@ -250,6 +332,22 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   //   };
   // }, [running, wsUrl, options.length]);
 
+  // Function to start the timer and update database
+  async function startTimer() {
+    try {
+      setTimer(15);
+      setTimerActive(true);
+      
+      // Update database to reflect timer state
+      const rec = await pb.collection('poll_system').getFirstListItem(`type="config"`);
+      if (rec && rec.id) {
+        await pb.collection('poll_system').update(rec.id, { timerActive: true });
+      }
+    } catch (error) {
+      console.error('Failed to start timer:', error);
+    }
+  }
+
   // Start/Stop poll control which updates PocketBase poll_system config record
   async function setPollActiveState(active) {
     try {
@@ -261,20 +359,29 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         rec = null;
       }
       if (rec && rec.id) {
-        await pb.collection('poll_system').update(rec.id, { active });
+        await pb.collection('poll_system').update(rec.id, { active, timerActive: false });
       } else {
-        await pb.collection('poll_system').create({ type: 'config', active });
+        await pb.collection('poll_system').create({ type: 'config', active, timerActive: false });
       }
       setPollActive(active);
+      // Stop timer when poll is deactivated
+      if (!active) {
+        setTimerActive(false);
+        setTimer(15); // Reset timer
+      }
     } catch (err) {
       console.error('Failed to update poll state', err);
     }
   }
 
-  // start the quiz (question 0)
+  // start the quiz (from current question)
   async function startQuiz() {
     try {
-      console.log('Starting quiz...');
+      console.log('Starting quiz from question:', currentQuestionIndex);
+      
+      // If no question is selected, start from question 0
+      const questionIndex = currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
+      
       let rec;
       try { 
         rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); 
@@ -283,7 +390,13 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         console.log('No existing config found, will create new one');
         rec = null; 
       }
-      const payload = { type: 'config', active: true, questionIndex: 0, question: questions[0] };
+      const payload = { 
+        type: 'config', 
+        active: true, 
+        questionIndex: questionIndex, 
+        question: questions[questionIndex],
+        timerActive: true
+      };
       console.log('Payload:', payload);
       
       if (rec && rec.id) {
@@ -294,18 +407,50 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         await pb.collection('poll_system').create(payload);
       }
       
-      console.log('Quiz started successfully!');
+      console.log('Quiz started successfully from question:', questionIndex);
       setPollActive(true);
-      setCurrentQuestionIndex(0);
-      setCurrentQuestionText(questions[0]);
-      // Update options for question 0
-      setOptions(quizQuestions[0].options);
-      setVotes(quizQuestions[0].options.map(() => 0));
+      setCurrentQuestionIndex(questionIndex);
+      setCurrentQuestionText(questions[questionIndex]);
+      // Update options for current question
+      setOptions(quizQuestions[questionIndex].options);
+      setVotes(quizQuestions[questionIndex].options.map(() => 0));
+      // Start the 15-second timer
+      setTimer(15);
+      setTimerActive(true);
       // ensure votes cleared for new question
       await clearVotes();
+      // Hide correct answer when starting quiz
+      setShowCorrectAnswer(false);
     } catch (err) {
       console.error('startQuiz failed:', err);
       alert('Failed to start quiz: ' + err.message + '\n\nCheck console for details.');
+    }
+  }
+
+  // show correct answer for current question
+  function showCorrectAnswerForQuestion() {
+    if (currentQuestionIndex >= 0 && currentQuestionIndex < quizQuestions.length) {
+      const currentQuestion = quizQuestions[currentQuestionIndex];
+      console.log('Current question data:', currentQuestion);
+      
+      const correctOption = currentQuestion.correct;
+      console.log('Correct option value:', correctOption);
+      
+      if (!correctOption || correctOption === 'undefined') {
+        alert('Correct answer not found in database. Please check that your quiz_questions collection has a field named "correct", "correctAnswer", "answer", or "correctOption".');
+        return;
+      }
+      
+      // Find the full text of the correct option
+      const correctOptionData = currentQuestion.options.find(opt => opt.id === correctOption);
+      const correctOptionLabel = correctOptionData ? correctOptionData.label : `${correctOption}`;
+      
+      setCorrectAnswer(correctOptionLabel);
+      setShowCorrectAnswer(true);
+      
+      console.log('Correct answer for question', currentQuestionIndex + 1, ':', correctOption, '-', correctOptionLabel);
+    } else {
+      alert('Please select a question first');
     }
   }
 
@@ -325,7 +470,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       // update poll config record
       let rec;
       try { rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); } catch (e) { rec = null; }
-      const payload = { type: 'config', active: true, questionIndex: next, question: questions[next] };
+      const payload = { type: 'config', active: false, questionIndex: next, question: questions[next], timerActive: false };
       if (rec && rec.id) await pb.collection('poll_system').update(rec.id, payload);
       else await pb.collection('poll_system').create(payload);
       setCurrentQuestionIndex(next);
@@ -333,7 +478,10 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       // Update options for next question
       setOptions(quizQuestions[next].options);
       setVotes(quizQuestions[next].options.map(() => 0));
-      setPollActive(true);
+      // Hide correct answer when changing question
+      setShowCorrectAnswer(false);
+      // Don't set poll active - only navigation, not starting poll
+      // setPollActive(true); // Removed this line
     } catch (err) {
       console.error('nextQuestion failed', err);
     }
@@ -352,7 +500,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       // update poll config record
       let rec;
       try { rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); } catch (e) { rec = null; }
-      const payload = { type: 'config', active: true, questionIndex: prev, question: questions[prev] };
+      const payload = { type: 'config', active: false, questionIndex: prev, question: questions[prev], timerActive: false };
       if (rec && rec.id) await pb.collection('poll_system').update(rec.id, payload);
       else await pb.collection('poll_system').create(payload);
       setCurrentQuestionIndex(prev);
@@ -360,7 +508,10 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       // Update options for previous question
       setOptions(quizQuestions[prev].options);
       setVotes(quizQuestions[prev].options.map(() => 0));
-      setPollActive(true);
+      // Hide correct answer when changing question
+      setShowCorrectAnswer(false);
+      // Don't set poll active - only navigation, not starting poll
+      // setPollActive(true); // Removed this line
     } catch (err) {
       console.error('previousQuestion failed', err);
     }
@@ -378,6 +529,16 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   }
 
   const total = votes.reduce((s, v) => s + v, 0) || 1;
+
+  // Check authentication first
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-black text-white py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden flex flex-col items-center justify-center">
+        <div className="text-white text-3xl font-extrabold tracking-tight mb-4">IEC - Technical</div>
+        <div className="text-red-400 text-xl">Authenticating...</div>
+      </div>
+    );
+  }
 
   // Show loading state while fetching questions
   if (loading) {
@@ -399,12 +560,38 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         <div className="bg-black/90 border border-blue-400/30 shadow-xl rounded-2xl p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-white">Live Audience Poll</h2>
-              <p className="mt-1 text-sm text-blue-200">{question}</p>
+              <h2 className="text-2xl font-semibold text-white">
+                {currentQuestionIndex >= 0 ? `Q${currentQuestionIndex + 1}: ${currentQuestionText}` : 'Live Audience Poll'}
+              </h2>
+              {showCorrectAnswer && (
+                <div className="mt-3 p-3 bg-green-900/50 border border-green-400 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="text-green-400 font-semibold">✓ Correct Answer:</div>
+                    <div className="text-green-300 font-medium">{correctAnswer}</div>
+                    <button
+                      onClick={() => setShowCorrectAnswer(false)}
+                      className="ml-auto text-green-400 hover:text-green-300 text-sm underline"
+                    >
+                      Hide
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="text-right">
-              <div className="text-sm text-blue-300">Total votes</div>
-              <div className="text-lg font-medium text-white">{total}</div>
+              {timerActive ? (
+                <>
+                  <div className="text-sm text-blue-300">Time Remaining</div>
+                  <div className={`text-2xl font-bold ${timer <= 5 ? 'text-red-400 animate-pulse' : timer <= 10 ? 'text-yellow-400' : 'text-green-400'}`}>
+                    {timer}s
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm text-blue-300">Total votes</div>
+                  <div className="text-lg font-medium text-white">{total}</div>
+                </>
+              )}
             </div>
           </div>
 
@@ -458,10 +645,20 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
               >
                 Next Question
               </button>
+              <button
+                onClick={showCorrectAnswerForQuestion}
+                disabled={currentQuestionIndex < 0}
+                className={`px-4 py-2 rounded text-white ${
+                  currentQuestionIndex < 0 
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                    : 'bg-green-600 hover:brightness-110'
+                }`}
+              >
+                Show Correct Answer
+              </button>
             </div>
 
             <div className="text-sm text-blue-300">Poll is: <span className={`font-semibold ${pollActive ? 'text-green-400' : 'text-red-400'}`}>{pollActive ? 'LIVE' : 'STOPPED'}</span>
-            {currentQuestionIndex >= 0 && <span className="ml-2 text-sm text-white">Q{currentQuestionIndex+1}: {currentQuestionText}</span>}
             </div>
           </div>
         </div>
