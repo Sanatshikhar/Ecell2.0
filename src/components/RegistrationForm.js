@@ -119,7 +119,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
       setShowSuccess(true);
       reset();
     } catch (err) {
-      alert("Error submitting registration: " + err.message);
+      alert("Error submitting registration: ");
     } finally {
       setLoading(false);
     }
