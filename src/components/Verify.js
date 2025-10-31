@@ -120,7 +120,7 @@ const Verify = () => {
     }
     const safeToken = token.replace(/"/g, '\"');
     try {
-      const result = await pb.collection('iecReg').getFirstListItem(`qr_token="${safeToken}"`);
+      const result = await pb.collection('joiningReg2025').getFirstListItem(`qr_token="${safeToken}"`);
       if (!result) {
         setStatus('invalid');
         setMessage('Invalid QR Token');
@@ -131,7 +131,7 @@ const Verify = () => {
         setIcon('already');
         setVerifiedName(result.name || '');
       } else {
-        await pb.collection('iecReg').update(result.id, { verified: true });
+        await pb.collection('joiningReg2025').update(result.id, { verified: true });
         setStatus('verified');
         setMessage('Verified Successfully');
         setIcon('verified');
@@ -185,7 +185,7 @@ const Verify = () => {
   const sendBulkEmails = async () => {
     setBulkMailStatus({ step: 'fetching', count: 0, sent: 0 });
     // Fetch all registrations (or filter as needed)
-    const registrations = await pb.collection('iecReg').getFullList();
+    const registrations = await pb.collection('joiningReg2025').getFullList();
     const unsent = registrations.filter(r => !r.mailSent);
     if (unsent.length === 0) {
       setBulkMailStatus({ step: 'none', count: 0, sent: 0 });
@@ -199,29 +199,44 @@ const Verify = () => {
     const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://your-backend-domain.com';
     for (const user of unsent) {
       let token = user.qr_token;
-      if (!token) {
+      if (user.qr_token !== undefined && !token) {
         if (window.crypto && window.crypto.randomUUID) {
           token = window.crypto.randomUUID();
         } else {
           token = Math.random().toString(36).substr(2, 16);
         }
         try {
-          await pb.collection('iecReg').update(user.id, { qr_token: token });
+          await pb.collection('joiningReg2025').update(user.id, { qr_token: token });
         } catch (err) {
           continue;
         }
       }
-      try {
+      if (user.qr_token === undefined) {
+        try {
         await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ to: user.email, name: user.name, token })
         });
-        await pb.collection('iecReg').update(user.id, { mailSent: true });
+        await pb.collection('joiningReg2025').update(user.id, { mailSent: true });
         sentCount++;
         setBulkMailStatus({ step: 'sending', count: unsent.length, sent: sentCount });
       } catch (err) {
         // Optionally handle error
+      }
+      }else{
+        try {
+          await fetch(`${backendUrl}/api/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to: user.email, name: user.name, token })
+          });
+          await pb.collection('joiningReg2025').update(user.id, { mailSent: true });
+          sentCount++;
+          setBulkMailStatus({ step: 'sending', count: unsent.length, sent: sentCount });
+        } catch (err) {
+          // Optionally handle error
+        }
       }
     }
     setBulkMailStatus({ step: 'done', count: unsent.length, sent: sentCount });
