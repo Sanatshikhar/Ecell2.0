@@ -6,7 +6,7 @@ const JoiningRegSheet = () => {
   const [search, setSearch] = useState('');
   const [courseFilter, setCourseFilter] = useState('all');
   const [teamFilter, setTeamFilter] = useState('all');
-  const [fieldFilter, setFieldFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [mailSentFilter, setMailSentFilter] = useState('all');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -65,11 +65,11 @@ const JoiningRegSheet = () => {
       
       const matchesCourse = courseFilter === 'all' || r.course === courseFilter;
       const matchesTeam = teamFilter === 'all' || (r.team && r.team.includes(teamFilter));
-      const matchesField = fieldFilter === 'all' || r.field === fieldFilter;
+      const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
       const matchesMailSent = mailSentFilter === 'all' || 
         (mailSentFilter === 'sent' ? r.mailSent : !r.mailSent);
 
-      return matchesSearch && matchesCourse && matchesTeam && matchesField && matchesMailSent;
+      return matchesSearch && matchesCourse && matchesTeam && matchesStatus && matchesMailSent;
     });
 
     // Apply sorting
@@ -91,12 +91,12 @@ const JoiningRegSheet = () => {
     }
 
     return filtered;
-  }, [registrations, search, courseFilter, teamFilter, fieldFilter, mailSentFilter, sortConfig]);
+  }, [registrations, search, courseFilter, teamFilter, statusFilter, mailSentFilter, sortConfig]);
 
   // Get unique values for filters
   const uniqueCourses = [...new Set(registrations.map(r => r.course).filter(Boolean))];
   const uniqueTeams = [...new Set(registrations.flatMap(r => r.team || []).filter(Boolean))];
-  const uniqueFields = [...new Set(registrations.map(r => r.field).filter(Boolean))];
+  const uniqueStatus = [...new Set(registrations.map(r => r.status).filter(Boolean))];
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return '⇅';
@@ -110,13 +110,13 @@ const JoiningRegSheet = () => {
   const handleStatusChange = async (recordId, newStatus) => {
     try {
       await pb.collection('joiningReg2025').update(recordId, {
-        field: newStatus
+        status: newStatus
       });
       // Update local state
       setRegistrations(prev => 
-        prev.map(r => r.id === recordId ? { ...r, field: newStatus } : r)
+        prev.map(r => r.id === recordId ? { ...r, status: newStatus } : r)
       );
-      setSelectedRecord(prev => ({ ...prev, field: newStatus }));
+      setSelectedRecord(prev => ({ ...prev, status: newStatus }));
     } catch (error) {
       console.error('Error updating status:', error);
       alert('Failed to update status');
@@ -157,7 +157,7 @@ const JoiningRegSheet = () => {
             Mail Sent: {registrations.filter(r => r.mailSent).length}
           </span>
           <span className="bg-[#2a2a2a] text-[#3d81f6] font-semibold text-sm sm:text-base rounded-full px-4 py-2 shadow-md border border-[#3d81f6]/30">
-            Selected: {registrations.filter(r => r.field === 'selected').length}
+            Selected: {registrations.filter(r => r.status === 'selected').length}
           </span>
         </div>
 
@@ -194,13 +194,13 @@ const JoiningRegSheet = () => {
           </select>
 
           <select
-            value={fieldFilter}
-            onChange={e => setFieldFilter(e.target.value)}
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
             className="min-w-[160px] text-base rounded-xl shadow-sm px-4 py-3 border border-[#b614f0]/30 focus:outline-none focus:ring-1 focus:ring-[#b614f0] bg-[#2a2a2a] text-white"
           >
             <option value="all">All Status</option>
-            {uniqueFields.map(field => (
-              <option key={field} value={field}>{field}</option>
+            {uniqueStatus.map(status => (
+              <option key={status} value={status}>{status}</option>
             ))}
           </select>
 
@@ -252,8 +252,8 @@ const JoiningRegSheet = () => {
                   <th className="py-4 px-2 font-bold text-xs border border-[#3a3a3a] cursor-pointer hover:bg-white/10" onClick={() => handleSort('mailSent')}>
                     Mail {getSortIcon('mailSent')}
                   </th>
-                  <th className="py-4 px-2 font-bold text-xs border border-[#3a3a3a] cursor-pointer hover:bg-white/10" onClick={() => handleSort('field')}>
-                    Status {getSortIcon('field')}
+                  <th className="py-4 px-2 font-bold text-xs border border-[#3a3a3a] cursor-pointer hover:bg-white/10" onClick={() => handleSort('status')}>
+                    Status {getSortIcon('status')}
                   </th>
                   <th className="py-4 px-2 font-bold text-xs border border-[#3a3a3a]">
                     ID Proof
@@ -274,7 +274,7 @@ const JoiningRegSheet = () => {
                   sortedAndFiltered.map((r, idx) => (
                     <tr 
                       key={r.id} 
-                      className={`${r.field === 'selected' ? 'bg-green-900/20' : idx % 2 === 0 ? 'bg-[#2a2a2a]' : 'bg-[#1f1f1f]'} hover:bg-[#b614f0]/10 transition cursor-pointer`}
+                      className={`${r.status === 'selected' ? 'bg-green-900/20' : idx % 2 === 0 ? 'bg-[#2a2a2a]' : 'bg-[#1f1f1f]'} hover:bg-[#b614f0]/10 transition cursor-pointer`}
                     >
                       <td className="py-3 px-2 border border-[#3a3a3a] text-white font-bold text-center">
                         {idx + 1}
@@ -327,9 +327,9 @@ const JoiningRegSheet = () => {
                       </td>
                       <td className="py-3 px-2 border border-[#3a3a3a] text-center">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          r.field === 'selected' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-[#333333] text-gray-400'
+                          r.status === 'selected' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-[#333333] text-gray-400'
                         }`}>
-                          {r.field || '-'}
+                          {r.status || '-'}
                         </span>
                       </td>
                       <td className="py-3 px-2 border border-[#3a3a3a] text-center">
@@ -430,15 +430,14 @@ const JoiningRegSheet = () => {
                 <div>
                   <label className="font-bold text-[#3d81f6] text-sm block mb-2">Status:</label>
                   <select
-                    value={selectedRecord.field || ''}
+                    value={selectedRecord.status || ''}
                     onChange={(e) => handleStatusChange(selectedRecord.id, e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-[#2a2a2a] border border-[#3a3a3a] text-white focus:outline-none focus:ring-2 focus:ring-[#3d81f6] text-sm"
                   >
                     <option value="">Not Set</option>
                     <option value="selected">Selected</option>
                     <option value="rejected">Rejected</option>
-                    <option value="pending">Pending</option>
-                    <option value="shortlisted">Shortlisted</option>
+                    <option value="review">Review</option>
                   </select>
                 </div>
               </div>
