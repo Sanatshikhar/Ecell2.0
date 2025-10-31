@@ -16,6 +16,7 @@ import AudiencePoll from './components/AudiencePoll';
 import AudienceVote from './components/AudienceVote';
 import Verify from './components/Verify';
 import Login from './components/Login';
+import JoiningRegSheet from './components/JoiningRegSheet';
 import pb from './lib/pocketbase';
 
 function App() {
@@ -34,7 +35,7 @@ function App() {
 
   return (
     <Router>
-  {!(window.location.pathname === '/registrations' || window.location.pathname === '/verify' || window.location.pathname === '/audience-poll' || window.location.pathname === '/audience-vote') && <Header />}
+  {!(window.location.pathname === '/registrations' || window.location.pathname === '/verify' || window.location.pathname === '/audience-poll' || window.location.pathname === '/audience-vote' || window.location.pathname === '/joining-registrations') && <Header />}
       <Routes>
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
@@ -45,6 +46,7 @@ function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
+        <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/audience-poll" element={auth ? <AudiencePoll /> : <Login onLogin={() => setAuth(true)} />} />
