@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import logo from './logo.png';
 import sampleEvent from '../components/Assets/Resonance.png';
 import styles from './TechXperience.module.css';
@@ -73,6 +74,38 @@ const TechXperience = () => {
                 <img src={s.src} alt={s.alt} className="h-12 object-contain" />
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Footer Links Section */}
+        <section className="py-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg p-8">
+              <div className="flex flex-wrap justify-center gap-4 text-sm">
+                <Link to="/cancellation-refunds" className="text-[#4b2aad] hover:text-[#a259ff] font-semibold transition-colors">
+                  Cancellation & Refunds
+                </Link>
+                <span className="text-gray-400">|</span>
+                <Link to="/terms-conditions" className="text-[#4b2aad] hover:text-[#a259ff] font-semibold transition-colors">
+                  Terms and Conditions
+                </Link>
+                <span className="text-gray-400">|</span>
+                <Link to="/shipping" className="text-[#4b2aad] hover:text-[#a259ff] font-semibold transition-colors">
+                  Shipping
+                </Link>
+                <span className="text-gray-400">|</span>
+                <Link to="/privacy" className="text-[#4b2aad] hover:text-[#a259ff] font-semibold transition-colors">
+                  Privacy
+                </Link>
+                <span className="text-gray-400">|</span>
+                <Link to="/contact" className="text-[#4b2aad] hover:text-[#a259ff] font-semibold transition-colors">
+                  Contact Us
+                </Link>
+              </div>
+              <p className="text-center text-xs text-gray-500 mt-4">
+                © 2025 E-Cell SOA. All rights reserved.
+              </p>
+            </div>
           </div>
         </section>
       </div>

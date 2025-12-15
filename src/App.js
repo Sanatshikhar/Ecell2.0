@@ -10,20 +10,25 @@ import TechTeam from "./components/TechTeam";
 import Members from "./components/Join";
 import Join from "./components/TechXperience";
 import ComingSoon from "./components/ComingSoon";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import AudiencePoll from './components/AudiencePoll';
 import AudienceVote from './components/AudienceVote';
 import Verify from './components/Verify';
 import Login from './components/Login';
 import JoiningRegSheet from './components/JoiningRegSheet';
+import CancellationRefunds from './components/CancellationRefunds';
+import TermsConditions from './components/TermsConditions';
+import Shipping from './components/Shipping';
+import Privacy from './components/Privacy';
 import pb from './lib/pocketbase';
 
-function App() {
+function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
+  const location = useLocation();
 
   React.useEffect(() => {
-    if (window.location.pathname === '/registrations') {
+    if (location.pathname === '/registrations') {
       pb.authStore.clear();
       setAuth(false);
     }
@@ -31,11 +36,13 @@ function App() {
       setAuth(pb.authStore.isValid);
     });
     return unsubscribe;
-  }, []);
+  }, [location.pathname]);
+
+  const hideHeaderPaths = ['/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
-    <Router>
-  {!(window.location.pathname === '/registrations' || window.location.pathname === '/verify' || window.location.pathname === '/audience-poll' || window.location.pathname === '/audience-vote' || window.location.pathname === '/joining-registrations') && <Header />}
+    <>
+      {!hideHeaderPaths.includes(location.pathname) && <Header />}
       <Routes>
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
@@ -51,7 +58,19 @@ function App() {
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/audience-poll" element={auth ? <AudiencePoll /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/audience-vote" element={<AudienceVote />} />
+        <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+        <Route path="/shipping" element={<Shipping />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

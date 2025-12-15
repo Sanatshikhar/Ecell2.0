@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import pb from '../lib/pocketbase';
 import styles from './TechXperience.module.css';
 
@@ -179,6 +180,31 @@ const ResonanceForm = ({ onClose }) => {
             <button type="submit" className={styles.formButton} disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
           </form>
         )}
+        
+        {/* Footer Links */}
+        <div className="mt-6 pt-4 border-t border-gray-600">
+          <div className="flex flex-wrap justify-center gap-3 text-xs text-gray-400">
+            <Link to="/cancellation-refunds" className="hover:text-[#4b2aad] transition-colors" target="_blank">
+              Cancellation & Refunds
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link to="/terms-conditions" className="hover:text-[#4b2aad] transition-colors" target="_blank">
+              Terms and Conditions
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link to="/shipping" className="hover:text-[#4b2aad] transition-colors" target="_blank">
+              Shipping
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link to="/privacy" className="hover:text-[#4b2aad] transition-colors" target="_blank">
+              Privacy
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link to="/contact" className="hover:text-[#4b2aad] transition-colors" target="_blank">
+              Contact Us
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
