@@ -21,6 +21,8 @@ const CancellationRefunds = () => {
             <p className="text-gray-300 leading-relaxed">
               Registrations for E-Cell events can be cancelled up to 7 days before the event date. 
               Cancellations made within 7 days of the event will not be eligible for refunds.
+                <br />
+                <strong>Non-Refundable Clause:</strong> Certain event registrations may be marked as non-refundable. In such cases, no refund will be provided upon cancellation. Please check event-specific terms before registering.
             </p>
           </section>
 
@@ -33,6 +35,7 @@ const CancellationRefunds = () => {
               <li>Full refund: Cancellations made 14 days or more before the event</li>
               <li>50% refund: Cancellations made 7-13 days before the event</li>
               <li>No refund: Cancellations made less than 7 days before the event</li>
+                <li>No refund: For registrations marked as non-refundable</li>
             </ul>
           </section>
 
@@ -41,8 +44,28 @@ const CancellationRefunds = () => {
             <p className="text-gray-300 leading-relaxed">
               Approved refunds will be processed within 7-10 business days to the original payment method. 
               Please contact us at ecell@soa.ac.in for any refund requests.
+                <br />
+                Refunds, if approved, will be credited to the original payment source used during registration. The actual time taken for the refund to reflect may vary depending on your bank or payment provider.
+                <br />
+                All payments and refunds are processed securely through Razorpay or other authorized payment gateways. E-Cell SOA is not responsible for delays or issues arising from the payment gateway or banking channels.
             </p>
           </section>
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-3">Governing Law & Jurisdiction</h2>
+                    <p className="text-gray-300 leading-relaxed">
+                      This Cancellation & Refund Policy shall be governed by and construed in accordance with the laws of India. Any disputes arising in relation to this policy shall be subject to the exclusive jurisdiction of the courts of Bhubaneswar, Odisha, India.
+                    </p>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-3">Grievance Redressal</h2>
+                    <p className="text-gray-300 leading-relaxed">
+                      For any concerns or grievances related to refunds, cancellations, or payment processing, please contact our Grievance Officer:<br />
+                      <strong>Name:</strong> Grievance Officer, E-Cell SOA<br />
+                      <strong>Email:</strong> ecell@soa.ac.in<br />
+                      <strong>Address:</strong> E-Cell, Siksha 'O' Anusandhan (Deemed to be University), Bhubaneswar, Odisha, India
+                    </p>
+                  </section>
         </div>
       </div>
     </div>

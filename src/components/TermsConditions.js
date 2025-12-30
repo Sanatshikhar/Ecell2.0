@@ -51,6 +51,35 @@ const TermsConditions = () => {
             <p className="text-gray-300 leading-relaxed">
               E-Cell SOA is not responsible for any loss, injury, or damage to persons or property during the event. 
               Participants attend at their own risk.
+              <br />
+                <strong>Payment Processing Disclaimer:</strong> All payments for event registrations are processed securely through third-party payment gateways, including Razorpay. E-Cell SOA does not store your payment information and is not liable for any issues arising from payment processing by the payment gateway provider. Please refer to Razorpay’s terms and privacy policy for more details.
+            </p>
+          </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Use of Payment Gateway</h2>
+            <p className="text-gray-300 leading-relaxed">
+              By registering for events and making payments on our platform, you agree to the use of Razorpay or other authorized payment gateways for processing your payments. You are subject to the terms and conditions and privacy policies of the respective payment gateway provider.
+            </p>
+          </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Refunds & Cancellations</h2>
+            <p className="text-gray-300 leading-relaxed">
+              Please refer to our <a href="/cancellation-refunds" className="text-[#a259ff] underline">Cancellation & Refunds</a> policy for detailed information regarding eligibility, timelines, and process for refunds and cancellations.
+            </p>
+          </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Governing Law & Jurisdiction</h2>
+            <p className="text-gray-300 leading-relaxed">
+              These Terms and Conditions shall be governed by and construed in accordance with the laws of India. Any disputes arising in relation to these terms shall be subject to the exclusive jurisdiction of the courts of Bhubaneswar, Odisha, India.
+            </p>
+          </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Grievance Redressal</h2>
+            <p className="text-gray-300 leading-relaxed">
+              For any concerns or grievances related to event registration, payments, or these terms, please contact our Grievance Officer:<br />
+              <strong>Name:</strong> Grievance Officer, E-Cell SOA<br />
+              <strong>Email:</strong> ecell@soa.ac.in<br />
+              <strong>Address:</strong> E-Cell, Siksha 'O' Anusandhan (Deemed to be University), Bhubaneswar, Odisha, India
             </p>
           </section>
 

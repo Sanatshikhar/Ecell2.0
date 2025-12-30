@@ -26,6 +26,7 @@ const Privacy = () => {
               <li>Educational institution and course details</li>
               <li>College ID or identification documents</li>
               <li>Payment information (processed securely)</li>
+              <li>Transaction details as required for payment processing</li>
             </ul>
           </section>
 
@@ -40,6 +41,7 @@ const Privacy = () => {
               <li>Verify participant identity at events</li>
               <li>Improve our services and event experiences</li>
               <li>Comply with legal obligations</li>
+              <li>Facilitate payment processing through third-party payment gateways</li>
             </ul>
           </section>
 
@@ -49,6 +51,8 @@ const Privacy = () => {
               We implement appropriate security measures to protect your personal information against 
               unauthorized access, alteration, disclosure, or destruction. Your data is stored securely 
               and accessed only by authorized personnel.
+              <br />
+              All payment transactions are processed through secure third-party payment gateways, such as Razorpay. We do not store your card or payment details on our servers. Payment information is handled in accordance with the policies of the payment gateway provider.
             </p>
           </section>
 
@@ -58,6 +62,14 @@ const Privacy = () => {
               We do not sell, trade, or rent your personal information to third parties. Information may be 
               shared with event partners and sponsors only with your explicit consent and as necessary for 
               event coordination.
+              <br />
+              For payment processing, your information may be shared with our payment gateway provider (Razorpay) as required to complete the transaction. Such sharing is limited to the extent necessary for payment processing and compliance with applicable laws.
+            </p>
+          </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Data Retention</h2>
+            <p className="text-gray-300 leading-relaxed">
+              We retain your personal data only as long as necessary to fulfill the purposes for which it was collected, including for event administration, legal, accounting, or reporting requirements. Payment-related data is retained in accordance with applicable laws and the policies of our payment gateway provider.
             </p>
           </section>
 
@@ -78,6 +90,21 @@ const Privacy = () => {
             <h2 className="text-2xl font-semibold mb-3">Contact Us</h2>
             <p className="text-gray-300 leading-relaxed">
               For privacy-related concerns or requests, please contact us at ecell@soa.ac.in
+            <br />
+              <br />
+              <strong>Grievance Officer:</strong> <br />
+              Name: Grievance Officer, E-Cell SOA<br />
+              Email: ecell@soa.ac.in<br />
+              Address: E-Cell, Siksha 'O' Anusandhan (Deemed to be University), Bhubaneswar, Odisha, India<br />
+              <br />
+              If you have any concerns regarding the processing of your personal information or payments, you may escalate your grievance to the above contact.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-3">Governing Law & Jurisdiction</h2>
+            <p className="text-gray-300 leading-relaxed">
+              This Privacy Policy shall be governed by and construed in accordance with the laws of India. Any disputes arising in relation to this policy shall be subject to the exclusive jurisdiction of the courts of Bhubaneswar, Odisha, India.
             </p>
           </section>
         </div>
