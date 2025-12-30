@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
           <section>
             <h2 className="text-2xl font-semibold mb-3">Refund & Cancellation Acknowledgement</h2>
             <p className="text-gray-300 leading-relaxed">
-              By registering for any E-Cell SOA event and making payment, you acknowledge and agree to the Cancellation & Refund Policy as stated on this website. You understand that eligibility for cancellation and refund is determined by the timelines and terms specified, and that certain registrations may be non-refundable. You further acknowledge that refunds, if applicable, will be processed only in accordance with the stated policy and timelines.
+              By registering for any event, you acknowledge and agree that all refund and cancellation requests shall be governed strictly by the Cancellation & Refund Policy of E-Cell SOA. E-Cell SOA reserves the right to approve or reject refund requests in accordance with the terms specified in that policy.
             </p>
           </section>
 
