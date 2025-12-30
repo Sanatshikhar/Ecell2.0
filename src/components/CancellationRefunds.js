@@ -19,10 +19,9 @@ const CancellationRefunds = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-3">Cancellation Policy</h2>
             <p className="text-gray-300 leading-relaxed">
-              Registrations for E-Cell events can be cancelled up to 7 days before the event date. 
-              Cancellations made within 7 days of the event will not be eligible for refunds.
-                <br />
-                <strong>Non-Refundable Clause:</strong> Certain event registrations may be marked as non-refundable. In such cases, no refund will be provided upon cancellation. Please check event-specific terms before registering.
+              Registrations for E-Cell events can be cancelled at any time up to 14 days before the event date. Cancellations made less than 14 days before the event are not eligible for a refund. 
+              <br />
+              <strong>Non-Refundable Clause:</strong> Certain event registrations may be marked as non-refundable. In such cases, no refund will be provided upon cancellation. Please check event-specific terms before registering.
             </p>
           </section>
 
@@ -33,9 +32,8 @@ const CancellationRefunds = () => {
             </p>
             <ul className="list-disc list-inside text-gray-300 space-y-2">
               <li>Full refund: Cancellations made 14 days or more before the event</li>
-              <li>50% refund: Cancellations made 7-13 days before the event</li>
-              <li>No refund: Cancellations made less than 7 days before the event</li>
-                <li>No refund: For registrations marked as non-refundable</li>
+              <li>No refund: Cancellations made less than 14 days before the event</li>
+              <li>No refund: For registrations marked as non-refundable</li>
             </ul>
           </section>
 
