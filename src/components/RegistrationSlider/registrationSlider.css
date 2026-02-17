@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-registration-fade-in {
+    animation: registration-fade-in 1s ease-out forwards;
+  }
+}
+
+@layer base {
+  @keyframes registration-fade-in {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -60%) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+}

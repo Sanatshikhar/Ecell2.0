@@ -22,6 +22,7 @@ import TermsConditions from './components/TermsConditions';
 import Shipping from './components/Shipping';
 import Privacy from './components/Privacy';
 import pb from './lib/pocketbase';
+import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -52,6 +53,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
+        <Route path="/registration-slider" element={<RegistrationSlider />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />

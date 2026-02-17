@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Footer from "./footer";
 // Import images from Gallery directory
@@ -51,7 +50,7 @@ import Img44 from "./Assets/Gallery/DSC_0032.jpg";
 import Img45 from "./Assets/Gallery/DSC04971.jpg";
 import Img46 from "./Assets/Gallery/DSC04968.jpg";
 import Img47 from "./Assets/Gallery/WhatsApp Image 2025-08-25 at 03.25.50_aae79243.jpg";
-// ...continue for all images in the directory...
+import RegistrationSlider from './RegistrationSlider/RegistrationSlider';
 
 const allGalleryImages = [
   Img1, Img2, Img3, Img4, Img7, Img8, Img9, Img10,
@@ -108,8 +107,9 @@ function Gallery() {
   // Only use landscape images for highlights
   const shuffledHighlights = shuffleArray(landscapeImages.map(img => img.image));
   return (
-    <div className="bg-black min-h-screen font-sans">
-      {/* Aurora background removed */}
+    <div>
+      {/* Registration Slider Animation */}
+      <RegistrationSlider />
       {/* Hero Section */}
 
       {/* Carousel Section */}
