@@ -29,6 +29,7 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -57,6 +58,7 @@ const Home = () => {
     },
 
   ];
+
 
   const faqs = [
     {

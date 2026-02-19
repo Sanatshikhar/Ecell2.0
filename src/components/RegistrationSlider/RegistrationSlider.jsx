@@ -1,139 +1,407 @@
-import React, { useState } from 'react';
-import pb from '../../lib/pocketbase';
-import './registrationSlider.css';
+import { useState, useEffect, useRef } from "react";
 
-const slides = [
+const events = [
   {
-    title: 'Workshop Registration',
-    subtitle: 'ANIMAL',
-    description: 'Register for our exciting workshop. Learn, explore, and grow!',
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+    id: 1,
+    tag: "KEYNOTE",
+    title: "The Next Frontier",
+    subtitle: "AI & The Future of Business",
+    date: "MAR 15, 2025",
+    time: "10:00 AM",
+    speaker: "Arjun Mehta",
+    role: "CEO, NeuralCore",
+    color: "#00f5d4",
+    accent: "#ff6b35",
+    bg: "linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 50%, #0a1628 100%)",
+    glowColor: "rgba(0, 245, 212, 0.3)",
+    number: "01",
   },
   {
-    title: 'Workshop Registration',
-    subtitle: 'ELEPHANT',
-    description: 'Join us for a unique learning experience.',
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7fda0c',
+    id: 2,
+    tag: "WORKSHOP",
+    title: "Build to Scale",
+    subtitle: "From Startup to Unicorn",
+    date: "MAR 16, 2025",
+    time: "2:00 PM",
+    speaker: "Priya Sharma",
+    role: "Partner, Sequoia India",
+    color: "#f72585",
+    accent: "#7209b7",
+    bg: "linear-gradient(135deg, #0d0014 0%, #1a0026 50%, #0d001a 100%)",
+    glowColor: "rgba(247, 37, 133, 0.3)",
+    number: "02",
   },
   {
-    title: 'Workshop Registration',
-    subtitle: 'JAGUAR',
-    description: 'Don’t miss out on this opportunity!',
-    image: 'https://images.unsplash.com/photo-1518717758525-3caefb9b7a9e',
+    id: 3,
+    tag: "PANEL",
+    title: "Capital Flows",
+    subtitle: "Navigating the VC Landscape",
+    date: "MAR 17, 2025",
+    time: "11:30 AM",
+    speaker: "Vikram Nair",
+    role: "MD, Tiger Global",
+    color: "#ffd60a",
+    accent: "#ff9500",
+    bg: "linear-gradient(135deg, #0d0a00 0%, #1a1400 50%, #0d0a00 100%)",
+    glowColor: "rgba(255, 214, 10, 0.25)",
+    number: "03",
+  },
+  {
+    id: 4,
+    tag: "FIRESIDE",
+    title: "Zero to One",
+    subtitle: "Bootstrapping vs Funding",
+    date: "MAR 18, 2025",
+    time: "4:00 PM",
+    speaker: "Neha Kapoor",
+    role: "Founder, CraftOS",
+    color: "#06ffa5",
+    accent: "#00b4d8",
+    bg: "linear-gradient(135deg, #000d0a 0%, #001a14 50%, #000d0a 100%)",
+    glowColor: "rgba(6, 255, 165, 0.25)",
+    number: "04",
   },
 ];
 
-export default function RegistrationSlider() {
-  const [current, setCurrent] = useState(0);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
-  const [formStatus, setFormStatus] = useState('');
+// Only keyframes + font import stay here — everything else is Tailwind
+const KEYFRAMES = `
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
 
-  const nextSlide = () => setCurrent((current + 1) % slides.length);
-  const prevSlide = () => setCurrent((current - 1 + slides.length) % slides.length);
+  .f-bebas  { font-family: 'Bebas Neue', sans-serif; }
+  .f-mono   { font-family: 'Space Mono', monospace; }
+  .f-dm     { font-family: 'DM Sans', sans-serif; }
+
+  @keyframes progressFill {
+    from { width: 0% }
+    to   { width: 100% }
+  }
+  @keyframes tickerScroll {
+    from { transform: translateX(0) }
+    to   { transform: translateX(-50%) }
+  }
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px) }
+    to   { opacity: 1; transform: translateY(0) }
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.2; }
+    50%       { opacity: 0.55; }
+  }
+
+  .progress-running {
+    animation: progressFill 4s linear forwards;
+  }
+  .ticker-scroll {
+    animation: tickerScroll 7s linear infinite;
+  }
+  .title-anim {
+    animation: slideInUp 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+  .hint-anim {
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+
+  /* show swipe hints only on real touch screens */
+  .swipe-hint { display: none; }
+  @media (hover: none) and (pointer: coarse) {
+    .swipe-hint  { display: flex; }
+    .desktop-btn { display: none; }
+  }
+`;
+
+// card transform per state
+const cardStyle = (state) => {
+  const base = { transition: "all 0.7s cubic-bezier(0.23, 1, 0.32, 1)" };
+  if (state === "active") return { ...base, transform: "translateX(0) scale(1) rotateY(0deg)", opacity: 1, zIndex: 5 };
+  if (state === "prev")   return { ...base, transform: "translateX(-80px) scale(0.92) rotateY(8deg)", opacity: 0, zIndex: 1, pointerEvents: "none" };
+  if (state === "next")   return { ...base, transform: "translateX(80px) scale(0.92) rotateY(-8deg)", opacity: 0, zIndex: 1, pointerEvents: "none" };
+  return { ...base, transform: "translateX(0) scale(0.8)", opacity: 0, zIndex: 0, pointerEvents: "none" };
+};
+
+export default function EsummitSlider() {
+  const [current, setCurrent]         = useState(0);
+  const [animating, setAnimating]     = useState(false);
+  const [progressKey, setProgressKey] = useState(0);
+  const [paused, setPaused]           = useState(false);
+
+  const intervalRef = useRef(null);
+  const pausedRef   = useRef(false);
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+
+  const startInterval = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      if (pausedRef.current) return;
+      setCurrent((c) => (c + 1) % events.length);
+      setProgressKey((k) => k + 1);
+    }, 4000);
+  };
+
+  useEffect(() => {
+    startInterval();
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  const go = (idx) => {
+    if (animating) return;
+    setAnimating(true);
+    setCurrent(idx);
+    setProgressKey((k) => k + 1);
+    startInterval();
+    setTimeout(() => setAnimating(false), 700);
+  };
+
+  const next = () => go((current + 1) % events.length);
+  const prev = () => go((current - 1 + events.length) % events.length);
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      dx < 0 ? next() : prev();
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  const getState = (i) => {
+    if (i === current) return "active";
+    const diff = (i - current + events.length) % events.length;
+    if (diff === 1)               return "next";
+    if (diff === events.length-1) return "prev";
+    return "far";
+  };
+
+  const tickerItems = Array(2).fill([
+    "E-Summit 2025","Entrepreneurship","Innovation","Startups","Pitch Competition",
+    "Networking","Keynotes","Workshops","VC Meetings",
+  ]).flat();
+
+  const ArrowLeft = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  );
+  const ArrowRight = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
-      <img
-        src={slides[current].image}
-        alt={slides[current].subtitle}
-        className="absolute inset-0 w-full h-full object-cover opacity-70 transition-all duration-700"
-      />
-      {/* Registration Details - top left corner */}
-      <div className="absolute top-1/2 left-1/2 z-10 max-w-2xl p-8 bg-black bg-opacity-60 rounded-lg text-white shadow-xl transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 opacity-0 animate-registration-fade-in">
-        <h1 className="text-4xl font-bold mb-2">{slides[current].title}</h1>
-        <h2 className="text-3xl font-bold text-orange-500 mb-4">{slides[current].subtitle}</h2>
-        <p className="mb-6">{slides[current].description}</p>
-        <div className="flex gap-4">
-          <button className="px-6 py-2 bg-white text-black rounded hover:bg-gray-200 transition">See More</button>
-          <button className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition" onClick={() => setShowForm(true)}>Register</button>
+    <>
+      <style>{KEYFRAMES}</style>
+
+      {/* Root */}
+      <div className="f-dm relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#050508] py-5">
+
+        {/* Noise overlay */}
+        <div
+          className="pointer-events-none fixed inset-0 z-[100] opacity-40"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")` }}
+        />
+
+        {/* Header */}
+        <div className="relative z-10 mb-8 text-center">
+          <p className="f-mono mb-2.5 text-[11px] uppercase tracking-[6px] text-white/30">
+            ◆ IIT Bhubaneswar ◆ March 2025
+          </p>
+          <h1 className="f-bebas m-0 text-[clamp(48px,8vw,96px)] leading-[0.9] tracking-[4px] text-white">
+            E-<span style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)", color: "transparent" }}>SUMMIT</span>
+          </h1>
         </div>
-            {/* Registration Form Modal */}
-            {showForm && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70" onClick={() => setShowForm(false)}>
-                <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative" onClick={e => e.stopPropagation()}>
-                  <button className="absolute top-2 right-2 text-black text-2xl font-bold bg-gray-200 rounded-full px-3 py-1 hover:bg-gray-300 transition-colors" onClick={() => setShowForm(false)}>&times;</button>
-                  <h2 className="text-2xl font-bold mb-4 text-center text-orange-500">Workshop Registration</h2>
-                  <form
-                    className="flex flex-col gap-4"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setFormStatus('');
-                      try {
-                        await pb.collection('workshop').create(formData);
-                        setFormStatus('Registration successful!');
-                        setFormData({ name: '', email: '', phone: '' });
-                      } catch (err) {
-                        setFormStatus('Registration failed. Please try again.');
-                      }
-                    }}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      className="px-4 py-2 rounded border border-gray-300 focus:border-orange-500 focus:outline-none"
-                      required
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="px-4 py-2 rounded border border-gray-300 focus:border-orange-500 focus:outline-none"
-                      required
-                      value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone"
-                      className="px-4 py-2 rounded border border-gray-300 focus:border-orange-500 focus:outline-none"
-                      required
-                      value={formData.phone}
-                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                    />
-                    <button type="submit" className="mt-4 px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition">Submit</button>
-                    {formStatus && <div className="mt-2 text-center text-sm text-green-600">{formStatus}</div>}
-                  </form>
-                </div>
-              </div>
-            )}
-      </div>
-      {/* Navigation Arrows */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-4 z-10">
-        <button onClick={prevSlide} className="w-10 h-10 bg-white bg-opacity-70 rounded-full flex items-center justify-center text-xl hover:bg-opacity-100 shadow-lg transition">&#8592;</button>
-        <button onClick={nextSlide} className="w-10 h-10 bg-white bg-opacity-70 rounded-full flex items-center justify-center text-xl hover:bg-opacity-100 shadow-lg transition">&#8594;</button>
-      </div>
-      {/* Slider Cards - bottom right corner */}
-      <div className="absolute bottom-10 right-10 flex gap-6 z-10">
-        {slides.map((slide, idx) => (
-          <div
-            key={idx}
-            onClick={() => setCurrent(idx)}
-            className={`cursor-pointer w-36 h-48 bg-white bg-opacity-80 rounded-xl shadow-lg flex flex-col items-center justify-end p-4 transition-all duration-300 border-2 ${idx === current ? 'border-orange-500 scale-105' : 'border-transparent hover:scale-105 hover:border-orange-300'}`}
-            style={{ backdropFilter: 'blur(4px)' }}
-          >
-            <img
-              src={slide.image}
-              alt={slide.subtitle}
-              className="w-full h-28 object-cover rounded-lg mb-2"
-            />
-            <div className="text-center">
-              <div className="font-bold text-lg text-gray-800">{slide.subtitle}</div>
-              <div className="text-xs text-gray-600">{slide.description.slice(0, 30)}...</div>
-            </div>
+
+        {/* Slider wrapper */}
+        <div className="relative w-full max-w-[900px] px-6">
+
+          {/* Floating badge */}
+          <div className="f-mono absolute left-10 top-[-16px] z-10 rounded-[10px] border border-white/10 bg-[rgba(5,5,8,0.9)] px-4 py-2 text-[10px] uppercase tracking-[2px] text-white/50 backdrop-blur-md">
+            Events Calendar
           </div>
-        ))}
+
+          {/* Swipe hint arrows — CSS shows these only on touch devices */}
+          <div className="swipe-hint hint-anim pointer-events-none absolute left-7 top-1/2 z-20 -translate-y-1/2 items-center text-white/25">
+            <ArrowLeft />
+          </div>
+          <div className="swipe-hint hint-anim pointer-events-none absolute right-7 top-1/2 z-20 -translate-y-1/2 items-center text-white/25">
+            <ArrowRight />
+          </div>
+
+          {/* Slider track */}
+          <div className="relative h-[440px] rounded-[20px]" style={{ perspective: "1200px" }}>
+            {events.map((ev, i) => {
+              const state = getState(i);
+              const isActive = state === "active";
+              return (
+                <div
+                  key={ev.id}
+                  className="absolute inset-0 overflow-hidden rounded-[20px] select-none"
+                  style={{ ...cardStyle(state), transformStyle: "preserve-3d", touchAction: "pan-y" }}
+                  onMouseEnter={() => isActive && setPaused(true)}
+                  onMouseLeave={() => setPaused(false)}
+                  onTouchStart={onTouchStart}
+                  onTouchEnd={onTouchEnd}
+                >
+                  {/* BG */}
+                  <div className="absolute inset-0" style={{ background: ev.bg }} />
+
+                  {/* Grid lines */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+                      backgroundSize: "40px 40px",
+                    }}
+                  />
+
+                  {/* Glows */}
+                  <div
+                    className="pointer-events-none absolute -right-12 -top-12 h-[300px] w-[300px] rounded-full opacity-60"
+                    style={{ background: ev.glowColor, filter: "blur(80px)" }}
+                  />
+                  <div
+                    className="pointer-events-none absolute bottom-0 left-10 h-[200px] w-[200px] rounded-full opacity-30"
+                    style={{ background: ev.accent + "44", filter: "blur(60px)" }}
+                  />
+
+                  {/* Border */}
+                  <div className="pointer-events-none absolute inset-0 rounded-[20px] border border-white/[0.08]" />
+
+                  {/* Big number watermark */}
+                  <div
+                    className="f-bebas pointer-events-none absolute right-9 top-7 text-[72px] leading-none tracking-[-2px] opacity-[0.12]"
+                    style={{ color: ev.color }}
+                  >
+                    {ev.number}
+                  </div>
+
+                  {/* Card content */}
+                  <div className="relative z-[2] grid h-full grid-rows-[auto_1fr_auto] px-10 py-9">
+
+                    {/* Top */}
+                    <div className="mb-3 flex items-center justify-between">
+                      <span
+                        className="f-mono rounded-full border px-3.5 py-1.5 text-[10px] uppercase tracking-[4px]"
+                        style={{ color: ev.color, borderColor: ev.color + "44" }}
+                      >
+                        {ev.tag}
+                      </span>
+                    </div>
+
+                    {/* Middle */}
+                    <div className="flex flex-col justify-center">
+                      <h2
+                        className={`f-bebas m-0 mb-2.5 text-[clamp(52px,8vw,76px)] leading-[0.92] tracking-[1px] text-white ${isActive ? "title-anim" : ""}`}
+                      >
+                        {ev.title}
+                      </h2>
+                      <p className="f-dm m-0 text-[15px] font-light tracking-[0.5px] text-white/50">
+                        {ev.subtitle}
+                      </p>
+
+                      {/* Divider */}
+                      <div className="my-6 h-px opacity-20" style={{ background: ev.color }} />
+
+                      {/* Register btn */}
+                      <button
+                        className="f-mono inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border bg-transparent px-7 py-3 text-[11px] uppercase tracking-[2px] text-white transition-transform duration-300 hover:scale-105"
+                        style={{ borderColor: ev.color + "44", color: ev.color }}
+                      >
+                        Register Now
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Bottom */}
+                    <div className="grid grid-cols-[1fr_auto] items-end gap-4">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[16px] font-medium tracking-[0.3px] text-white">{ev.speaker}</span>
+                        <span className="f-mono text-[10px] tracking-[1px] text-white/35">{ev.role}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="f-mono mb-0.5 block text-[11px] tracking-[1px] text-white/40">{ev.date}</span>
+                        <span className="f-bebas text-[28px] tracking-[1px]" style={{ color: ev.color }}>{ev.time}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  {isActive && (
+                    <div
+                      key={progressKey}
+                      className="progress-running absolute bottom-0 left-0 h-[2px] rounded-r-sm"
+                      style={{
+                        background: ev.color,
+                        animationPlayState: paused ? "paused" : "running",
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Controls: arrows + dots */}
+        <div className="relative z-10 mt-7 flex items-center justify-center gap-5">
+          <button
+            className="desktop-btn flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/25 hover:bg-white/10"
+            onClick={prev}
+            aria-label="Previous"
+          >
+            <ArrowLeft />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {events.map((_, i) => (
+              <div
+                key={i}
+                role="button"
+                aria-label={`Slide ${i + 1}`}
+                onClick={() => go(i)}
+                className="h-1.5 cursor-pointer rounded-full transition-all duration-[400ms]"
+                style={{
+                  width: i === current ? "28px" : "6px",
+                  background: i === current ? "white" : "rgba(255,255,255,0.2)",
+                }}
+              />
+            ))}
+          </div>
+
+          <button
+            className="desktop-btn flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/25 hover:bg-white/10"
+            onClick={next}
+            aria-label="Next"
+          >
+            <ArrowRight />
+          </button>
+        </div>
+
+        {/* Ticker */}
+        <div className="relative z-10 mt-6 w-full overflow-hidden border-b border-t border-white/[0.05] py-3">
+          <div className="ticker-scroll flex gap-12 whitespace-nowrap">
+            {tickerItems.map((item, i) => (
+              <span
+                key={i}
+                className="f-mono flex items-center gap-12 text-[10px] uppercase tracking-[3px] text-white/20 after:text-[6px] after:text-white/10 after:content-['◆']"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
-      {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-        {slides.map((_, idx) => (
-          <div
-            key={idx}
-            className={`w-3 h-3 rounded-full ${idx === current ? 'bg-orange-500' : 'bg-white bg-opacity-50'}`}
-          />
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
