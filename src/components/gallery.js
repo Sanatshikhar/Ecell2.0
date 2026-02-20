@@ -62,22 +62,7 @@ const allGalleryImages = [
 // ...existing code...
 
 
-const galleryImages = allGalleryImages;
-const carouselImages = allGalleryImages.map(img => img.image);
-
-// Filter for landscape images (width > height in filename or by known landscape files)
-// If you want to be more precise, you can manually select landscape images by their filenames
-const landscapeImages = allGalleryImages.filter(imgObj => {
-  // Heuristic: filenames with 'wide', 'landscape', or known landscape files
-  // Or, if you know which are landscape, list them here:
-  const landscapeList = [
-    Img39, Img27, Img33, Img46, Img41, Img31, Img15, Img1, Img2, Img24,
-  ];
-  return landscapeList.includes(imgObj.image);
-});
-
-function getBoxClass(idx) {
-  const styles = [
+// Removed unused galleryImages, carouselImages, getBoxClass, and landscapeImages
     "aspect-square h-[340px] w-[340px]", // square
     "aspect-[4/5] h-[420px] w-[340px]", // portrait
     "aspect-[5/4] h-[340px] w-[420px]", // landscape
