@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from "react";
+import EventRegistrationForm from "./EventRegistrationForm";
 
 const events = [
   {
     id: 1,
-    tag: "KEYNOTE",
-    title: "The Next Frontier",
-    subtitle: "AI & The Future of Business",
-    date: "MAR 15, 2025",
+    tag: "TECH",
+    title: "Zero to MVP",
+    subtitle: "Building Your First Project",
+    date: "MAR 14, 2025",
     time: "10:00 AM",
-    speaker: "Arjun Mehta",
-    role: "CEO, NeuralCore",
+    speaker: "Sanat Sinha",
+    role: "Tech Lead, Innovation and Entrepreneurship Cell, ITER Bhubaneswar",
     color: "#00f5d4",
     accent: "#ff6b35",
     bg: "linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 50%, #0a1628 100%)",
@@ -118,11 +119,13 @@ const cardStyle = (state) => {
   return { ...base, transform: "translateX(0) scale(0.8)", opacity: 0, zIndex: 0, pointerEvents: "none" };
 };
 
-export default function EsummitSlider() {
+export default function WorkshopSlider() {
   const [current, setCurrent]         = useState(0);
   const [animating, setAnimating]     = useState(false);
   const [progressKey, setProgressKey] = useState(0);
   const [paused, setPaused]           = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const intervalRef = useRef(null);
   const pausedRef   = useRef(false);
@@ -182,7 +185,7 @@ export default function EsummitSlider() {
   };
 
   const tickerItems = Array(2).fill([
-    "E-Summit 2025","Entrepreneurship","Innovation","Startups","Pitch Competition",
+    "Workshop 2025","Entrepreneurship","Innovation","Startups","Pitch Competition",
     "Networking","Keynotes","Workshops","VC Meetings",
   ]).flat();
 
@@ -213,10 +216,10 @@ export default function EsummitSlider() {
         {/* Header */}
         <div className="relative z-10 mb-8 text-center">
           <p className="f-mono mb-2.5 text-[11px] uppercase tracking-[6px] text-white/30">
-            ◆ IIT Bhubaneswar ◆ March 2025
+            ◆ ITER Bhubaneswar ◆ March 2025
           </p>
           <h1 className="f-bebas m-0 text-[clamp(48px,8vw,96px)] leading-[0.9] tracking-[4px] text-white">
-            E-<span style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)", color: "transparent" }}>SUMMIT</span>
+            WORK<span style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)", color: "transparent" }}>SHOP</span>
           </h1>
         </div>
 
@@ -315,6 +318,10 @@ export default function EsummitSlider() {
                       <button
                         className="f-mono inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border bg-transparent px-7 py-3 text-[11px] uppercase tracking-[2px] text-white transition-transform duration-300 hover:scale-105"
                         style={{ borderColor: ev.color + "44", color: ev.color }}
+                        onClick={() => {
+                          setSelectedEvent(ev);
+                          setIsModalOpen(true);
+                        }}
                       >
                         Register Now
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -402,6 +409,16 @@ export default function EsummitSlider() {
           </div>
         </div>
       </div>
+
+      {/* Registration Modal */}
+      <EventRegistrationForm
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+      />
     </>
   );
 }

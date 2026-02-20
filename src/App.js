@@ -39,7 +39,7 @@ function AppContent() {
     return unsubscribe;
   }, [location.pathname]);
 
-  const hideHeaderPaths = ['/registration-slider', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = ['/workshop', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
     <>
@@ -53,7 +53,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
-        <Route path="/registration-slider" element={<RegistrationSlider />} />
+        <Route path="/workshop" element={<RegistrationSlider />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
