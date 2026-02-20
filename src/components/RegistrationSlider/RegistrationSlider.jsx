@@ -119,7 +119,7 @@ const cardStyle = (state) => {
   return { ...base, transform: "translateX(0) scale(0.8)", opacity: 0, zIndex: 0, pointerEvents: "none" };
 };
 
-export default function WorkshopSlider() {
+export default function RegistrationSlider() {
   const [current, setCurrent]         = useState(0);
   const [animating, setAnimating]     = useState(false);
   const [progressKey, setProgressKey] = useState(0);
@@ -214,13 +214,27 @@ export default function WorkshopSlider() {
         />
 
         {/* Header */}
-        <div className="relative z-10 mb-8 text-center">
+        <div className="relative z-10 mb-8 text-center flex flex-col items-center">
           <p className="f-mono mb-2.5 text-[11px] uppercase tracking-[6px] text-white/30">
             ◆ ITER Bhubaneswar ◆ March 2025
           </p>
           <h1 className="f-bebas m-0 text-[clamp(48px,8vw,96px)] leading-[0.9] tracking-[4px] text-white">
             WORK<span style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)", color: "transparent" }}>SHOP</span>
           </h1>
+          <button
+            className="mt-4 f-mono rounded-full border border-white/20 bg-white/10 px-6 py-2 text-[12px] uppercase tracking-[2px] text-white hover:bg-white/20 transition-all duration-200"
+            onClick={() => {
+              // Scroll to workshop section or navigate to workshop page
+              const el = document.getElementById('workshop-section');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.location.href = '/#workshop';
+              }
+            }}
+          >
+            Go to Workshop
+          </button>
         </div>
 
         {/* Slider wrapper */}
