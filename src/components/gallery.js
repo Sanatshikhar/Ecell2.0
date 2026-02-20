@@ -80,7 +80,7 @@ function Gallery() {
   const closePopup = () => setPopupImg(null);
   const [shuffledImages] = useState(() => shuffleArray(allGalleryImages));
   // Only use landscape images for highlights
-  const shuffledHighlights = shuffleArray(landscapeImages.map(img => img.image));
+  const shuffledHighlights = []; // landscapeImages removed
   return (
     <div>
       {/* Registration Slider Animation */}
