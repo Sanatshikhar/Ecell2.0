@@ -45,30 +45,32 @@ const Header = () => {
       : 'bg-black bg-opacity-20 backdrop-blur-md rounded-3xl w-[80%] md:w-[90%] lg:w-[80%] top-6 left-1/2 -translate-x-1/2 h-[60px] md:h-[70px] lg:h-[80px] px-4 md:px-8 lg:px-12'
   }`}>
     {/* Logo */}
-    <div className="flex items-center h-full flex-shrink-0">
-      <img src={logo} alt="Logo" className="w-[90px] md:w-[120px] lg:w-[150px] max-h-[80px] md:max-h-[100px] lg:max-h-[120px] object-contain" />
-    </div>
+      <div className="flex items-center h-full flex-shrink-0">
+        <img src={logo} alt="Logo" className="w-[90px] md:w-[120px] lg:w-[150px] max-h-[80px] md:max-h-[100px] lg:max-h-[120px] object-contain" />
+      </div>
 
-    {/* Menu Links (Tablet/Laptop/Big Screens) */}
-    <div className="hidden md:flex items-center space-x-14 md:space-x-10 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
-      <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''} end>
+      <div className="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2 top-1/2 text-white font-semibold -translate-y-1/2 z-20 h-[40px] ">
+        <NavLink to="/" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''} end>
         Home
-      </NavLink>
-      <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
+        </NavLink>
+        <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Team
-      </NavLink>
-      <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
+        </NavLink>
+        <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Gallery
-      </NavLink>
-      <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
+        </NavLink>
+        <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         About
-      </NavLink>
-      <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
+        </NavLink>
+        <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Contact
-      </NavLink>
-    </div>
+        </NavLink>
+        <NavLink to="/workshop" className={({ isActive }) => isActive ? 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold' : 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold'}>
+        Workshop
+        </NavLink>
+      </div>
 
-        {/* Hamburger/Cross Button */}
+      {/* Hamburger/Cross Button */}
         <button
           id="menu-toggle"
           className={`md:hidden focus:outline-none absolute z-20 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] right-[5%] top-1/2 -translate-y-1/2 text-white`}
@@ -150,6 +152,13 @@ const Header = () => {
               className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}
             >
               About
+            </NavLink>
+            <NavLink
+              to="/workshop"
+              onClick={toggleMenu}
+              className={({ isActive }) => isActive ? 'text-[#00f5d4] underline underline-offset-8 font-bold' : ''}
+            >
+              Workshop
             </NavLink>
             <NavLink
               to="/contact"
