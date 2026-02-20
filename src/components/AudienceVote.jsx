@@ -70,7 +70,7 @@ export default function AudienceVote() {
 
       try {
         const existing = await pb.collection('poll_system').getList(1, 1, { 
-          filter: `type=\"vote\" && regNo=\"${regNo}\" && questionIndex=${currentQuestionIndex}`,
+          filter: `type="vote" && regNo="${regNo}" && questionIndex=${currentQuestionIndex}`,
           requestKey: null 
         });
         
@@ -98,7 +98,7 @@ export default function AudienceVote() {
 
     async function loadPollState() {
       try {
-        const poll = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`);
+        const poll = await pb.collection('poll_system').getFirstListItem(`type="config"`);
         if (!mounted) return;
         setPollActive(!!poll.active);
         const qIndex = typeof poll.questionIndex === 'number' ? poll.questionIndex : (poll.questionIndex ? Number(poll.questionIndex) : -1);
@@ -206,7 +206,7 @@ export default function AudienceVote() {
 
       // Check for existing vote for this registration and current question
       const existing = await pb.collection('poll_system').getList(1, 1, { 
-        filter: `type=\"vote\" && regNo=\"${regNo}\" && questionIndex=${currentQuestionIndex}`,
+        filter: `type="vote" && regNo="${regNo}" && questionIndex=${currentQuestionIndex}`,
         requestKey: null 
       });
       if (existing.items && existing.items.length > 0) {

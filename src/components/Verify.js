@@ -118,7 +118,7 @@ const Verify = () => {
       setLoading(false);
       return;
     }
-    const safeToken = token.replace(/"/g, '\"');
+    const safeToken = token.replace(/"/g, '"');
     try {
       const result = await pb.collection('joiningReg2025').getFirstListItem(`qr_token="${safeToken}"`);
       if (!result) {

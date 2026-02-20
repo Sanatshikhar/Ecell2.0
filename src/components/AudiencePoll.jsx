@@ -54,7 +54,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
     });
 
     return unsubscribe;
-  }, []);
+  }, [pollActive]);
 
   // Load questions from PocketBase on component mount
   useEffect(() => {
@@ -184,7 +184,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         return;
       }
       const all = await pb.collection('poll_system').getFullList({ 
-        filter: `type=\"vote\" && questionIndex=${qIndex}`,
+        filter: `type="vote" && questionIndex=${qIndex}`,
         sort: 'created',
         requestKey: null 
       });
@@ -213,7 +213,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
     leaderboardTimerRef.current = setTimeout(async () => {
       try {
         const all = await pb.collection('poll_system').getFullList({ 
-          filter: `type=\"vote\" && questionIndex=${qIndex}`,
+          filter: `type="vote" && questionIndex=${qIndex}`,
           sort: 'created',
           requestKey: null,
           $autoCancel: false
@@ -239,7 +239,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
 
     async function refreshPollState() {
       try {
-        const p = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`);
+        const p = await pb.collection('poll_system').getFirstListItem(`type="config"`);
         if (!mounted) return;
         console.log('refreshPollState - database state:', { active: p.active, timerActive: p.timerActive, questionIndex: p.questionIndex });
         setPollActive(!!p.active);
@@ -384,7 +384,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       
       let rec;
       try { 
-        rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); 
+        rec = await pb.collection('poll_system').getFirstListItem(`type="config"`); 
         console.log('Found existing config:', rec);
       } catch (e) { 
         console.log('No existing config found, will create new one');
@@ -469,7 +469,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       await clearVotes();
       // update poll config record
       let rec;
-      try { rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); } catch (e) { rec = null; }
+      try { rec = await pb.collection('poll_system').getFirstListItem(`type="config"`); } catch (e) { rec = null; }
       const payload = { type: 'config', active: false, questionIndex: next, question: questions[next], timerActive: false };
       if (rec && rec.id) await pb.collection('poll_system').update(rec.id, payload);
       else await pb.collection('poll_system').create(payload);
@@ -499,7 +499,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       await clearVotes();
       // update poll config record
       let rec;
-      try { rec = await pb.collection('poll_system').getFirstListItem(`type=\"config\"`); } catch (e) { rec = null; }
+      try { rec = await pb.collection('poll_system').getFirstListItem(`type="config"`); } catch (e) { rec = null; }
       const payload = { type: 'config', active: false, questionIndex: prev, question: questions[prev], timerActive: false };
       if (rec && rec.id) await pb.collection('poll_system').update(rec.id, payload);
       else await pb.collection('poll_system').create(payload);
@@ -519,7 +519,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
 
   async function clearVotes() {
     try {
-      const filter = `type=\"vote\"${currentQuestionIndex >= 0 ? ' && questionIndex=' + currentQuestionIndex : ''}`;
+      const filter = `type="vote"${currentQuestionIndex >= 0 ? ' && questionIndex=' + currentQuestionIndex : ''}`;
       const all = await pb.collection('poll_system').getFullList({ filter });
       await Promise.all(all.map(r => pb.collection('poll_system').delete(r.id)));
       setVotes(options.map(() => 0));
