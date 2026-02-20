@@ -63,17 +63,7 @@ const allGalleryImages = [
 
 
 // Removed unused galleryImages, carouselImages, getBoxClass, and landscapeImages
-    "aspect-square h-[340px] w-[340px]", // square
-    "aspect-[4/5] h-[420px] w-[340px]", // portrait
-    "aspect-[5/4] h-[340px] w-[420px]", // landscape
-    "aspect-square h-[380px] w-[380px]", // big square
-    "aspect-[3/2] h-[340px] w-[510px]", // wide
-    "aspect-[2/3] h-[510px] w-[340px]", // tall
-    "aspect-[5/6] h-[400px] w-[340px]", // vertical
-    "aspect-[6/5] h-[340px] w-[400px]", // horizontal
-  ];
-  return styles[idx % styles.length];
-}
+// Removed leftover lines from getBoxClass and landscapeImages
 
 function shuffleArray(array) {
   const arr = [...array];
