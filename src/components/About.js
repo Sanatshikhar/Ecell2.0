@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Footer from './footer';
 
 // Custom hook for scroll-triggered animations

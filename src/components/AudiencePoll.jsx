@@ -17,7 +17,7 @@ const defaultOptions = [
 export default function AudiencePoll({ wsUrl, question = 'Which option do you prefer?' }) {
   const [options, setOptions] = useState(defaultOptions);
   const [votes, setVotes] = useState(() => defaultOptions.map(() => 0));
-  const [running, setRunning] = useState(true);
+  // Removed unused running and setRunning
   const [pollActive, setPollActive] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [quizQuestions, setQuizQuestions] = useState([]);
@@ -311,7 +311,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
 
   // Simulation disabled - votes now come only from real PocketBase data
   // useEffect(() => {
-  //   if (!running || wsUrl) return;
+  //   if (!wsUrl) return;
   //   let mounted = true;
   //   function tick() {
   //     if (!mounted) return;
@@ -330,7 +330,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   //     mounted = false;
   //     clearTimeout(timer);
   //   };
-  // }, [running, wsUrl, options.length]);
+  // }, [wsUrl, options.length]);
 
   // Function to start the timer and update database
   async function startTimer() {
