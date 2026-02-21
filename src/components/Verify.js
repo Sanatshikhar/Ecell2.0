@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import pb from '../lib/pocketbase';
 import QrScanner from 'qr-scanner';
-import axios from 'axios';
+// Removed unused import 'axios'
 
 const Verify = () => {
   const [status, setStatus] = useState(null); // 'verified', 'already', 'invalid'
@@ -10,7 +10,7 @@ const Verify = () => {
   const [message, setMessage] = useState('');
   const [scannerActive, setScannerActive] = useState(false);
   const [verifiedName, setVerifiedName] = useState('');
-  const [inputDevices, setInputDevices] = useState([]);
+  // Removed unused variable 'inputDevices'
   const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
   const videoRef = useRef(null);
@@ -169,9 +169,7 @@ const Verify = () => {
   };
 
   // Helper to detect if device is a laptop (not mobile/tablet)
-  const isLaptop = () => {
-    return !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  };
+  // Removed unused function 'isLaptop'
 
   const handleNext = () => {
   setStatus(null);

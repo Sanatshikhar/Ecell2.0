@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import logo from "./logo.png";
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,7 +8,7 @@ const Header = () => {
 
   useEffect(() => {
     let ticking = false;
-    let lastScrollY = 0;
+    // Removed unused variable 'lastScrollY'
 
     const handleScroll = () => {
       if (!ticking) {

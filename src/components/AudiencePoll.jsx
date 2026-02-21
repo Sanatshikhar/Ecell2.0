@@ -175,7 +175,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   }, [wsUrl]);
 
   // Helper to fetch votes for a specific question from poll_system
-  const fetchVotesForCurrentQuestion = async (qIndex) => {
+  const fetchVotesForCurrentQuestion = React.useCallback(async (qIndex) => {
     try {
       fetchingRef.current = true;
       if (qIndex == null || qIndex < 0) {

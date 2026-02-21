@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import pb from '../lib/pocketbase';
@@ -36,7 +36,7 @@ const ResonanceForm = ({ onClose }) => {
       formData.append('mailSent', 'false');
       const record = await pb.collection('iecReg').create(formData);
 
-      const verificationUrl = `https://yourdomain.com/verify?token=${token}`;
+      // Removed unused variable 'verificationUrl'
 
   // Use REACT_APP_BACKEND_URL from environment variables
   const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';

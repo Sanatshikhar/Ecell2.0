@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from './logo.png';
+// Removed unused import 'logo'
 import sampleEvent from '../components/Assets/Resonance.png';
 import styles from './TechXperience.module.css';
 
