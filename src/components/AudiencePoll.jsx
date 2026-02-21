@@ -138,7 +138,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         clearTimeout(pollTimerRef.current);
       }
     };
-  }, [timer, timerActive]);
+  }, [timer, timerActive, pollActive]);
 
   // Cleanup timer on component unmount
   useEffect(() => {
@@ -297,7 +297,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
       mounted = false;
       try { pb.collection('poll_system').unsubscribe(pollSystemSub); } catch (e) {}
     };
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, fetchVotesForCurrentQuestion]);
 
   // Separate effect to fetch votes when questionIndex changes
   useEffect(() => {

@@ -6,7 +6,7 @@ const Dashboard = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [campusFilter, setCampusFilter] = useState('all');
-  const [campusOptions, setCampusOptions] = useState([]);
+  // Removed unused variable 'campusOptions'
 
   useEffect(() => {
     let abortController = new AbortController();
