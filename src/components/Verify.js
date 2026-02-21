@@ -25,7 +25,7 @@ const Verify = () => {
           (device.kind !== 'videoinput' && device.kind !== 'audioinput' && device.kind !== 'audiooutput') &&
           (!device.label || /scanner|barcode|hid|usb/i.test(device.label))
         );
-        setInputDevices(scannerDevices);
+        // Removed call to undefined setInputDevices
       });
     }
   }, []);

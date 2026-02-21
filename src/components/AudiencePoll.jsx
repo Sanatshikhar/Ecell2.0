@@ -194,7 +194,6 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
         if (index >= 0) counts[index] += 1;
       });
       setVotes(counts);
-      
       // Update leaderboard (debounced to prevent freezing)
       updateLeaderboard(qIndex);
     } catch (err) {
@@ -202,7 +201,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
     } finally {
       fetchingRef.current = false;
     }
-  };
+  }, [options]);
 
   // Debounced leaderboard update to prevent freezing
   const updateLeaderboard = (qIndex) => {

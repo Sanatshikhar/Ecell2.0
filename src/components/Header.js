@@ -20,7 +20,7 @@ const Header = () => {
             setScrolled(scrollPosition > 300);
           }
           
-          lastScrollY = scrollPosition;
+          // Removed reference to undefined lastScrollY
           ticking = false;
         });
         ticking = true;
