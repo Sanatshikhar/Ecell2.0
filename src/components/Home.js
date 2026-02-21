@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { CardSpotlight } from "../ui/card-spotlight.jsx";
+
 import logo from "./logo.png";
 import Footer from "./footer.js";
-import Cs from "./Assets/comingSoon.webp";
+
 import { TypewriterEffectSmooth } from "./animation/homeani.tsx";
 import Rposter from "./Assets/Resonance.png";
 import resonance from "./Assets/Resonance Campus 2 (9 x 5 in) (4).png";
@@ -17,7 +17,7 @@ import Boblive from "./Assets/oblive.jpg";
 const Home = () => {
   const navigate = useNavigate();
   const [openIndex, setOpenIndex] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+
   const [popupEvent, setPopupEvent] = useState(null);
 
   useEffect(() => {
