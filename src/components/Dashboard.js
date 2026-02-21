@@ -15,7 +15,7 @@ const Dashboard = () => {
         const result = await pb.collection('iecReg').getFullList({ requestOptions: { signal: abortController.signal } });
         setRegistrations(result);
         const campuses = Array.from(new Set(result.map(r => r.campus).filter(Boolean)));
-        setCampusOptions(campuses);
+        
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error(err);
