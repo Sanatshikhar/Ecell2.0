@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import pb from "../lib/pocketbase";
-import logo from "./logo.png";
+// Removed unused import 'logo'
 
 
 const RegistrationForm = ({ isOpen, onClose }) => {
-  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm();
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm(); // Removed unused 'watch'
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

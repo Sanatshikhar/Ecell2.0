@@ -21,10 +21,7 @@ const Verify = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
       navigator.mediaDevices.enumerateDevices().then(devices => {
         // Only keep devices that are likely to be handheld scanners (no label, kind is not 'videoinput', 'audioinput', or 'audiooutput')
-        const scannerDevices = devices.filter(device =>
-          (device.kind !== 'videoinput' && device.kind !== 'audioinput' && device.kind !== 'audiooutput') &&
-          (!device.label || /scanner|barcode|hid|usb/i.test(device.label))
-        );
+        // Removed unused variable 'scannerDevices'
         // Removed call to undefined setInputDevices
       });
     }

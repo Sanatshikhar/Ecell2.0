@@ -332,20 +332,7 @@ export default function AudiencePoll({ wsUrl, question = 'Which option do you pr
   // }, [wsUrl, options.length]);
 
   // Function to start the timer and update database
-  async function startTimer() {
-    try {
-      setTimer(15);
-      setTimerActive(true);
-      
-      // Update database to reflect timer state
-      const rec = await pb.collection('poll_system').getFirstListItem(`type="config"`);
-      if (rec && rec.id) {
-        await pb.collection('poll_system').update(rec.id, { timerActive: true });
-      }
-    } catch (error) {
-      console.error('Failed to start timer:', error);
-    }
-  }
+  // Removed unused function 'startTimer'
 
   // Start/Stop poll control which updates PocketBase poll_system config record
   async function setPollActiveState(active) {
