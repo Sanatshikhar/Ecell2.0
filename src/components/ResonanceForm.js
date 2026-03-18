@@ -72,13 +72,13 @@ const ResonanceForm = ({ onClose }) => {
     <div className={styles.formOverlay}>
       <div className={styles.formModal}>
   <button className={styles.formClose} onClick={onClose} aria-label="Close">&times;</button>
-  <h2 className="text-2xl font-extrabold mb-4 text-center text-[#4b2aad] tracking-tight">Registration</h2>
+  <h2 className="text-lg sm:text-2xl font-extrabold mb-3 sm:mb-4 text-center text-[#4b2aad] tracking-tight">Registration</h2>
         {submitted ? (
           <div className={styles.formSuccess}>Thank you for registering!</div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 sm:gap-3">
             {/* User Type Radio */}
-            <div className="flex gap-6 mb-2">
+            <div className="flex flex-wrap gap-4 sm:gap-6 mb-2">
               <label className={styles.formLabel} style={{marginBottom:0}}>
                 <input
                   type="radio"
@@ -96,7 +96,7 @@ const ResonanceForm = ({ onClose }) => {
                 /> Faculty
               </label>
             </div>
-            {errors.userType && <span className="text-red-500 text-xs">Please select a user type</span>}
+            {errors.userType && <span className="text-red-500 text-xs sm:text-sm">Please select a user type</span>}
 
             {/* Common fields */}
             <label className={styles.formLabel} htmlFor="name">Full Name</label>
@@ -107,7 +107,7 @@ const ResonanceForm = ({ onClose }) => {
               placeholder="Full Name"
               className={styles.formInput}
             />
-            {errors.name && <span className="text-red-500 text-xs">Name is required</span>}
+            {errors.name && <span className="text-red-500 text-xs sm:text-sm">Name is required</span>}
 
             <label className={styles.formLabel} htmlFor="email">Email</label>
             <input
@@ -117,7 +117,7 @@ const ResonanceForm = ({ onClose }) => {
               placeholder="Email"
               className={styles.formInput}
             />
-            {errors.email && <span className="text-red-500 text-xs">Email is required</span>}
+            {errors.email && <span className="text-red-500 text-xs sm:text-sm">Email is required</span>}
 
             <label className={styles.formLabel} htmlFor="phone">Phone Number</label>
             <input
@@ -127,7 +127,7 @@ const ResonanceForm = ({ onClose }) => {
               placeholder="Phone Number"
               className={styles.formInput}
             />
-            {errors.phone && <span className="text-red-500 text-xs">Phone Number is required</span>}
+            {errors.phone && <span className="text-red-500 text-xs sm:text-sm">Phone Number is required</span>}
 
             <label className={styles.formLabel} htmlFor="idCard">Upload Image/College ID</label>
             <input
@@ -137,7 +137,7 @@ const ResonanceForm = ({ onClose }) => {
               {...register("idCard", { required: true })}
               className={styles.formInput}
             />
-            {errors.idCard && <span className="text-red-500 text-xs">ID/College Image is required</span>}
+            {errors.idCard && <span className="text-red-500 text-xs sm:text-sm">ID/College Image is required</span>}
 
             {/* Campus dropdown */}
             <label className={styles.formLabel} htmlFor="campus">Campus</label>
@@ -147,10 +147,10 @@ const ResonanceForm = ({ onClose }) => {
               className={styles.formInput}
             >
               <option value="">Select Campus</option>
-              <option value="SOA Campus 2" disabled>SOA Campus 2</option>
+              <option value="SOA Campus 2">SOA Campus 2</option>
               <option value="SOA Campus 4">SOA Campus 4</option>
             </select>
-            {errors.campus && <span className="text-red-500 text-xs">Campus is required</span>}
+            {errors.campus && <span className="text-red-500 text-xs sm:text-sm">Campus is required</span>}
 
             {/* Student-only fields */}
             {userType === 'student' && <>
@@ -162,7 +162,7 @@ const ResonanceForm = ({ onClose }) => {
                 placeholder="Course/Branch"
                 className={styles.formInput}
               />
-              {errors.course && <span className="text-red-500 text-xs">Course/Branch is required</span>}
+              {errors.course && <span className="text-red-500 text-xs sm:text-sm">Course/Branch is required</span>}
 
               <label className={styles.formLabel} htmlFor="regNo">Registration/Application Number</label>
               <input
@@ -172,7 +172,7 @@ const ResonanceForm = ({ onClose }) => {
                 placeholder="Reg/Application No."
                 className={styles.formInput}
               />
-              {errors.regNo && <span className="text-red-500 text-xs">Reg/Application No. is required</span>}
+              {errors.regNo && <span className="text-red-500 text-xs sm:text-sm">Reg/Application No. is required</span>}
 
               
             </>}

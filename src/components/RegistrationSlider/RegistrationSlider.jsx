@@ -229,11 +229,11 @@ export default function RegistrationSlider() {
               if (el) {
                 el.scrollIntoView({ behavior: 'smooth' });
               } else {
-                window.location.href = '/#workshop';
+                window.location.href = '/';
               }
             }}
           >
-            Go to Workshop
+            Go to Homepage
           </button>
         </div>
 
@@ -242,7 +242,7 @@ export default function RegistrationSlider() {
 
           {/* Floating badge */}
           <div className="f-mono absolute left-10 top-[-16px] z-10 rounded-[10px] border border-white/10 bg-[rgba(5,5,8,0.9)] px-4 py-2 text-[10px] uppercase tracking-[2px] text-white/50 backdrop-blur-md">
-            Events Calendar
+            Sessions Calendar
           </div>
 
           {/* Swipe hint arrows — CSS shows these only on touch devices */}

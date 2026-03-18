@@ -127,9 +127,9 @@ const RegistrationForm = ({ isOpen, onClose }) => {
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[999] min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 bg-black" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
+      <div className="fixed inset-0 z-[999] min-h-screen font-sans overflow-y-auto flex flex-col items-center justify-start px-2 sm:px-3 md:px-4 lg:px-6 py-3 sm:py-4 md:py-6 lg:py-8 bg-black" style={{backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)'}}>
         {/* Responsive Blue radial balls in corners */}
-        <svg className="absolute top-2 left-2 sm:top-4 sm:left-4 w-[35vw] h-[35vw] sm:w-[28vw] sm:h-[28vw] lg:w-[25vw] lg:h-[25vw] min-w-[200px] min-h-[200px] max-w-[420px] max-h-[420px] opacity-40 z-0 pointer-events-none select-none" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-4 md:left-4 w-[30vw] h-[30vw] sm:w-[28vw] sm:h-[28vw] md:w-[25vw] md:h-[25vw] lg:w-[25vw] lg:h-[25vw] min-w-[200px] min-h-[200px] max-w-[420px] max-h-[420px] opacity-40 z-0 pointer-events-none select-none" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="150" cy="150" r="150" fill="url(#paint0_radial_contact)" />
           <defs>
             <radialGradient id="paint0_radial_contact" cx="0" cy="0" r="1" gradientTransform="translate(150 150) scale(150)" gradientUnits="userSpaceOnUse">
@@ -138,7 +138,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
             </radialGradient>
           </defs>
         </svg>
-        <svg className="absolute bottom-0 right-0 w-[45vw] h-[30vw] sm:w-[52vw] sm:h-[38vw] lg:w-[45vw] lg:h-[35vw] min-w-[300px] min-h-[200px] max-w-[800px] max-h-[600px] opacity-30 z-0 pointer-events-none select-none" viewBox="0 0 330 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="absolute bottom-0 right-0 w-[40vw] h-[28vw] sm:w-[45vw] sm:h-[32vw] md:w-[52vw] md:h-[38vw] lg:w-[45vw] lg:h-[35vw] min-w-[250px] min-h-[180px] max-w-[800px] max-h-[600px] opacity-30 z-0 pointer-events-none select-none" viewBox="0 0 330 260" fill="none" xmlns="http://www.w3.org/2000/svg">
           <ellipse cx="165" cy="130" rx="165" ry="120" fill="url(#paint1_radial_contact)" />
           <defs>
             <radialGradient id="paint1_radial_contact" cx="0" cy="0" r="1" gradientTransform="translate(165 130) scale(165 120)" gradientUnits="userSpaceOnUse">
@@ -149,7 +149,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
         </svg>
         {/* Responsive close button */}
         <button
-          className="fixed top-3 right-4 sm:top-6 sm:right-8 text-white hover:text-blue-200 text-3xl sm:text-4xl lg:text-4xl font-bold z-[1000] transition-colors duration-200 touch-manipulation"
+          className="fixed top-2 right-2 sm:top-4 sm:right-4 md:top-6 md:right-8 text-white hover:text-blue-200 text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold z-[1000] transition-colors duration-200 touch-manipulation"
           onClick={onClose}
           aria-label="Close"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
@@ -157,10 +157,10 @@ const RegistrationForm = ({ isOpen, onClose }) => {
           &times;
         </button>
         {/* Responsive container */}
-        <div className="w-full max-w-sm sm:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto p-3 sm:p-6 lg:p-8 flex flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16 mb-4 sm:mb-8 z-10">
-          <h2 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-extrabold text-center bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent tracking-tight mb-4 sm:mb-6 lg:mb-8" style={{fontFamily: 'Montserrat, sans-serif'}}>Join Us</h2>
-          <form className="space-y-3 sm:space-y-4 lg:space-y-6 w-full flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 w-full max-w-sm sm:max-w-lg lg:max-w-4xl mx-auto">
+        <div className="w-full max-w-sm sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto p-2 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center mt-6 sm:mt-10 md:mt-12 lg:mt-16 mb-4 sm:mb-6 md:mb-8 z-10">
+          <h2 className="text-lg sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-center bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent tracking-tight mb-3 sm:mb-5 md:mb-6 lg:mb-8" style={{fontFamily: 'Montserrat, sans-serif'}}>Join Us</h2>
+          <form className="space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6 w-full flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6 w-full max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto">
               {/* Name */}
               <div className="flex flex-col w-full">
                 <label className="block font-semibold mb-1 sm:mb-2 text-white w-full text-left text-sm sm:text-base">Name</label>
@@ -298,17 +298,17 @@ const RegistrationForm = ({ isOpen, onClose }) => {
                 {errors.idProof && <span className="text-red-400 text-xs sm:text-sm mt-1 text-center">Upload your ID/College Image</span>}
               </div>
             </div>
-            <button type="submit" className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-blue-800 text-white py-3 sm:py-4 lg:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg lg:text-xl shadow-lg border border-cyan-700 hover:bg-blue-900 hover:scale-105 active:scale-95 transition transform mt-4 sm:mt-6 lg:mt-8 touch-manipulation" disabled={loading}>{loading ? 'Submitting...' : 'Register'}</button>
+            <button type="submit" className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg bg-blue-800 text-white py-2.5 sm:py-3 md:py-4 lg:py-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg lg:text-xl shadow-lg border border-cyan-700 hover:bg-blue-900 hover:scale-105 active:scale-95 transition transform mt-3 sm:mt-4 md:mt-6 lg:mt-8 touch-manipulation" disabled={loading}>{loading ? 'Submitting...' : 'Register'}</button>
           </form>
         </div>
         {/* Responsive Success Popup Modal */}
         {showSuccess && (
-          <div className="fixed inset-0 z-[1001] flex items-center justify-center bg-black bg-opacity-60 p-4">
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 max-w-xs sm:max-w-md lg:max-w-lg w-full mx-auto text-center">
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 mb-3 sm:mb-4">Registration Successful!</h3>
-              <p className="text-base sm:text-lg lg:text-xl text-gray-800 mb-4 sm:mb-6">For further information, check your mail.</p>
+          <div className="fixed inset-0 z-[1001] flex items-center justify-center bg-black bg-opacity-60 p-3 sm:p-4 md:p-6">
+            <div className="bg-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md md:max-w-lg w-full mx-auto text-center">
+              <h3 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-green-600 mb-2 sm:mb-3 md:mb-4">Registration Successful!</h3>
+              <p className="text-xs sm:text-base md:text-lg lg:text-xl text-gray-800 mb-3 sm:mb-4 md:mb-6">For further information, check your mail.</p>
               <button
-                className="bg-blue-600 text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full font-bold hover:bg-blue-700 transition text-sm sm:text-base lg:text-lg touch-manipulation"
+                className="bg-blue-600 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-full font-bold hover:bg-blue-700 transition text-xs sm:text-sm md:text-base lg:text-lg touch-manipulation"
                 onClick={() => { setShowSuccess(false); onClose(); }}
               >
                 Close

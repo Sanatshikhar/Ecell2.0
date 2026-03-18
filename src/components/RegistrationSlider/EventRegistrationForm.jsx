@@ -132,7 +132,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
       
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
         onClick={handleClose}
       >
         {/* Noise overlay */}
@@ -143,7 +143,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
 
         {/* Modal Container */}
         <div 
-          className="modal-anim f-dm relative w-full max-w-2xl bg-[#050508] rounded-[20px] border border-white/10 overflow-hidden my-8"
+          className="modal-anim f-dm relative w-full max-w-sm sm:max-w-md md:max-w-2xl bg-[#050508] rounded-xl sm:rounded-[20px] border border-white/10 overflow-hidden my-4 sm:my-8"
           style={{ background: event.bg }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -178,40 +178,40 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
           </button>
 
           {/* Content */}
-          <div className="relative z-[2] p-8">
+          <div className="relative z-[2] p-5 sm:p-6 md:p-8">
             {/* Header */}
-            <div className="mb-8">
+            <div className="mb-4 sm:mb-6 md:mb-8">
               <span
-                className="f-mono inline-block rounded-full border px-3.5 py-1.5 text-[10px] uppercase tracking-[4px] mb-4"
+                className="f-mono inline-block rounded-full border px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[10px] uppercase tracking-[2px] sm:tracking-[4px] mb-2 sm:mb-4"
                 style={{ color: event.color, borderColor: event.color + "44" }}
               >
                 {event.tag}
               </span>
-              <h2 className="f-bebas m-0 mb-2 text-[48px] leading-[0.9] tracking-[1px] text-white">
+              <h2 className="f-bebas m-0 mb-1 sm:mb-2 text-3xl sm:text-[40px] md:text-[48px] leading-[0.9] tracking-[1px] text-white">
                 {event.title}
               </h2>
-              <p className="f-dm text-[14px] text-white/50 mb-4">{event.subtitle}</p>
+              <p className="f-dm text-xs sm:text-sm md:text-[14px] text-white/50 mb-3 sm:mb-4">{event.subtitle}</p>
               
               {/* Event Details (Locked) */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 backdrop-blur-sm">
-                  <span className="f-mono block text-[10px] uppercase tracking-[1px] text-white/40 mb-1">Date</span>
-                  <span className="f-dm text-[14px] font-medium text-white">{event.date}</span>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3 backdrop-blur-sm">
+                  <span className="f-mono block text-[8px] sm:text-[10px] uppercase tracking-[1px] text-white/40 mb-0.5 sm:mb-1">Date</span>
+                  <span className="f-dm text-xs sm:text-sm md:text-[14px] font-medium text-white">{event.date}</span>
                 </div>
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 backdrop-blur-sm">
-                  <span className="f-mono block text-[10px] uppercase tracking-[1px] text-white/40 mb-1">Time</span>
-                  <span className="f-bebas text-[20px] tracking-[0.5px]" style={{ color: event.color }}>{event.time}</span>
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3 backdrop-blur-sm">
+                  <span className="f-mono block text-[8px] sm:text-[10px] uppercase tracking-[1px] text-white/40 mb-0.5 sm:mb-1">Time</span>
+                  <span className="f-bebas text-base sm:text-lg md:text-[20px] tracking-[0.5px]" style={{ color: event.color }}>{event.time}</span>
                 </div>
               </div>
 
-              <div className="h-px opacity-20 mb-6" style={{ background: event.color }} />
+              <div className="h-px opacity-20 mb-4 sm:mb-6" style={{ background: event.color }} />
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
               {/* Name */}
               <div>
-                <label className="f-mono mb-2 block text-[11px] uppercase tracking-[1px] text-white/60">
+                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                   Full Name *
                 </label>
                 <input
@@ -220,16 +220,16 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                 />
                 {errors.name && (
-                  <span className="f-dm mt-1 block text-[12px] text-red-400">{errors.name}</span>
+                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.name}</span>
                 )}
               </div>
 
               {/* Email */}
               <div>
-                <label className="f-mono mb-2 block text-[11px] uppercase tracking-[1px] text-white/60">
+                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                   Email Address *
                 </label>
                 <input
@@ -238,16 +238,16 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your.email@example.com"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                 />
                 {errors.email && (
-                  <span className="f-dm mt-1 block text-[12px] text-red-400">{errors.email}</span>
+                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.email}</span>
                 )}
               </div>
 
               {/* Phone */}
               <div>
-                <label className="f-mono mb-2 block text-[11px] uppercase tracking-[1px] text-white/60">
+                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                   Phone Number *
                 </label>
                 <input
@@ -256,18 +256,18 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+91 9876543210"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                 />
                 {errors.phone && (
-                  <span className="f-dm mt-1 block text-[12px] text-red-400">{errors.phone}</span>
+                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.phone}</span>
                 )}
               </div>
 
               {/* Course/Branch and Reg No in grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
                 {/* Course/Branch */}
                 <div>
-                  <label className="f-mono mb-2 block text-[11px] uppercase tracking-[1px] text-white/60">
+                  <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                     Course/Branch *
                   </label>
                   <input
@@ -276,16 +276,16 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                     value={formData.course}
                     onChange={handleChange}
                     placeholder="e.g., B.Tech CSE"
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                   />
                   {errors.course && (
-                    <span className="f-dm mt-1 block text-[12px] text-red-400">{errors.course}</span>
+                    <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.course}</span>
                   )}
                 </div>
 
                 {/* Registration Number */}
                 <div>
-                  <label className="f-mono mb-2 block text-[11px] uppercase tracking-[1px] text-white/60">
+                  <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                     Registration No. *
                   </label>
                   <input
@@ -294,10 +294,10 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                     value={formData.regNo}
                     onChange={handleChange}
                     placeholder="Your Reg/App No."
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                   />
                   {errors.regNo && (
-                    <span className="f-dm mt-1 block text-[12px] text-red-400">{errors.regNo}</span>
+                    <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.regNo}</span>
                   )}
                 </div>
               </div>
@@ -306,7 +306,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="f-mono mt-6 w-full cursor-pointer rounded-lg border px-6 py-4 text-[12px] uppercase tracking-[2px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                className="f-mono mt-4 sm:mt-5 md:mt-6 w-full cursor-pointer rounded-lg border px-4 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-[12px] uppercase tracking-[1.5px] sm:tracking-[2px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
                   borderColor: event.color + "44",
                   background: loading ? event.color + "33" : event.color + "22",
@@ -315,7 +315,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <svg className="animate-spin h-3 w-3 sm:h-4 sm:w-4" viewBox="0 0 24 24" fill="none">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
@@ -337,34 +337,34 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
         {/* Success Modal */}
         {showSuccess && (
           <div 
-            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4"
             onClick={() => { setShowSuccess(false); handleClose(); }}
           >
             <div 
-              className="modal-anim f-dm relative max-w-md w-full bg-white rounded-2xl p-8 text-center shadow-2xl"
+              className="modal-anim f-dm relative max-w-sm w-full bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Success Icon */}
-              <div className="mb-6 flex justify-center">
-                <div className="rounded-full bg-green-100 p-4">
-                  <svg className="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="mb-4 sm:mb-6 flex justify-center">
+                <div className="rounded-full bg-green-100 p-3 sm:p-4">
+                  <svg className="h-8 w-8 sm:h-12 sm:w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>
 
-              <h3 className="f-bebas mb-3 text-[36px] tracking-[1px] text-gray-900">
+              <h3 className="f-bebas mb-2 sm:mb-3 text-2xl sm:text-[36px] tracking-[1px] text-gray-900">
                 Registration Successful!
               </h3>
-              <p className="mb-2 text-[16px] text-gray-600">
+              <p className="mb-1 sm:mb-2 text-sm sm:text-base md:text-[16px] text-gray-600">
                 You're all set for <span className="font-semibold" style={{ color: event.color }}>{event.title}</span>
               </p>
-              <p className="mb-6 text-[14px] text-gray-500">
+              <p className="mb-4 sm:mb-6 text-xs sm:text-sm md:text-[14px] text-gray-500">
                 Check your email for confirmation and event details.
               </p>
 
               <button
-                className="f-mono w-full rounded-lg py-3 text-[12px] uppercase tracking-[2px] text-white transition-all duration-300 hover:scale-105"
+                className="f-mono w-full rounded-lg py-2 sm:py-3 text-[11px] sm:text-[12px] uppercase tracking-[1.5px] sm:tracking-[2px] text-white transition-all duration-300 hover:scale-105"
                 style={{ background: event.color }}
                 onClick={() => { setShowSuccess(false); handleClose(); }}
               >
