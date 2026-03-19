@@ -48,6 +48,23 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     return `${mm}:${ss}`;
   };
 
+  const maskEmail = (email) => {
+    if (!email || !email.includes("@")) return email;
+    const [local, domain] = email.split("@");
+    const [domainName, ...tldParts] = domain.split(".");
+
+    const maskedLocal = local.length <= 2
+      ? `${local[0] || ""}*`
+      : `${local.slice(0, 2)}${"*".repeat(Math.max(2, local.length - 2))}`;
+
+    const maskedDomain = domainName.length <= 2
+      ? `${domainName[0] || ""}*`
+      : `${domainName.slice(0, 2)}${"*".repeat(Math.max(2, domainName.length - 2))}`;
+
+    const tld = tldParts.length ? `.${tldParts.join(".")}` : "";
+    return `${maskedLocal}@${maskedDomain}${tld}`;
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -427,234 +444,246 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3 md:space-y-4">
-              {/* Name */}
-              <div>
-                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                />
-                {errors.name && (
-                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.name}</span>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your.email@example.com"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                />
-                {errors.email && (
-                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.email}</span>
-                )}
-              </div>
-
-              {/* OTP Verification */}
-              {otpStepActive && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 sm:p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="f-mono block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/70">
-                    Email Verification *
-                  </label>
-                  {otpVerified ? (
-                    <span className="f-mono text-[10px] uppercase tracking-[1px]" style={{ color: event.color }}>
-                      Verified
-                    </span>
-                  ) : (
-                    <span className="f-mono text-[10px] uppercase tracking-[1px] text-white/45">
-                      Required
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={otpInput}
-                    onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={otpVerifying || otpVerified || otpSecondsLeft === 0}
-                    className="f-mono rounded-lg border px-3 py-2 text-[10px] uppercase tracking-[1px] text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ borderColor: event.color + "66", color: event.color }}
-                  >
-                    {otpVerified ? "Verified" : otpVerifying ? "Verifying..." : "Verify OTP"}
-                  </button>
-                </div>
-
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={otpSending}
-                    className="f-mono rounded-lg border px-3 py-2 text-[10px] uppercase tracking-[1px] text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ borderColor: event.color + "66", color: event.color }}
-                  >
-                    {otpSending ? "Sending..." : otpSecondsLeft > 0 ? "Resend OTP" : "Send OTP"}
-                  </button>
-                  {otpSecondsLeft > 0 && !otpVerified && (
-                    <span className="f-mono text-[10px] uppercase tracking-[1px] text-white/60">
-                      Expires in {formatOtpTime(otpSecondsLeft)}
-                    </span>
-                  )}
-                </div>
-
-                {otpMessage && (
-                  <p className="f-dm mt-2 text-[11px] text-green-400">{otpMessage}</p>
-                )}
-                {otpError && (
-                  <p className="f-dm mt-2 text-[11px] text-red-400">{otpError}</p>
-                )}
-              </div>
-              )}
-
-              {/* Phone */}
-              <div>
-                <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+91 9876543210"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                />
-                {errors.phone && (
-                  <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.phone}</span>
-                )}
-              </div>
-
-              {/* Course/Branch, IEC member, and Reg No in grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                {/* Course/Branch */}
-                <div>
-                  <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                    Course/Branch *
-                  </label>
-                  <input
-                    type="text"
-                    name="course"
-                    value={formData.course}
-                    onChange={handleChange}
-                    placeholder="e.g., B.Tech CSE"
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                  />
-                  {errors.course && (
-                    <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.course}</span>
-                  )}
-                </div>
-
-                {/* IEC Member */}
-                <div>
-                  <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                    IEC Member *
-                  </label>
-                  <div className="relative">
-                    <select
-                      name="iecMember"
-                      value={formData.iecMember}
+              {!otpStepActive ? (
+                <>
+                  {/* Name */}
+                  <div>
+                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
-                      className={`w-full appearance-none rounded-lg border bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 pr-10 text-xs sm:text-sm md:text-base backdrop-blur-sm transition-all duration-200 focus:bg-white/[0.06] focus:outline-none ${formData.iecMember ? "text-white" : "text-white/30"}`}
-                      style={{
-                        borderColor: formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)",
-                        color: formData.iecMember ? event.color : "rgba(255,255,255,0.3)",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = event.color + "cc";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)";
-                      }}
-                    >
-                      <option value="" className="bg-gray-900 text-white/50">Select an option</option>
-                      <option value="Yes" className="bg-gray-900">Yes</option>
-                      <option value="No" className="bg-gray-900">No</option>
-                    </select>
-                    <svg
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      style={{ color: formData.iecMember ? event.color : "rgba(255,255,255,0.4)" }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
+                      placeholder="Enter your name"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    />
+                    {errors.name && (
+                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.name}</span>
+                    )}
                   </div>
-                  {errors.iecMember && (
-                    <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.iecMember}</span>
-                  )}
-                </div>
 
-                {/* Registration Number */}
-                <div className="col-span-2 sm:col-span-1 md:col-span-1">
-                  <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                    Registration No. *
-                  </label>
-                  <input
-                    type="text"
-                    name="regNo"
-                    value={formData.regNo}
-                    onChange={handleChange}
-                    placeholder="Your Reg No."
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
-                  />
-                  {errors.regNo && (
-                    <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.regNo}</span>
-                  )}
-                </div>
-              </div>
+                  {/* Email */}
+                  <div>
+                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="your.email@example.com"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    />
+                    {errors.email && (
+                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.email}</span>
+                    )}
+                  </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading || (otpStepActive && !otpVerified)}
-                className="f-mono mt-2 sm:mt-3 w-full cursor-pointer rounded-lg border px-3 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-[11px] uppercase tracking-[1px] sm:tracking-[1.5px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
-                style={{
-                  borderColor: event.color + "44",
-                  background: loading ? event.color + "33" : event.color + "22",
-                  color: loading ? event.color : "white",
-                }}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-3 w-3 sm:h-4 sm:w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Processing...
-                  </span>
-                ) : (
-                  !otpStepActive ? "Continue To Email Verification" : otpVerified ? "Complete Registration" : "Verify Email To Continue"
-                )}
-              </button>
+                  {/* Phone */}
+                  <div>
+                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+91 9876543210"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    />
+                    {errors.phone && (
+                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.phone}</span>
+                    )}
+                  </div>
+
+                  {/* Course/Branch, IEC member, and Reg No in grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+                    {/* Course/Branch */}
+                    <div>
+                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                        Course/Branch *
+                      </label>
+                      <input
+                        type="text"
+                        name="course"
+                        value={formData.course}
+                        onChange={handleChange}
+                        placeholder="e.g., B.Tech CSE"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      />
+                      {errors.course && (
+                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.course}</span>
+                      )}
+                    </div>
+
+                    {/* IEC Member */}
+                    <div>
+                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                        IEC Member *
+                      </label>
+                      <div className="relative">
+                        <select
+                          name="iecMember"
+                          value={formData.iecMember}
+                          onChange={handleChange}
+                          className={`w-full appearance-none rounded-lg border bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 pr-10 text-xs sm:text-sm md:text-base backdrop-blur-sm transition-all duration-200 focus:bg-white/[0.06] focus:outline-none ${formData.iecMember ? "text-white" : "text-white/30"}`}
+                          style={{
+                            borderColor: formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)",
+                            color: formData.iecMember ? event.color : "rgba(255,255,255,0.3)",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = event.color + "cc";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)";
+                          }}
+                        >
+                          <option value="" className="bg-gray-900 text-white/50">Select an option</option>
+                          <option value="Yes" className="bg-gray-900">Yes</option>
+                          <option value="No" className="bg-gray-900">No</option>
+                        </select>
+                        <svg
+                          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          style={{ color: formData.iecMember ? event.color : "rgba(255,255,255,0.4)" }}
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </div>
+                      {errors.iecMember && (
+                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.iecMember}</span>
+                      )}
+                    </div>
+
+                    {/* Registration Number */}
+                    <div className="col-span-2 sm:col-span-1 md:col-span-1">
+                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                        Registration No. *
+                      </label>
+                      <input
+                        type="text"
+                        name="regNo"
+                        value={formData.regNo}
+                        onChange={handleChange}
+                        placeholder="Your Reg No."
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      />
+                      {errors.regNo && (
+                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.regNo}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="f-mono mt-2 sm:mt-3 w-full cursor-pointer rounded-lg border px-3 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-[11px] uppercase tracking-[1px] sm:tracking-[1.5px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                      borderColor: event.color + "44",
+                      background: loading ? event.color + "33" : event.color + "22",
+                      color: loading ? event.color : "white",
+                    }}
+                  >
+                    {loading ? "Processing..." : "Continue To Email Verification"}
+                  </button>
+                </>
+              ) : (
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                  <div className="mb-4">
+                    <p className="f-mono text-[10px] uppercase tracking-[2px] text-white/60">Step 2 of 2</p>
+                    <h3 className="f-bebas mt-1 text-3xl leading-none text-white">Verify Email OTP</h3>
+                    <p className="f-dm mt-2 text-xs text-white/60">
+                      Enter the 6-digit OTP sent to <span className="text-white">{maskEmail(formData.email)}</span>
+                    </p>
+                  </div>
+
+                  <div className="mb-3 flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+                    <span className="f-mono text-[10px] uppercase tracking-[1px] text-white/55">Verification Status</span>
+                    {otpVerified ? (
+                      <span className="f-mono text-[10px] uppercase tracking-[1px]" style={{ color: event.color }}>Verified</span>
+                    ) : (
+                      <span className="f-mono text-[10px] uppercase tracking-[1px] text-yellow-300">Pending</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={otpInput}
+                      onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
+                      placeholder="Enter 6-digit OTP"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={otpVerifying || otpVerified || otpSecondsLeft === 0}
+                      className="f-mono rounded-lg border px-4 py-2.5 text-[10px] uppercase tracking-[1px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{ borderColor: event.color + "66", color: event.color }}
+                    >
+                      {otpVerified ? "Verified" : otpVerifying ? "Verifying..." : "Verify OTP"}
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={otpSending}
+                      className="f-mono rounded-lg border px-3 py-2 text-[10px] uppercase tracking-[1px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{ borderColor: event.color + "66", color: event.color }}
+                    >
+                      {otpSending ? "Sending..." : otpSecondsLeft > 0 ? "Resend OTP" : "Send OTP"}
+                    </button>
+                    {otpSecondsLeft > 0 && !otpVerified && (
+                      <span className="f-mono text-[10px] uppercase tracking-[1px] text-white/60">
+                        Expires in {formatOtpTime(otpSecondsLeft)}
+                      </span>
+                    )}
+                  </div>
+
+                  {otpMessage && <p className="f-dm mt-2 text-[11px] text-green-400">{otpMessage}</p>}
+                  {otpError && <p className="f-dm mt-2 text-[11px] text-red-400">{otpError}</p>}
+
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOtpStepActive(false);
+                        setOtpVerified(false);
+                        setOtpInput("");
+                        setOtpError("");
+                        setOtpMessage("");
+                      }}
+                      className="f-mono w-full rounded-lg border border-white/20 px-4 py-2.5 text-[10px] uppercase tracking-[1px] text-white/80 transition-all duration-200 hover:bg-white/10"
+                    >
+                      Edit Details
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading || !otpVerified}
+                      className="f-mono w-full rounded-lg border px-4 py-2.5 text-[10px] uppercase tracking-[1px] text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{ borderColor: event.color + "66", background: event.color + "22", color: otpVerified ? "white" : event.color }}
+                    >
+                      {loading ? "Processing..." : "Complete Registration"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
 
