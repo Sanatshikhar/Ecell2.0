@@ -56,9 +56,9 @@ const Header = () => {
         <NavLink to="/team" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Team
         </NavLink>
-        <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
+        {/* <NavLink to="/gallery" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Gallery
-        </NavLink>
+        </NavLink> */}
         <NavLink to="/about" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         About
         </NavLink>
@@ -139,13 +139,13 @@ const Header = () => {
             >
               Team
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/gallery"
               onClick={toggleMenu}
               className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}
             >
               Gallery
-            </NavLink>
+            </NavLink> */}
             <NavLink
               to="/about"
               onClick={toggleMenu}

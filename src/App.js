@@ -4,7 +4,7 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import About from "./components/About";
 import Contact from "./components/Contact";
-import Gallery from "./components/gallery";
+// import Gallery from "./components/gallery";
 import Team from "./components/Team";
 import TechTeam from "./components/TechTeam";
 import Members from "./components/Join";
@@ -49,7 +49,7 @@ function AppContent() {
         <Route path="/Members" element={<Members />} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/gallery" element={<Gallery />} />
+        {/* <Route path="/gallery" element={<Gallery />} /> */}
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />

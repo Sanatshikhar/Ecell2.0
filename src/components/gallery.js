@@ -83,35 +83,6 @@ function Gallery() {
   const shuffledHighlights = []; // landscapeImages removed
   return (
     <div>
-      {/* Registration Slider Animation */}
-      <RegistrationSlider />
-      {/* Hero Section */}
-
-      {/* Carousel Section */}
-      <section id="carousel" className="py-16 bg-black ">
-        <div className="w-full">
-          <h2 className="text-7xl font-bold text-center mb-8 pt-20 pb-3 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent ">Highlights</h2>
-          <div className="relative w-full overflow-hidden bg-black">
-            <div className="flex gap-8 animate-logo-ticker whitespace-nowrap min-w-max py-8" style={{ animation: 'logo-ticker 90s linear infinite', minHeight: '320px' }}>
-              {[...shuffledHighlights, ...shuffledHighlights].map((img, idx) => (
-                <div key={idx} className="min-w-[600px] max-w-[600px] h-[300px] flex items-center justify-center rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] mx-2">
-                  <img src={img} alt="Highlight" className="object-cover w-full h-full" loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <style>{`
-          @keyframes logo-ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .animate-logo-ticker {
-            animation: logo-ticker 90s linear infinite;
-          }
-        `}</style>
-      </section>
-      {/* Masonry Gallery Section */}
       <section id="gallery" className="py-20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#3d81f6] to-[#b80bf0] bg-clip-text text-transparent uppercase tracking-wide">Our Collection</h2>
@@ -128,7 +99,6 @@ function Gallery() {
               />
             ))}
           </div>
-          {/* Popup Modal */}
           {popupImg && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={closePopup}>
               <div className="relative max-w-3xl w-full mx-4" onClick={e => e.stopPropagation()}>
@@ -145,6 +115,5 @@ function Gallery() {
     </div>
   );
 }
-// ...existing code...
 
 export default React.memo(Gallery);
