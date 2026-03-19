@@ -8,7 +8,44 @@ const path = require('path');
 const logoPath2 = path.join(__dirname, '../src/components/Resonance Campus 2 (9 x 5 in) (3).png');
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  'https://www.ecellsoa.in',
+  'https://ecellsoa.in',
+  'https://email.ecellsoa.in',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests and approved browser origins.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
+
+// Ensure CORS headers are consistently present even behind strict proxies.
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Vary', 'Origin');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  return next();
+});
 app.get('/qr/:token.png', async (req, res) => {
   const token = req.params.token;
   if (!token) {
