@@ -61,7 +61,7 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post('/api/send-email', async (req, res) => {
-  const { to, name, token } = req.body;
+  const { to, name, token, otp } = req.body;
   
   try {
     // Read logo file as base64
@@ -127,6 +127,34 @@ app.post('/api/send-email', async (req, res) => {
             cid: 'qr-code'
           },
         ],
+      };
+    } else if (otp && otp !== null && otp !== undefined && otp !== '') {
+      // OTP email for workshop verification
+      mailOptions = {
+        from: SENDER_EMAIL,
+        to,
+        subject: 'Your Workshop Verification OTP - E-Cell SOA',
+        html: `
+          <div style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f4f5fb;padding:32px 0;">
+            <div style="max-width:560px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+              <div style="background:#4b2aad;padding:20px 24px;color:#fff;text-align:center;">
+                <h2 style="margin:0;font-size:22px;letter-spacing:.3px;">E-Cell SOA Workshop Verification</h2>
+              </div>
+              <div style="padding:28px 24px;">
+                <p style="margin:0 0 12px;color:#222;font-size:15px;">Hello <strong>${name || 'Participant'}</strong>,</p>
+                <p style="margin:0 0 16px;color:#444;font-size:14px;line-height:1.6;">Use the OTP below to verify your email and complete workshop registration.</p>
+                <div style="margin:18px 0;padding:16px;border:1px solid #e9defc;background:#f8f3ff;border-radius:10px;text-align:center;">
+                  <div style="font-size:28px;letter-spacing:8px;font-weight:700;color:#4b2aad;">${otp}</div>
+                </div>
+                <p style="margin:0;color:#666;font-size:13px;line-height:1.5;">This OTP is valid for <strong>5 minutes</strong>. Do not share it with anyone.</p>
+              </div>
+              <div style="padding:14px 24px;background:#fafafa;border-top:1px solid #eee;color:#888;font-size:12px;text-align:center;">
+                © ${new Date().getFullYear()} E-Cell SOA
+              </div>
+            </div>
+          </div>
+        `,
+        attachments: [],
       };
     } else {
       // If no token, send simple confirmation email (for RegistrationForm)
