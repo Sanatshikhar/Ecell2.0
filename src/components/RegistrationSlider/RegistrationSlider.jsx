@@ -32,10 +32,10 @@ export default function RegistrationSlider() {
 
   const workshop = {
     id: 1,
-    title: "Zero to MVP",
-    subtitle: "Growth begins where comfort ends.",
+    title: "foundation Series",
+    subtitle: "Ultimate Master Class",
     date: "MAR 23-24, 2026",
-    time: "10:00 AM",
+    time: "1:00 PM",
     color: "#f72585",
     accent: "#7209b7",
     bg: "linear-gradient(135deg, #0d0014 0%, #1a0026 50%, #0d001a 100%)",
