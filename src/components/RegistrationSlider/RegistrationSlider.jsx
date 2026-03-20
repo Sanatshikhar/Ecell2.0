@@ -32,7 +32,7 @@ export default function RegistrationSlider() {
 
   const workshop = {
     id: 1,
-    title: "foundation Series",
+    title: "Foundation Series",
     subtitle: "Ultimate Master Class",
     date: "MAR 23-24, 2026",
     time: "1:00 PM",
