@@ -33,7 +33,7 @@ export default function RegistrationSlider() {
   const workshop = {
     id: 1,
     title: "Foundation Series",
-    subtitle: "Ultimate Master Class",
+    subtitle: "The ultimate master class",
     date: "MAR 23-24, 2026",
     time: "1:00 PM",
     color: "#f72585",
