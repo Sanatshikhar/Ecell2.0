@@ -26,6 +26,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     phone: "",
     course: "",
     regNo: "",
+    referral: "",
     iecMember: "",
   });
   const [errors, setErrors] = useState({});
@@ -127,6 +128,19 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
       return false;
     }
 
+    // Check for duplicate email before sending OTP
+    try {
+      const existing = await pb.collection('workshops').getList(1, 1, { filter: `email="${formData.email.trim()}"` });
+      if (existing.items.length > 0) {
+        setOtpError("This email is already registered. Please use a different email address.");
+        setErrors((prev) => ({ ...prev, email: "Email already registered" }));
+        return false;
+      }
+    } catch (err) {
+      console.error("Error checking email:", err);
+      // Continue even if check fails, don't block registration
+    }
+
     setOtpSending(true);
     setOtpError("");
     setOtpMessage("");
@@ -219,6 +233,24 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      
+      // Check if this is the OTP input field
+      if (e.currentTarget.getAttribute("data-otp") === "true") {
+        // In OTP step, verify OTP instead of submitting form
+        handleVerifyOtp();
+      } else {
+        // Regular form submission
+        const form = e.currentTarget.closest("form");
+        if (form) {
+          form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+        }
+      }
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
     const validEmailDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "rediffmail.com", "protonmail.com", "icloud.com", "aol.com"];
@@ -277,6 +309,11 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     if (!formData.iecMember) {
       newErrors.iecMember = "Please select IEC member status";
     }
+    
+    // Referral validation (optional field, just check if provided it's not too short)
+    if (formData.referral.trim() && formData.referral.trim().length < 2) {
+      newErrors.referral = "Referral must be at least 2 characters";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -309,6 +346,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
         phone: formData.phone.trim(),
         course: formData.course.trim(),
         regNo: formData.regNo.trim(),
+        referral: formData.referral.trim(),
         iecMember: formData.iecMember,
       };
       
@@ -323,6 +361,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
         email: "",
         phone: "",
         course: "",
+        referral: "",
         regNo: "",
         iecMember: "",
       });
@@ -346,6 +385,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
       name: "",
       email: "",
       phone: "",
+      referral: "",
       course: "",
       regNo: "",
       iecMember: "",
@@ -413,42 +453,42 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
           </button>
 
           {/* Content */}
-          <div className="relative z-[2] p-3 sm:p-5 md:p-6 overflow-y-auto flex-1">
+          <div className="relative z-[2] p-2.5 sm:p-4 md:p-5 overflow-y-auto flex-1">
             {/* Header */}
-            <div className="mb-2 sm:mb-4 md:mb-5">
+            <div className="mb-2 sm:mb-3 md:mb-4">
               <span
-                className="f-mono inline-block rounded-full border px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[10px] uppercase tracking-[2px] sm:tracking-[4px] mb-2 sm:mb-4"
+                className="f-mono inline-block rounded-full border px-2 sm:px-2.5 py-1 sm:py-1.5 text-[8px] sm:text-[9px] uppercase tracking-[2px] sm:tracking-[3px] mb-1.5 sm:mb-3"
                 style={{ color: event.color, borderColor: event.color + "44" }}
               >
                 {event.tag}
               </span>
-              <h2 className="f-bebas m-0 mb-1 text-2xl sm:text-[32px] md:text-[40px] leading-[0.9] tracking-[1px] text-white">
+              <h2 className="f-bebas m-0 mb-0.5 text-xl sm:text-2xl md:text-3xl leading-[0.9] tracking-[1px] text-white">
                 {event.title}
               </h2>
-              <p className="f-dm text-[11px] sm:text-xs md:text-[13px] text-white/50 mb-2">{event.subtitle}</p>
+              <p className="f-dm text-[10px] sm:text-xs md:text-[12px] text-white/50 mb-1.5">{event.subtitle}</p>
               
               {/* Event Details (Locked) */}
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 sm:p-2 backdrop-blur-sm">
-                  <span className="f-mono block text-[7px] sm:text-[9px] uppercase tracking-[0.5px] text-white/40 mb-0.5">Date</span>
-                  <span className="f-dm text-[10px] sm:text-xs md:text-[12px] font-medium text-white">{event.date}</span>
+              <div className="grid grid-cols-2 gap-1.5 mb-1.5">
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1 sm:p-1.5 backdrop-blur-sm">
+                  <span className="f-mono block text-[7px] sm:text-[8px] uppercase tracking-[0.5px] text-white/40 mb-0.5">Date</span>
+                  <span className="f-dm text-[9px] sm:text-xs md:text-[11px] font-medium text-white">{event.date}</span>
                 </div>
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 sm:p-2 backdrop-blur-sm">
-                  <span className="f-mono block text-[7px] sm:text-[9px] uppercase tracking-[0.5px] text-white/40 mb-0.5">Time</span>
-                  <span className="f-bebas text-sm sm:text-base md:text-[18px] tracking-[0.5px]" style={{ color: event.color }}>{event.time}</span>
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1 sm:p-1.5 backdrop-blur-sm">
+                  <span className="f-mono block text-[7px] sm:text-[8px] uppercase tracking-[0.5px] text-white/40 mb-0.5">Time</span>
+                  <span className="f-bebas text-sm sm:text-base tracking-[0.5px]" style={{ color: event.color }}>{event.time}</span>
                 </div>
               </div>
 
-              <div className="h-px opacity-20 mb-2" style={{ background: event.color }} />
+              <div className="h-px opacity-20 mb-1.5" style={{ background: event.color }} />
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3 md:space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 md:space-y-3.5">
               {!otpStepActive ? (
                 <>
                   {/* Name */}
                   <div>
-                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                    <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                       Full Name *
                     </label>
                     <input
@@ -456,17 +496,18 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
+                      onKeyPress={handleKeyPress}
                       placeholder="Enter your name"
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                     />
                     {errors.name && (
-                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.name}</span>
+                      <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.name}</span>
                     )}
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                    <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                       Email Address *
                     </label>
                     <input
@@ -474,17 +515,18 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
+                      onKeyPress={handleKeyPress}
                       placeholder="your.email@example.com"
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                     />
                     {errors.email && (
-                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.email}</span>
+                      <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.email}</span>
                     )}
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                    <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                       Phone Number *
                     </label>
                     <input
@@ -492,19 +534,20 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
+                      onKeyPress={handleKeyPress}
                       placeholder="+91 9876543210"
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                     />
                     {errors.phone && (
-                      <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.phone}</span>
+                      <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.phone}</span>
                     )}
                   </div>
 
-                  {/* Course/Branch, IEC member, and Reg No in grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+                  {/* Course/Branch, IEC member, Reg No, and Referral in grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-2.5 md:gap-3">
                     {/* Course/Branch */}
                     <div>
-                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                      <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                         Course/Branch *
                       </label>
                       <input
@@ -512,17 +555,18 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                         name="course"
                         value={formData.course}
                         onChange={handleChange}
+                        onKeyPress={handleKeyPress}
                         placeholder="e.g., B.Tech CSE"
-                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                       />
                       {errors.course && (
-                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.course}</span>
+                        <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.course}</span>
                       )}
                     </div>
 
                     {/* IEC Member */}
                     <div>
-                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                      <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
                         IEC Member *
                       </label>
                       <div className="relative">
@@ -530,7 +574,8 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                           name="iecMember"
                           value={formData.iecMember}
                           onChange={handleChange}
-                          className={`w-full appearance-none rounded-lg border bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 pr-10 text-xs sm:text-sm md:text-base backdrop-blur-sm transition-all duration-200 focus:bg-white/[0.06] focus:outline-none ${formData.iecMember ? "text-white" : "text-white/30"}`}
+                          onKeyPress={handleKeyPress}
+                          className={`w-full appearance-none rounded-lg border bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 pr-8 text-sm sm:text-sm md:text-sm backdrop-blur-sm transition-all duration-200 focus:bg-white/[0.06] focus:outline-none ${formData.iecMember ? "text-white" : "text-white/30"}`}
                           style={{
                             borderColor: formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)",
                             color: formData.iecMember ? event.color : "rgba(255,255,255,0.3)",
@@ -542,14 +587,14 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                             e.target.style.borderColor = formData.iecMember ? event.color + "66" : "rgba(255,255,255,0.1)";
                           }}
                         >
-                          <option value="" className="bg-gray-900 text-white/50">Select an option</option>
+                          <option value="" className="bg-gray-900 text-white/50">Select</option>
                           <option value="Yes" className="bg-gray-900">Yes</option>
                           <option value="No" className="bg-gray-900">No</option>
                         </select>
                         <svg
-                          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
-                          width="16"
-                          height="16"
+                          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2"
+                          width="14"
+                          height="14"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -563,25 +608,45 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                         </svg>
                       </div>
                       {errors.iecMember && (
-                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.iecMember}</span>
+                        <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.iecMember}</span>
                       )}
                     </div>
 
                     {/* Registration Number */}
-                    <div className="col-span-2 sm:col-span-1 md:col-span-1">
-                      <label className="f-mono mb-1.5 sm:mb-2 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
-                        Registration No. *
+                    <div>
+                      <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                        Reg No. *
                       </label>
                       <input
                         type="text"
                         name="regNo"
                         value={formData.regNo}
                         onChange={handleChange}
+                        onKeyPress={handleKeyPress}
                         placeholder="Your Reg No."
-                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm md:text-base text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                       />
                       {errors.regNo && (
-                        <span className="f-dm mt-1 block text-[11px] sm:text-[12px] text-red-400">{errors.regNo}</span>
+                        <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.regNo}</span>
+                      )}
+                    </div>
+
+                    {/* Referral */}
+                    <div>
+                      <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
+                        Referral (if any)
+                      </label>
+                      <input
+                        type="text"
+                        name="referral"
+                        value={formData.referral}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Any Referral?"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-3 py-2.5 sm:py-2.5 text-sm sm:text-sm md:text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
+                      />
+                      {errors.referral && (
+                        <span className="f-dm mt-0.5 block text-[10px] sm:text-[11px] text-red-400">{errors.referral}</span>
                       )}
                     </div>
                   </div>
@@ -589,7 +654,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="f-mono mt-2 sm:mt-3 w-full cursor-pointer rounded-lg border px-3 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-[11px] uppercase tracking-[1px] sm:tracking-[1.5px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="f-mono mt-2 sm:mt-2 w-full cursor-pointer rounded-lg border px-3 sm:px-3 py-2.5 sm:py-2.5 text-[10px] sm:text-[10px] uppercase tracking-[1px] sm:tracking-[1px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                     style={{
                       borderColor: event.color + "44",
                       background: loading ? event.color + "33" : event.color + "22",
@@ -625,6 +690,8 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                       maxLength={6}
                       value={otpInput}
                       onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
+                      onKeyPress={handleKeyPress}
+                      data-otp="true"
                       placeholder="Enter 6-digit OTP"
                       className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all duration-200 focus:border-white/25 focus:bg-white/[0.06] focus:outline-none"
                     />
