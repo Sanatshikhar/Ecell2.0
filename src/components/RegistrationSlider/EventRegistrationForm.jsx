@@ -42,6 +42,14 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
   const [otpMessage, setOtpMessage] = useState("");
   const [otpError, setOtpError] = useState("");
   const [otpStepActive, setOtpStepActive] = useState(false);
+  const isBusy = loading || otpSending || otpVerifying;
+  const loadingLabel = loading
+    ? "Submitting registration..."
+    : otpSending
+      ? "Sending OTP..."
+      : otpVerifying
+        ? "Verifying OTP..."
+        : "Please wait...";
 
   const formatOtpTime = (seconds) => {
     const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -483,9 +491,19 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 md:space-y-3.5">
-              {!otpStepActive ? (
-                <>
+            <div className="relative">
+              {isBusy && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center rounded-xl border border-white/10 bg-black/55 backdrop-blur-sm">
+                  <div className="flex flex-col items-center gap-2 rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3">
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/80 border-t-transparent" />
+                    <span className="f-mono text-[10px] uppercase tracking-[1px] text-white/80">{loadingLabel}</span>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 md:space-y-3.5">
+                {!otpStepActive ? (
+                  <>
                   {/* Name */}
                   <div>
                     <label className="f-mono mb-1.5 sm:mb-1.5 block text-[10px] sm:text-[11px] uppercase tracking-[1px] text-white/60">
@@ -651,21 +669,21 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="f-mono mt-2 sm:mt-2 w-full cursor-pointer rounded-lg border px-3 sm:px-3 py-2.5 sm:py-2.5 text-[10px] sm:text-[10px] uppercase tracking-[1px] sm:tracking-[1px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{
-                      borderColor: event.color + "44",
-                      background: loading ? event.color + "33" : event.color + "22",
-                      color: loading ? event.color : "white",
-                    }}
-                  >
-                    {loading ? "Processing..." : "Continue To Email Verification"}
-                  </button>
-                </>
-              ) : (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                    <button
+                      type="submit"
+                      disabled={isBusy}
+                      className="f-mono mt-2 sm:mt-2 w-full cursor-pointer rounded-lg border px-3 sm:px-3 py-2.5 sm:py-2.5 text-[10px] sm:text-[10px] uppercase tracking-[1px] sm:tracking-[1px] text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{
+                        borderColor: event.color + "44",
+                        background: isBusy ? event.color + "33" : event.color + "22",
+                        color: isBusy ? event.color : "white",
+                      }}
+                    >
+                      {otpSending ? "Sending OTP..." : loading ? "Processing..." : "Continue To Email Verification"}
+                    </button>
+                  </>
+                ) : (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
                   <div className="mb-4">
                     <p className="f-mono text-[10px] uppercase tracking-[2px] text-white/60">Step 2 of 2</p>
                     <h3 className="f-bebas mt-1 text-3xl leading-none text-white">Verify Email OTP</h3>
@@ -710,7 +728,7 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                     <button
                       type="button"
                       onClick={handleSendOtp}
-                      disabled={otpSending}
+                      disabled={isBusy}
                       className="f-mono rounded-lg border px-3 py-2 text-[10px] uppercase tracking-[1px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
                       style={{ borderColor: event.color + "66", color: event.color }}
                     >
@@ -751,7 +769,8 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
                   </div>
                 </div>
               )}
-            </form>
+              </form>
+            </div>
           </div>
 
         </div>
