@@ -9,15 +9,21 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username || !password) {
+      setError('Username and password are required.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
-  const authData = await pb.collection('creds').authWithPassword(username, password);
+      // Auth uses username + password as credentials.
+      const authData = await pb.collection('creds').authWithPassword(username, password);
       setLoading(false);
       onLogin(authData);
     } catch (err) {
       setLoading(false);
-      setError('Invalid credentials. Please try again.');
+      setError(err?.response?.message || 'Invalid username or password. Please try again.');
     }
   };
 
@@ -32,6 +38,7 @@ const Login = ({ onLogin }) => {
           placeholder="Username"
           value={username}
           onChange={e => setUsername(e.target.value)}
+          autoComplete="username"
           className="rounded-xl px-4 py-3 border border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] bg-[#ede9fe] text-violet-900 placeholder:text-violet-400"
           required
         />
@@ -40,6 +47,7 @@ const Login = ({ onLogin }) => {
           placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
+          autoComplete="current-password"
           className="rounded-xl px-4 py-3 border border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] bg-[#ede9fe] text-violet-900 placeholder:text-violet-400"
           required
         />

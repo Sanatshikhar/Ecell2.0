@@ -29,15 +29,11 @@ function AppContent() {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (location.pathname === '/registrations') {
-      pb.authStore.clear();
-      setAuth(false);
-    }
     const unsubscribe = pb.authStore.onChange(() => {
       setAuth(pb.authStore.isValid);
     });
     return unsubscribe;
-  }, [location.pathname]);
+  }, []);
 
   const hideHeaderPaths = ['/workshop', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 

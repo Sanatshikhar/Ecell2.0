@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import pb from '../lib/pocketbase';
 import QrScanner from 'qr-scanner';
+import { buildWorkshopConfirmationMailPayload } from '../lib/emailTemplates';
 // Removed unused import 'axios'
 
 const Verify = () => {
@@ -179,8 +180,8 @@ const Verify = () => {
   // Bulk email function
   const sendBulkEmails = async () => {
     setBulkMailStatus({ step: 'fetching', count: 0, sent: 0 });
-    // Fetch all registrations (or filter as needed)
-    const registrations = await pb.collection('joiningReg2025').getFullList();
+    // Fetch workshop registrations and find records that haven't received confirmation email.
+    const registrations = await pb.collection('workshops').getFullList();
     const unsent = registrations.filter(r => !r.mailSent);
     if (unsent.length === 0) {
       setBulkMailStatus({ step: 'none', count: 0, sent: 0 });
@@ -191,47 +192,38 @@ const Verify = () => {
     setBulkMailStatus({ step: 'sending', count: unsent.length, sent: 0 });
     let sentCount = 0;
     // Use REACT_APP_BACKEND_URL from environment variables
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://your-backend-domain.com';
+    const backendUrl = (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, '');
+    if (!backendUrl) {
+      setBulkMailStatus({ step: 'error', count: 0, sent: 0 });
+      return;
+    }
     for (const user of unsent) {
-      let token = user.qr_token;
-      if (user.qr_token !== undefined && !token) {
-        if (window.crypto && window.crypto.randomUUID) {
-          token = window.crypto.randomUUID();
-        } else {
-          token = Math.random().toString(36).substr(2, 16);
-        }
-        try {
-          await pb.collection('joiningReg2025').update(user.id, { qr_token: token });
-        } catch (err) {
-          continue;
-        }
-      }
-      if (user.qr_token === undefined) {
-        try {
-        await fetch(`${backendUrl}/api/send-email`, {
+      try {
+        const mailPayload = buildWorkshopConfirmationMailPayload({
+          to: user.email,
+          details: {
+            name: user.name,
+            workshopTitle: user.workshopTitle || "E-Cell SOA Workshop",
+            subtitle: user.subtitle,
+            tag: user.tag,
+            date: user.date,
+            time: user.time,
+          },
+        });
+        const response = await fetch(`${backendUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to: user.email, name: user.name, token })
+          body: JSON.stringify(mailPayload)
         });
-        await pb.collection('joiningReg2025').update(user.id, { mailSent: true });
+        if (!response.ok) {
+          continue;
+        }
+
+        await pb.collection('workshops').update(user.id, { mailSent: true });
         sentCount++;
         setBulkMailStatus({ step: 'sending', count: unsent.length, sent: sentCount });
       } catch (err) {
         // Optionally handle error
-      }
-      }else{
-        try {
-          await fetch(`${backendUrl}/api/send-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ to: user.email, name: user.name, token })
-          });
-          await pb.collection('joiningReg2025').update(user.id, { mailSent: true });
-          sentCount++;
-          setBulkMailStatus({ step: 'sending', count: unsent.length, sent: sentCount });
-        } catch (err) {
-          // Optionally handle error
-        }
       }
     }
     setBulkMailStatus({ step: 'done', count: unsent.length, sent: sentCount });
@@ -296,16 +288,19 @@ const Verify = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
           <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-xs w-full">
             {bulkMailStatus.step === 'idle' && (
-              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Send bulk emails to all users who haven't received one?</span>
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Send workshop confirmation emails to everyone who has not received one?</span>
             )}
             {bulkMailStatus.step === 'fetching' && (
-              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Checking for unmailed registrations...</span>
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#ffff1c] mt-2 mb-4">Checking for unmailed workshop registrations...</span>
             )}
             {bulkMailStatus.step === 'none' && (
-              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4">No unmailed registration found.</span>
+              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4">No unmailed workshop registration found.</span>
+            )}
+            {bulkMailStatus.step === 'error' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-red-400 mt-2 mb-4">Backend URL is missing. Set REACT_APP_BACKEND_URL first.</span>
             )}
             {bulkMailStatus.step === 'found' && (
-              <span className="text-base sm:text-lg md:text-xl font-bold text-yellow-400 mt-2 mb-4">{bulkMailStatus.count} unmailed registration{bulkMailStatus.count > 1 ? 's' : ''} found.</span>
+              <span className="text-base sm:text-lg md:text-xl font-bold text-yellow-400 mt-2 mb-4">{bulkMailStatus.count} unmailed workshop registration{bulkMailStatus.count > 1 ? 's' : ''} found.</span>
             )}
             {bulkMailStatus.step === 'sending' && (
               <>

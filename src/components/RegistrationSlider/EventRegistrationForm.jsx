@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import pb from "../../lib/pocketbase";
+import {
+  buildOTPVerificationEmail,
+  buildWorkshopConfirmationMailPayload,
+} from "../../lib/emailTemplates";
 
 const KEYFRAMES = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
@@ -55,6 +59,21 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
     const ss = String(seconds % 60).padStart(2, "0");
     return `${mm}:${ss}`;
+  };
+
+  const normalizePhone = (value) => {
+    const digits = String(value || "").replace(/\D/g, "");
+    if (!digits) return "";
+
+    // Accept +91/91/0 prefixed Indian numbers and normalize to 10 digits.
+    let normalized = digits;
+    if (normalized.length === 12 && normalized.startsWith("91")) {
+      normalized = normalized.slice(2);
+    } else if (normalized.length === 11 && normalized.startsWith("0")) {
+      normalized = normalized.slice(1);
+    }
+
+    return normalized;
   };
 
   const maskEmail = (email) => {
@@ -160,14 +179,15 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
       }
 
       const nextOtp = String(Math.floor(100000 + Math.random() * 900000));
+      const html = buildOTPVerificationEmail(formData.name.trim() || "Participant", nextOtp);
 
       const response = await fetch(`${backendUrl}/api/send-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: formData.email.trim(),
-          name: formData.name.trim() || "Participant",
-          otp: nextOtp,
+          subject: "Email Verification - OTP",
+          html: html,
         }),
       });
 
@@ -288,11 +308,12 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
     }
     
     // Phone validation
-    if (!formData.phone.trim()) {
+    const normalizedPhone = normalizePhone(formData.phone);
+    if (!normalizedPhone) {
       newErrors.phone = "Phone number is required";
     } else {
-      const phoneRegex = /^(\+91|91|0)?[6-9]\d{9}$/;
-      if (!phoneRegex.test(formData.phone.replace(/\s|-/g, ""))) {
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(normalizedPhone)) {
         newErrors.phone = "Invalid phone number (must be 10 digits starting with 6-9)";
       }
     }
@@ -345,21 +366,60 @@ export default function EventRegistrationForm({ isOpen, onClose, event }) {
       return;
     }
 
+    const normalizedPhone = normalizePhone(formData.phone);
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
+      setErrors((prev) => ({
+        ...prev,
+        phone: "Invalid phone number (must be 10 digits starting with 6-9)",
+      }));
+      return;
+    }
+
     setLoading(true);
     
     try {
       const registrationData = {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim(),
+        phone: normalizedPhone,
         course: formData.course.trim(),
         regNo: formData.regNo.trim(),
         referral: formData.referral.trim(),
         iecMember: formData.iecMember,
+        mailSent: false,
       };
       
       // Save to PocketBase workshops collection
       const record = await pb.collection('workshops').create(registrationData);
+
+      // Send registration confirmation mail and track delivery status.
+      try {
+        const backendUrl = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
+        if (backendUrl) {
+          const mailPayload = buildWorkshopConfirmationMailPayload({
+            to: formData.email.trim(),
+            details: {
+              name: formData.name.trim(),
+              workshopTitle: event?.title || event?.tag || "E-Cell SOA Workshop",
+              subtitle: event?.subtitle,
+              tag: event?.tag,
+              date: event?.date,
+              time: event?.time,
+            },
+          });
+          const mailRes = await fetch(`${backendUrl}/api/send-email`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(mailPayload),
+          });
+
+          if (mailRes.ok) {
+            await pb.collection('workshops').update(record.id, { mailSent: true });
+          }
+        }
+      } catch (mailErr) {
+        console.error("Workshop confirmation mail failed:", mailErr);
+      }
       
       console.log("Registration saved successfully:", record);
       
