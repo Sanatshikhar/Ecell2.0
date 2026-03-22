@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import pb from '../lib/pocketbase';
 import QrScanner from 'qr-scanner';
-import { buildWorkshopConfirmationMailPayload } from '../lib/emailTemplates';
+import {
+  buildWorkshopConfirmationMailPayload,
+  buildFoundationSeriesTimeChangeMailPayload,
+} from '../lib/emailTemplates';
 // Removed unused import 'axios'
 
 const Verify = () => {
@@ -14,6 +17,8 @@ const Verify = () => {
   // Removed unused variable 'inputDevices'
   const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
+  const [showTimeChangePopup, setShowTimeChangePopup] = useState(false);
+  const [timeChangeMailStatus, setTimeChangeMailStatus] = useState({ step: 'idle', count: 0, sent: 0, failed: 0 });
   const videoRef = useRef(null);
   const scannerRef = useRef(null);
 
@@ -229,6 +234,64 @@ const Verify = () => {
     setBulkMailStatus({ step: 'done', count: unsent.length, sent: sentCount });
   };
 
+  const sendTimeChangeBulkEmails = async () => {
+    setTimeChangeMailStatus({ step: 'fetching', count: 0, sent: 0, failed: 0 });
+
+    const isEligibleForTimeChangeMail = (record) => {
+      return record?.changeMail === false || record?.changeMail === 0 || record?.changeMail === 'false' || record?.changeMail === '0' || !record?.changeMail;
+    };
+
+    const registrations = await pb.collection('workshops').getFullList();
+    const recipients = registrations.filter((record) => isEligibleForTimeChangeMail(record) && record.email);
+
+    if (recipients.length === 0) {
+      setTimeChangeMailStatus({ step: 'none', count: 0, sent: 0, failed: 0 });
+      return;
+    }
+
+    setTimeChangeMailStatus({ step: 'found', count: recipients.length, sent: 0, failed: 0 });
+    await new Promise((res) => setTimeout(res, 600));
+    setTimeChangeMailStatus({ step: 'sending', count: recipients.length, sent: 0, failed: 0 });
+
+    const backendUrl = (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, '');
+    if (!backendUrl) {
+      setTimeChangeMailStatus({ step: 'error', count: 0, sent: 0, failed: 0 });
+      return;
+    }
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    for (const user of recipients) {
+      try {
+        const mailPayload = buildFoundationSeriesTimeChangeMailPayload({
+          to: user.email,
+          details: { name: user.name },
+        });
+
+        const response = await fetch(`${backendUrl}/api/send-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mailPayload),
+        });
+
+        if (!response.ok) {
+          failedCount++;
+          setTimeChangeMailStatus({ step: 'sending', count: recipients.length, sent: sentCount, failed: failedCount });
+          continue;
+        }
+
+        sentCount++;
+        setTimeChangeMailStatus({ step: 'sending', count: recipients.length, sent: sentCount, failed: failedCount });
+      } catch (err) {
+        failedCount++;
+        setTimeChangeMailStatus({ step: 'sending', count: recipients.length, sent: sentCount, failed: failedCount });
+      }
+    }
+
+    setTimeChangeMailStatus({ step: 'done', count: recipients.length, sent: sentCount, failed: failedCount });
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#181a20] px-2 sm:px-4 py-4">
       <div className="bg-[#23263a] rounded-2xl shadow-2xl p-0 sm:p-0 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col items-center relative" style={{boxShadow:'0 8px 32px #0008'}}>
@@ -278,12 +341,20 @@ const Verify = () => {
           </div>
         )}
       </div>
-      <button
-        onClick={() => setShowBulkMailPopup(true)}
-        className="bg-yellow-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg mt-6 hover:bg-yellow-800 transition"
-      >
-        Email not received?
-      </button>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <button
+          onClick={() => setShowBulkMailPopup(true)}
+          className="bg-yellow-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-800 transition"
+        >
+          Email not received?
+        </button>
+        <button
+          onClick={() => setShowTimeChangePopup(true)}
+          className="bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-blue-900 transition"
+        >
+          Send Bulk Time Change Mail
+        </button>
+      </div>
       {showBulkMailPopup && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
           <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-xs w-full">
@@ -324,6 +395,75 @@ const Verify = () => {
             )}
             <button
               onClick={() => { setShowBulkMailPopup(false); setBulkMailStatus({ step: 'idle', count: 0, sent: 0 }); }}
+              className="bg-gray-600 text-white font-bold px-6 py-2 rounded-xl shadow-lg mt-4 hover:bg-gray-800 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      {showTimeChangePopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
+          <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-xs w-full">
+            {timeChangeMailStatus.step === 'idle' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#bfdbfe] mt-2 mb-4 text-center">
+                Send the Foundation Series time-change email to all participants with changeMail disabled in PocketBase?
+              </span>
+            )}
+            {timeChangeMailStatus.step === 'fetching' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-[#bfdbfe] mt-2 mb-4 text-center">
+                Checking participants eligible for time-change update...
+              </span>
+            )}
+            {timeChangeMailStatus.step === 'none' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4 text-center">
+                No participant found with changeMail disabled.
+              </span>
+            )}
+            {timeChangeMailStatus.step === 'error' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-red-400 mt-2 mb-4 text-center">
+                Backend URL is missing. Set REACT_APP_BACKEND_URL first.
+              </span>
+            )}
+            {timeChangeMailStatus.step === 'found' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-blue-300 mt-2 mb-4 text-center">
+                {timeChangeMailStatus.count} eligible participant{timeChangeMailStatus.count > 1 ? 's' : ''} found.
+              </span>
+            )}
+            {timeChangeMailStatus.step === 'sending' && (
+              <>
+                <span className="text-base sm:text-lg md:text-xl font-bold text-[#bfdbfe] mt-2 mb-4 text-center">
+                  Sending update emails...
+                </span>
+                <div className="w-full bg-gray-700 rounded-full h-4 mb-4">
+                  <div
+                    className="bg-blue-600 h-4 rounded-full transition-all duration-300"
+                    style={{ width: `${((timeChangeMailStatus.sent + timeChangeMailStatus.failed) / timeChangeMailStatus.count) * 100}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm text-white">Sent: {timeChangeMailStatus.sent} | Failed: {timeChangeMailStatus.failed} | Total: {timeChangeMailStatus.count}</span>
+              </>
+            )}
+            {timeChangeMailStatus.step === 'done' && (
+              <span className="text-base sm:text-lg md:text-xl font-bold text-green-400 mt-2 mb-4 text-center">
+                Time-change mail completed. Sent: {timeChangeMailStatus.sent}, Failed: {timeChangeMailStatus.failed}
+              </span>
+            )}
+
+            {timeChangeMailStatus.step === 'idle' && (
+              <button
+                onClick={sendTimeChangeBulkEmails}
+                className="bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg mt-2 hover:bg-blue-900 transition"
+              >
+                Send Time Change Mails
+              </button>
+            )}
+
+            <button
+              onClick={() => {
+                setShowTimeChangePopup(false);
+                setTimeChangeMailStatus({ step: 'idle', count: 0, sent: 0, failed: 0 });
+              }}
               className="bg-gray-600 text-white font-bold px-6 py-2 rounded-xl shadow-lg mt-4 hover:bg-gray-800 transition"
             >
               Close

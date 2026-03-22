@@ -25,7 +25,7 @@ export const buildWorkshopConfirmationEmail = (input) => {
   const eventSubtitle  = subtitle      || "Foundation Series — The ultimate master class";
   const eventTrack     = tag           || "INNOVATION SPRINT 2026";
   const eventDate      = date          || "Mar 23-24, 2026";
-  const eventTime      = time          || "1:00 PM";
+  const eventTime      = time          || "4:30 - 6:30 PM";
   const eventVenue     = venue         || "Bansuri Guru Auditorium, ITER";
   const eventOrganiser = organiser     || "Innovation &amp; Entrepreneurship Cell, SOA";
   const year           = new Date().getFullYear();
@@ -193,6 +193,80 @@ export const buildOTPVerificationEmail = (name, otp) => {
   `;
 };
 
+export const TIME_CHANGE_SUBJECT = "Important Update: Foundation Series Session Timings Revised";
+
+export const buildFoundationSeriesTimeChangeEmail = (input) => {
+  const details = typeof input === "string" ? { name: input } : (input || {});
+  const name = details.name || "Participant";
+  const year = new Date().getFullYear();
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Session Timing Update</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f5f8;font-family:'Segoe UI',Roboto,Arial,sans-serif;color:#1f2937;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f5f8;padding:28px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:640px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,0.07);">
+          <tr>
+            <td style="background:linear-gradient(90deg,#0f172a,#1e3a8a);padding:20px 24px;">
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#bfdbfe;font-weight:600;">Innovation &amp; Entrepreneurship Cell</div>
+              <div style="font-size:22px;line-height:1.3;color:#ffffff;font-weight:700;margin-top:6px;">Foundation Series - The Ultimate Masterclass</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:26px 24px 10px;">
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:#1f2937;">Dear ${name},</p>
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:#374151;">A slight update has been made to the schedule for the Foundation Series - The Ultimate Masterclass.</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:14px 0 18px;border:1px solid #dbeafe;border-radius:10px;background:#f8fbff;">
+                <tr>
+                  <td style="padding:16px 18px;border-bottom:1px solid #e5e7eb;">
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#1e40af;font-weight:700;">Updated Session Time</div>
+                    <div style="margin-top:6px;font-size:20px;font-weight:700;color:#0f172a;">4:30 PM - 6:30 PM</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:16px 18px;border-bottom:1px solid #e5e7eb;">
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#1e40af;font-weight:700;">Venue (Unchanged)</div>
+                    <div style="margin-top:6px;font-size:15px;font-weight:600;color:#111827;">Bansuri Guru Auditorium, ITER</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:16px 18px;">
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#1e40af;font-weight:700;">Date (Unchanged)</div>
+                    <div style="margin-top:6px;font-size:15px;font-weight:600;color:#111827;">23rd &amp; 24th March</div>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:#374151;">Everything else remains as planned. We understand this change may cause minor inconvenience and truly appreciate your flexibility.</p>
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#374151;">We look forward to having you with us.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 24px 24px;">
+              <div style="border-top:1px solid #e5e7eb;padding-top:18px;">
+                <p style="margin:0;font-size:14px;color:#1f2937;font-weight:600;">Warm regards,</p>
+                <p style="margin:6px 0 0;font-size:14px;color:#374151;line-height:1.6;">Innovation &amp; Entrepreneurship Cell<br/>SOA University</p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:14px 24px;text-align:center;">
+              <span style="font-size:12px;color:#6b7280;">© ${year} Innovation &amp; Entrepreneurship Cell, SOA University</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
 export const WORKSHOP_CONFIRMATION_SUBJECT = "Workshop Registration Confirmed";
 
 export const buildWorkshopConfirmationMailPayload = ({ to, details }) => {
@@ -200,5 +274,13 @@ export const buildWorkshopConfirmationMailPayload = ({ to, details }) => {
     to,
     subject: WORKSHOP_CONFIRMATION_SUBJECT,
     html: buildWorkshopConfirmationEmail(details),
+  };
+};
+
+export const buildFoundationSeriesTimeChangeMailPayload = ({ to, details }) => {
+  return {
+    to,
+    subject: TIME_CHANGE_SUBJECT,
+    html: buildFoundationSeriesTimeChangeEmail(details),
   };
 };
