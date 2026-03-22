@@ -35,7 +35,7 @@ export default function RegistrationSlider() {
     title: "Foundation Series",
     subtitle: "The ultimate master class",
     date: "MAR 23-24, 2026",
-    time: "1:00 PM",
+    time: "4:30 PM",
     color: "#f72585",
     accent: "#7209b7",
     bg: "linear-gradient(135deg, #0d0014 0%, #1a0026 50%, #0d001a 100%)",
