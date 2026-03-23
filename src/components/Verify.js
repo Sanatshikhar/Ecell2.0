@@ -13,48 +13,34 @@ const Verify = () => {
   const [message, setMessage] = useState('');
   const [verifiedName, setVerifiedName] = useState('');
   const [scannedRegistration, setScannedRegistration] = useState(null);
+  const [manualRegNo, setManualRegNo] = useState('');
   const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
   const [showTimeChangePopup, setShowTimeChangePopup] = useState(false);
   const [timeChangeMailStatus, setTimeChangeMailStatus] = useState({ step: 'idle', count: 0, sent: 0, failed: 0 });
 
-  // Auto-clear success state after a brief delay.
-  useEffect(() => {
-    if (status === 'arrived') {
-      const timer = setTimeout(() => {
-        setStatus(null);
-        setMessage('');
-        setIcon(null);
-        setVerifiedName('');
-        setScannedRegistration(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
-
-  // Handle QR/barcode scan
-  const handleScan = async (rawToken) => {
-    setLoading(true);
+  const resetVerificationState = () => {
     setStatus(null);
     setMessage('');
     setIcon(null);
     setVerifiedName('');
     setScannedRegistration(null);
-    let token = rawToken;
-    if (typeof token === 'string' && token.includes('?token=')) {
-      token = token.split('?token=')[1];
-    }
-    if (typeof token === 'string' && token.includes('/')) {
-      token = token.split('/').pop();
-    }
-    if (typeof token !== 'string' || !token) {
+  };
+
+  const verifyByRegNo = async (rawRegNo) => {
+    setLoading(true);
+    resetVerificationState();
+
+    const regNo = (rawRegNo || '').trim();
+    if (!regNo) {
       setStatus('invalid');
-      setMessage('No valid QR token found');
+      setMessage('Please enter a valid Reg No');
       setIcon('invalid');
       setLoading(false);
       return;
     }
-    const safeToken = token.trim().replace(/"/g, '\\"');
+
+    const safeToken = regNo.replace(/"/g, '\\"');
     try {
       const result = await pb.collection('workshops').getFirstListItem(`regNo="${safeToken}"`);
       if (!result) {
@@ -78,7 +64,45 @@ const Verify = () => {
       setMessage('Registration not found for this Reg No');
       setIcon('invalid');
     }
+
     setLoading(false);
+  };
+
+  // Auto-clear success state after a brief delay.
+  useEffect(() => {
+    if (status === 'arrived') {
+      const timer = setTimeout(() => {
+        setStatus(null);
+        setMessage('');
+        setIcon(null);
+        setVerifiedName('');
+        setScannedRegistration(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
+  // Handle QR/barcode scan
+  const handleScan = async (rawToken) => {
+    let token = rawToken;
+    if (typeof token === 'string' && token.includes('?token=')) {
+      token = token.split('?token=')[1];
+    }
+    if (typeof token === 'string' && token.includes('/')) {
+      token = token.split('/').pop();
+    }
+    if (typeof token !== 'string' || !token) {
+      setStatus('invalid');
+      setMessage('No valid QR token found');
+      setIcon('invalid');
+      return;
+    }
+    await verifyByRegNo(token);
+  };
+
+  const handleManualSearch = async (e) => {
+    e.preventDefault();
+    await verifyByRegNo(manualRegNo);
   };
 
   const handleMarkArrived = async () => {
@@ -91,6 +115,7 @@ const Verify = () => {
       setIcon('verified');
       setVerifiedName(scannedRegistration.name || '');
       setScannedRegistration(null);
+      setManualRegNo('');
     } catch (error) {
       setStatus('invalid');
       setMessage('Failed to mark arrived. Please try again.');
@@ -122,11 +147,7 @@ const Verify = () => {
   };
 
   const handleNext = () => {
-    setStatus(null);
-    setMessage('');
-    setIcon(null);
-    setVerifiedName('');
-    setScannedRegistration(null);
+    resetVerificationState();
   };
 
   // Bulk email function
@@ -244,10 +265,32 @@ const Verify = () => {
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#181a20] px-2 sm:px-4 py-4">
       <div className="bg-[#23263a] rounded-2xl shadow-2xl p-0 sm:p-0 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col items-center relative" style={{boxShadow:'0 8px 32px #0008'}}>
         <h2 className="text-base sm:text-lg md:text-2xl font-bold text-[#00c3ff] text-center mt-6 mb-2 tracking-wide" style={{letterSpacing:'0.04em'}}>Scan Registration QR</h2>
-        <div className="text-xs sm:text-sm md:text-base text-[#b0b3c6] text-center mb-4 px-2 sm:px-4">Please align the QR code within the frame below. Hold steady for instant verification.</div>
+        <div className="text-xs sm:text-sm md:text-base text-[#b0b3c6] text-center mb-4 px-2 sm:px-4">Please align the QR code within the frame below or search manually by Reg No.</div>
         <div className="w-full px-3 pb-4">
           <BarcodeScanner onScan={handleScan} loading={loading} />
         </div>
+        <form onSubmit={handleManualSearch} className="w-full px-3 pb-4">
+          <label htmlFor="manual-regno" className="block text-xs sm:text-sm font-semibold text-[#b0b3c6] mb-2">
+            Search by Reg No
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="manual-regno"
+              type="text"
+              value={manualRegNo}
+              onChange={(e) => setManualRegNo(e.target.value)}
+              placeholder="Enter Reg No"
+              className="flex-1 rounded-lg bg-[#161925] border border-[#2f3652] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00c3ff]"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-[#00c3ff] to-[#0ea5e9] text-[#0a1022] font-bold px-4 py-2 rounded-lg disabled:opacity-60"
+            >
+              Search
+            </button>
+          </div>
+        </form>
         {loading && <div className="text-[#00c3ff] text-center font-semibold mt-2 mb-4 text-sm sm:text-base md:text-lg">Processing...</div>}
         {/* Popup for every scan message */}
         {status && (
