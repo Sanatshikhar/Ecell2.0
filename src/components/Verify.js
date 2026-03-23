@@ -7,11 +7,12 @@ import {
 } from '../lib/emailTemplates';
 
 const Verify = () => {
-  const [status, setStatus] = useState(null); // 'verified', 'already', 'invalid'
+  const [status, setStatus] = useState(null); // 'found', 'arrived', 'already', 'invalid'
   const [loading, setLoading] = useState(false);
   const [icon, setIcon] = useState(null);
   const [message, setMessage] = useState('');
   const [verifiedName, setVerifiedName] = useState('');
+  const [scannedRegistration, setScannedRegistration] = useState(null);
   const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
   const [showTimeChangePopup, setShowTimeChangePopup] = useState(false);
@@ -19,12 +20,13 @@ const Verify = () => {
 
   // Auto-clear success state after a brief delay.
   useEffect(() => {
-    if (status === 'verified') {
+    if (status === 'arrived') {
       const timer = setTimeout(() => {
         setStatus(null);
         setMessage('');
         setIcon(null);
         setVerifiedName('');
+        setScannedRegistration(null);
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -37,6 +39,7 @@ const Verify = () => {
     setMessage('');
     setIcon(null);
     setVerifiedName('');
+    setScannedRegistration(null);
     let token = rawToken;
     if (typeof token === 'string' && token.includes('?token=')) {
       token = token.split('?token=')[1];
@@ -51,28 +54,46 @@ const Verify = () => {
       setLoading(false);
       return;
     }
-    const safeToken = token.replace(/"/g, '"');
+    const safeToken = token.trim().replace(/"/g, '\\"');
     try {
-      const result = await pb.collection('joiningReg2025').getFirstListItem(`qr_token="${safeToken}"`);
+      const result = await pb.collection('workshops').getFirstListItem(`regNo="${safeToken}"`);
       if (!result) {
         setStatus('invalid');
-        setMessage('Invalid QR Token');
+        setMessage('Registration not found for this Reg No');
         setIcon('invalid');
-      } else if (result.verified) {
+      } else if (result.arrived) {
         setStatus('already');
-        setMessage('Already Verified');
+        setMessage('Already Marked Arrived');
         setIcon('already');
         setVerifiedName(result.name || '');
       } else {
-        await pb.collection('joiningReg2025').update(result.id, { verified: true });
-        setStatus('verified');
-        setMessage('Verified Successfully');
-        setIcon('verified');
+        setStatus('found');
+        setMessage('Registration Found');
+        setIcon('found');
         setVerifiedName(result.name || '');
+        setScannedRegistration(result);
       }
     } catch (err) {
       setStatus('invalid');
-      setMessage('Invalid QR Token');
+      setMessage('Registration not found for this Reg No');
+      setIcon('invalid');
+    }
+    setLoading(false);
+  };
+
+  const handleMarkArrived = async () => {
+    if (!scannedRegistration?.id) return;
+    setLoading(true);
+    try {
+      await pb.collection('workshops').update(scannedRegistration.id, { arrived: true });
+      setStatus('arrived');
+      setMessage('Marked Arrived Successfully');
+      setIcon('verified');
+      setVerifiedName(scannedRegistration.name || '');
+      setScannedRegistration(null);
+    } catch (error) {
+      setStatus('invalid');
+      setMessage('Failed to mark arrived. Please try again.');
       setIcon('invalid');
     }
     setLoading(false);
@@ -83,6 +104,10 @@ const Verify = () => {
     if (icon === 'verified') {
       return (
         <svg className="h-16 w-16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#2aad4b" /><path d="M7 13l3 3 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      );
+    } else if (icon === 'found') {
+      return (
+        <svg className="h-16 w-16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#2563eb" /><path d="M9 12h6M12 9v6" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
       );
     } else if (icon === 'already') {
       return (
@@ -101,6 +126,7 @@ const Verify = () => {
     setMessage('');
     setIcon(null);
     setVerifiedName('');
+    setScannedRegistration(null);
   };
 
   // Bulk email function
@@ -222,7 +248,7 @@ const Verify = () => {
         <div className="w-full px-3 pb-4">
           <BarcodeScanner onScan={handleScan} loading={loading} />
         </div>
-        {loading && <div className="text-[#00c3ff] text-center font-semibold mt-2 mb-4 text-sm sm:text-base md:text-lg">Verifying...</div>}
+        {loading && <div className="text-[#00c3ff] text-center font-semibold mt-2 mb-4 text-sm sm:text-base md:text-lg">Processing...</div>}
         {/* Popup for every scan message */}
         {status && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
@@ -232,12 +258,31 @@ const Verify = () => {
               {verifiedName && (
                 <span className="text-sm sm:text-lg md:text-xl font-semibold text-green-400 mb-4">{verifiedName}</span>
               )}
-              <button
-                className="mt-2 bg-gradient-to-r from-[#00c3ff] to-[#ffff1c] text-[#23263a] font-bold py-2 px-6 rounded-xl shadow hover:from-[#00bfff] hover:to-[#ffe600] transition text-base sm:text-lg md:text-xl"
-                onClick={handleNext}
-              >
-                Next
-              </button>
+              {status === 'found' ? (
+                <div className="flex gap-2 mt-2">
+                  <button
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-4 rounded-xl shadow transition text-base"
+                    onClick={handleMarkArrived}
+                    disabled={loading}
+                  >
+                    Mark Arrived
+                  </button>
+                  <button
+                    className="bg-gray-600 text-white font-bold py-2 px-4 rounded-xl shadow hover:bg-gray-800 transition text-base"
+                    onClick={handleNext}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="mt-2 bg-gradient-to-r from-[#00c3ff] to-[#ffff1c] text-[#23263a] font-bold py-2 px-6 rounded-xl shadow hover:from-[#00bfff] hover:to-[#ffe600] transition text-base sm:text-lg md:text-xl"
+                  onClick={handleNext}
+                >
+                  Next
+                </button>
+              )}
             </div>
           </div>
         )}

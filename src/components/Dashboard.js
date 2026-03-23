@@ -45,6 +45,59 @@ const Dashboard = () => {
     return matchesSearch && matchesMember;
   });
 
+  const downloadCsv = () => {
+    if (filtered.length === 0) return;
+
+    const columns = [
+      'name',
+      'email',
+      'phone',
+      'course',
+      'regNo',
+      'referral',
+      'iecMember',
+      'mailSent',
+      'arrived',
+      'created',
+    ];
+
+    const escapeCsv = (value) => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value).replace(/"/g, '""');
+      if (/[",\n]/.test(stringValue)) {
+        return `"${stringValue}"`;
+      }
+      return stringValue;
+    };
+
+    const headerRow = columns.join(',');
+    const dataRows = filtered.map((record) =>
+      columns
+        .map((column) => {
+          if (column === 'mailSent' || column === 'arrived') {
+            return escapeCsv(record[column] ? 'Yes' : 'No');
+          }
+          if (column === 'created') {
+            return escapeCsv(record.created ? new Date(record.created).toISOString() : '');
+          }
+          return escapeCsv(record[column] ?? '');
+        })
+        .join(',')
+    );
+
+    const csv = [headerRow, ...dataRows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.setAttribute('download', `workshop-registrations-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
   <div className="min-h-screen overflow-y-hidden w-screen font-sans flex flex-col items-center justify-start px-2 sm:px-4 py-4 bg-gradient-to-br from-[#ede9fe] via-[#a78bfa] to-[#7c3aed] bg-fixed" style={{backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)'}}>
   <div className="w-full px-4 pt-10 pb-8">
@@ -69,6 +122,13 @@ const Dashboard = () => {
             <option value="yes">IEC Member: Yes</option>
             <option value="no">IEC Member: No</option>
           </select>
+          <button
+            onClick={downloadCsv}
+            disabled={filtered.length === 0}
+            className="min-w-[180px] text-base rounded-xl shadow-md px-4 py-3 border border-[#7c3aed] bg-[#7c3aed] text-white hover:bg-[#6d28d9] transition disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+          >
+            Download CSV
+          </button>
         </div>
         <div className="overflow-x-auto mt-2 w-full">
           <table className="w-full border-separate border-spacing-0 text-lg rounded-2xl shadow-2xl bg-[#ede9fe]">
