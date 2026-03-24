@@ -18,6 +18,13 @@ const Verify = () => {
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
   const [showTimeChangePopup, setShowTimeChangePopup] = useState(false);
   const [timeChangeMailStatus, setTimeChangeMailStatus] = useState({ step: 'idle', count: 0, sent: 0, failed: 0 });
+  const [showOnspotPopup, setShowOnspotPopup] = useState(false);
+  const [onspotRegNo, setOnspotRegNo] = useState('');
+  const [onspotName, setOnspotName] = useState('');
+  const [onspotEmail, setOnspotEmail] = useState('');
+  const [onspotSubmitting, setOnspotSubmitting] = useState(false);
+  const [onspotMessage, setOnspotMessage] = useState('');
+  const [onspotError, setOnspotError] = useState('');
 
   const resetVerificationState = () => {
     setStatus(null);
@@ -25,6 +32,25 @@ const Verify = () => {
     setIcon(null);
     setVerifiedName('');
     setScannedRegistration(null);
+  };
+
+  const openOnspotRegistration = (regNo) => {
+    setOnspotRegNo(regNo);
+    setOnspotName('');
+    setOnspotEmail('');
+    setOnspotMessage('');
+    setOnspotError('');
+    setShowOnspotPopup(true);
+  };
+
+  const closeOnspotRegistration = () => {
+    setShowOnspotPopup(false);
+    setOnspotRegNo('');
+    setOnspotName('');
+    setOnspotEmail('');
+    setOnspotSubmitting(false);
+    setOnspotMessage('');
+    setOnspotError('');
   };
 
   const verifyByRegNo = async (rawRegNo) => {
@@ -47,6 +73,7 @@ const Verify = () => {
         setStatus('invalid');
         setMessage('Registration not found for this Reg No');
         setIcon('invalid');
+        openOnspotRegistration(regNo);
       } else if (result.arrived) {
         setStatus('already');
         setMessage('Already Marked Arrived');
@@ -60,9 +87,16 @@ const Verify = () => {
         setScannedRegistration(result);
       }
     } catch (err) {
-      setStatus('invalid');
-      setMessage('Registration not found for this Reg No');
-      setIcon('invalid');
+      if (err?.status === 404) {
+        setStatus('invalid');
+        setMessage('Registration not found for this Reg No');
+        setIcon('invalid');
+        openOnspotRegistration(regNo);
+      } else {
+        setStatus('invalid');
+        setMessage('Something went wrong while verifying. Please try again.');
+        setIcon('invalid');
+      }
     }
 
     setLoading(false);
@@ -122,6 +156,52 @@ const Verify = () => {
       setIcon('invalid');
     }
     setLoading(false);
+  };
+
+  const handleOnspotSubmit = async (e) => {
+    e.preventDefault();
+    const cleanRegNo = (onspotRegNo || '').trim();
+    const cleanName = (onspotName || '').trim();
+    const cleanEmail = (onspotEmail || '').trim();
+
+    if (!cleanRegNo) {
+      setOnspotError('Reg No is required.');
+      return;
+    }
+
+    if (!cleanName) {
+      setOnspotError('Name is required for on-spot registration.');
+      return;
+    }
+
+    if (!cleanEmail) {
+      setOnspotError('Mail ID is required for on-spot registration.');
+      return;
+    }
+
+    setOnspotSubmitting(true);
+    setOnspotError('');
+    setOnspotMessage('');
+
+    try {
+      await pb.collection('onspot').create({
+        regNo: cleanRegNo,
+        name: cleanName,
+        email: cleanEmail,
+      });
+      setOnspotMessage('On-spot registration saved successfully.');
+      setManualRegNo('');
+      setStatus(null);
+      setMessage('');
+      setIcon(null);
+      setTimeout(() => {
+        closeOnspotRegistration();
+      }, 900);
+    } catch (error) {
+      setOnspotError('Failed to save on-spot registration. Please try again.');
+    }
+
+    setOnspotSubmitting(false);
   };
 
   // Icon rendering
@@ -293,7 +373,7 @@ const Verify = () => {
         </form>
         {loading && <div className="text-[#00c3ff] text-center font-semibold mt-2 mb-4 text-sm sm:text-base md:text-lg">Processing...</div>}
         {/* Popup for every scan message */}
-        {status && (
+        {status && !showOnspotPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
             <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-xs w-full">
               {icon && renderIcon()}
@@ -457,6 +537,83 @@ const Verify = () => {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+      {showOnspotPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60] bg-black bg-opacity-70 px-3">
+          <div className="bg-[#23263a] rounded-2xl shadow-2xl p-6 flex flex-col items-center max-w-sm w-full">
+            <h3 className="text-lg sm:text-xl font-bold text-[#ffff1c] text-center mb-2">On-Spot Registration</h3>
+            <p className="text-sm text-[#c7cbe2] text-center mb-4">
+              Reg No <span className="font-semibold text-white">{onspotRegNo}</span> was not found. Add participant details for on-spot registration.
+            </p>
+
+            <form onSubmit={handleOnspotSubmit} className="w-full space-y-3">
+              <div>
+                <label htmlFor="onspot-regno" className="block text-xs sm:text-sm font-semibold text-[#b0b3c6] mb-1">
+                  Reg No
+                </label>
+                <input
+                  id="onspot-regno"
+                  type="text"
+                  value={onspotRegNo}
+                  onChange={(e) => setOnspotRegNo(e.target.value)}
+                  className="w-full rounded-lg bg-[#161925] border border-[#2f3652] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00c3ff]"
+                  disabled={onspotSubmitting}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="onspot-name" className="block text-xs sm:text-sm font-semibold text-[#b0b3c6] mb-1">
+                  Name
+                </label>
+                <input
+                  id="onspot-name"
+                  type="text"
+                  value={onspotName}
+                  onChange={(e) => setOnspotName(e.target.value)}
+                  placeholder="Enter participant name"
+                  className="w-full rounded-lg bg-[#161925] border border-[#2f3652] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00c3ff]"
+                  disabled={onspotSubmitting}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="onspot-email" className="block text-xs sm:text-sm font-semibold text-[#b0b3c6] mb-1">
+                  Mail ID
+                </label>
+                <input
+                  id="onspot-email"
+                  type="email"
+                  value={onspotEmail}
+                  onChange={(e) => setOnspotEmail(e.target.value)}
+                  placeholder="Enter participant email"
+                  className="w-full rounded-lg bg-[#161925] border border-[#2f3652] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00c3ff]"
+                  disabled={onspotSubmitting}
+                />
+              </div>
+
+              {onspotError && <div className="text-red-400 text-sm font-semibold">{onspotError}</div>}
+              {onspotMessage && <div className="text-green-400 text-sm font-semibold">{onspotMessage}</div>}
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="submit"
+                  disabled={onspotSubmitting}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-4 rounded-xl shadow transition disabled:opacity-60"
+                >
+                  {onspotSubmitting ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeOnspotRegistration}
+                  disabled={onspotSubmitting}
+                  className="flex-1 bg-gray-600 text-white font-bold py-2 px-4 rounded-xl shadow hover:bg-gray-800 transition disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
