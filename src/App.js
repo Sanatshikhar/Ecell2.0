@@ -23,6 +23,7 @@ import Shipping from './components/Shipping';
 import Privacy from './components/Privacy';
 import pb from './lib/pocketbase';
 import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
+import ScratchLabsRegistration from "./components/ScratchLabsRegistration";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -35,7 +36,7 @@ function AppContent() {
     return unsubscribe;
   }, []);
 
-  const hideHeaderPaths = ['/workshop', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = ['/scratchlabs', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
     <>
@@ -49,6 +50,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
+        <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
