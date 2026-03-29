@@ -22,7 +22,6 @@ import TermsConditions from './components/TermsConditions';
 import Shipping from './components/Shipping';
 import Privacy from './components/Privacy';
 import pb from './lib/pocketbase';
-import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
 import ScratchLabsRegistration from "./components/ScratchLabsRegistration";
 import AITribunalRegistration from "./components/AITribunalRegistration";
 
