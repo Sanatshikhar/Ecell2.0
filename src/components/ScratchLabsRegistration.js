@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import pb from "../lib/pocketbase";
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@300;400;600;700&display=swap');
@@ -23,6 +24,16 @@ const STYLES = `
   .header-desc{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.8;margin-top:14px;border-left:2px solid var(--accent);padding-left:16px;letter-spacing:.5px;}
 
   .progress-wrap{margin-bottom:36px;opacity:0;animation:fadeIn .5s ease .5s forwards;}
+  .progress-wrap.embedded-progress{
+    margin:0;
+    padding:18px 24px 12px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,rgba(200,255,0,.08),rgba(17,17,17,.45));
+    opacity:1;
+    animation:none;
+    transition:all .3s ease;
+  }
+  .progress-wrap.embedded-progress .step-conn{margin-bottom:22px;}
   .progress-steps{display:flex;align-items:center;}
   .step-item{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1;}
   .step-circle{width:36px;height:36px;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);transition:all .4s cubic-bezier(.16,1,.3,1);clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);}
@@ -109,6 +120,8 @@ const STYLES = `
   .success-icon{font-size:48px;color:var(--accent);margin-bottom:16px;display:block;animation:pulse 2s infinite;}
   .success-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--accent);margin-bottom:8px;}
   .success-msg{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.8;letter-spacing:.5px;}
+  .success-action{margin-top:24px;background:transparent;color:var(--accent);border:1px solid rgba(200,255,0,.45);padding:10px 18px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s ease;}
+  .success-action:hover{background:rgba(200,255,0,.12);border-color:var(--accent);color:#fff;}
 
   @keyframes slideDown{to{opacity:1;transform:translateY(0)}}
   @keyframes slideUp{to{opacity:1;transform:translateY(0)}}
@@ -122,10 +135,44 @@ const STYLES = `
 function ScratchLabsRegistration() {
   useEffect(() => {
     document.title = "ScratchLabs — Registration";
+    const collectionName = process.env.REACT_APP_PB_SCRATCHLABS_COLLECTION || "scratchlabsRegistrations";
 
     let current = 1;
     const TOTAL = 4;
     let animating = false;
+    let isSubmitting = false;
+
+    function getValue(id) {
+      return document.getElementById(id)?.value?.trim() || "";
+    }
+
+    function buildPayload() {
+      const registrationType = document.querySelector('input[name="regType"]:checked')?.value || "";
+      const experience = document.querySelector('input[name="experience"]:checked')?.value || "";
+
+      return {
+        fullName: getValue("fullName"),
+        regNum: getValue("regNum"),
+        year: document.getElementById("year")?.value || "",
+        branch: getValue("branch"),
+        contact: getValue("contact"),
+        email: getValue("email"),
+        registrationType,
+        experience,
+        teammateName: getValue("tm_name"),
+        teammateRegNum: getValue("tm_reg"),
+        teammateYear: document.getElementById("tm_year")?.value || "",
+        teammateBranch: getValue("tm_branch"),
+        teammateContact: getValue("tm_contact"),
+        teammateEmail: getValue("tm_email"),
+        source: "scratchlabs",
+      };
+    }
+
+    async function submitRegistration() {
+      const payload = buildPayload();
+      await pb.collection(collectionName).create(payload);
+    }
 
     function updateProgress(to) {
       for (let i = 1; i <= TOTAL; i += 1) {
@@ -253,32 +300,97 @@ function ScratchLabsRegistration() {
       return ok;
     }
 
+    function resetFormState() {
+      const formCard = document.querySelector(".form-card");
+      if (!formCard) return;
+
+      formCard.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]').forEach((el) => {
+        el.value = "";
+        el.classList.remove("field-err");
+      });
+
+      formCard.querySelectorAll('input[type="radio"]').forEach((el) => {
+        el.checked = false;
+      });
+
+      formCard.querySelectorAll("select").forEach((sel) => {
+        sel.value = "";
+        sel.classList.remove("field-err");
+      });
+
+      const s3Individual = document.getElementById("s3-individual");
+      const s3Team = document.getElementById("s3-team");
+      if (s3Individual) s3Individual.style.display = "none";
+      if (s3Team) s3Team.style.display = "block";
+
+      document.querySelectorAll(".step-panel").forEach((panel, index) => {
+        panel.classList.remove("active", "panel-enter-right", "panel-enter-left", "panel-exit-left", "panel-exit-right");
+        if (index === 0) panel.classList.add("active");
+      });
+
+      current = 1;
+      updateProgress(1);
+    }
+
+    const closeSuccessOverlay = () => {
+      const successOverlay = document.getElementById("successOverlay");
+      if (successOverlay) {
+        successOverlay.classList.remove("show");
+      }
+    };
+
     const btnNext = document.getElementById("btnNext");
     const btnBack = document.getElementById("btnBack");
+    const successCloseBtn = document.getElementById("successCloseBtn");
 
-    const handleNext = () => {
+    const isIndividualSelected = () =>
+      document.querySelector('input[name="regType"]:checked')?.value === "Individual";
+
+    const handleNext = async () => {
       if (!validate(current)) return;
       if (current < TOTAL) {
-        goTo(current + 1, "forward");
+        if (current === 2 && isIndividualSelected()) {
+          goTo(4, "forward");
+        } else {
+          goTo(current + 1, "forward");
+        }
       } else {
-        const successOverlay = document.getElementById("successOverlay");
-        if (successOverlay) {
-          successOverlay.classList.add("show");
-          window.setTimeout(() => successOverlay.classList.remove("show"), 4000);
+        if (isSubmitting) return;
+        isSubmitting = true;
+        try {
+          await submitRegistration();
+          resetFormState();
+          const successOverlay = document.getElementById("successOverlay");
+          if (successOverlay) {
+            successOverlay.classList.add("show");
+          }
+        } catch (error) {
+          console.error("ScratchLabs registration submission failed:", error);
+          window.alert("Could not submit registration. Please try again.");
+        } finally {
+          isSubmitting = false;
         }
       }
     };
 
     const handleBack = () => {
-      if (current > 1) goTo(current - 1, "back");
+      if (current > 1) {
+        if (current === 4 && isIndividualSelected()) {
+          goTo(2, "back");
+        } else {
+          goTo(current - 1, "back");
+        }
+      }
     };
 
     if (btnNext) btnNext.addEventListener("click", handleNext);
     if (btnBack) btnBack.addEventListener("click", handleBack);
+    if (successCloseBtn) successCloseBtn.addEventListener("click", closeSuccessOverlay);
 
     return () => {
       if (btnNext) btnNext.removeEventListener("click", handleNext);
       if (btnBack) btnBack.removeEventListener("click", handleBack);
+      if (successCloseBtn) successCloseBtn.removeEventListener("click", closeSuccessOverlay);
     };
   }, []);
 
@@ -303,19 +415,19 @@ function ScratchLabsRegistration() {
           </p>
         </div>
 
-        <div className="progress-wrap">
-          <div className="progress-steps">
-            <div className="step-item active" id="si-1"><div className="step-circle">01</div><div className="step-label">General</div></div>
-            <div className="step-conn" id="sc-1" />
-            <div className="step-item" id="si-2"><div className="step-circle">02</div><div className="step-label">Participation</div></div>
-            <div className="step-conn" id="sc-2" />
-            <div className="step-item" id="si-3"><div className="step-circle">03</div><div className="step-label">Team Details</div></div>
-            <div className="step-conn" id="sc-3" />
-            <div className="step-item" id="si-4"><div className="step-circle">04</div><div className="step-label">Experience</div></div>
-          </div>
-        </div>
-
         <div className="form-card">
+          <div className="progress-wrap embedded-progress">
+            <div className="progress-steps">
+              <div className="step-item active" id="si-1"><div className="step-circle">01</div><div className="step-label">General</div></div>
+              <div className="step-conn" id="sc-1" />
+              <div className="step-item" id="si-2"><div className="step-circle">02</div><div className="step-label">Participation</div></div>
+              <div className="step-conn" id="sc-2" />
+              <div className="step-item" id="si-3"><div className="step-circle">03</div><div className="step-label">Team Details</div></div>
+              <div className="step-conn" id="sc-3" />
+              <div className="step-item" id="si-4"><div className="step-circle">04</div><div className="step-label">Experience</div></div>
+            </div>
+          </div>
+
           <div className="steps-container">
             <div className="step-panel active" id="step-1">
               <div className="section-header">
@@ -400,11 +512,12 @@ function ScratchLabsRegistration() {
           <p className="success-msg">
             Registration received for ScratchLabs.
             <br />
-            Check your email for confirmation.
+            GET READY TO
             <br />
             <br />
             IDEATE · VALIDATE · EXECUTE
           </p>
+          <button className="success-action" id="successCloseBtn">Back to ScratchLabs Form</button>
         </div>
       </div>
     </>

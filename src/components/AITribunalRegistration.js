@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import pb from "../lib/pocketbase";
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
@@ -30,6 +31,16 @@ const STYLES = `
   .header-desc{font-family:'Crimson Pro',serif;font-size:15px;font-style:italic;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.8;letter-spacing:.3px;}
 
   .progress-wrap{margin-bottom:40px;opacity:0;animation:fadeIn .5s ease .6s forwards;}
+  .progress-wrap.embedded-progress{
+    margin:0;
+    padding:22px 26px 14px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,rgba(201,168,76,.06),rgba(8,13,26,.35));
+    opacity:1;
+    animation:none;
+    transition:all .35s ease;
+  }
+  .progress-wrap.embedded-progress .step-conn{margin-bottom:20px;}
   .progress-steps{display:flex;align-items:center;}
   .step-item{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1;}
   .step-circle{width:36px;height:36px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:var(--text2);transition:all .45s cubic-bezier(.16,1,.3,1);position:relative;}
@@ -121,6 +132,7 @@ const STYLES = `
   .exp-box{width:16px;height:16px;border:1px solid var(--borderg);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .25s;transform:rotate(45deg);}
   .exp-card input:checked~.exp-label{border-color:var(--borderg);background:rgba(201,168,76,.05);color:var(--gold);}
   .exp-card input:checked~.exp-label .exp-box{background:var(--gold);border-color:var(--gold);color:#000;box-shadow:0 0 8px rgba(201,168,76,.4);}
+  .exp-card input:disabled~.exp-label{opacity:.45;cursor:not-allowed;}
 
   .gold-div{display:flex;align-items:center;gap:16px;margin:32px 0;}
   .gold-div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border));}
@@ -153,6 +165,8 @@ const STYLES = `
   .success-icon{font-size:44px;margin-bottom:20px;display:block;animation:glowPulse 2s infinite;}
   .success-title{font-family:'Cinzel',serif;font-size:22px;font-weight:700;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
   .success-msg{font-family:'Crimson Pro',serif;font-size:16px;font-style:italic;color:var(--text2);line-height:1.8;}
+  .success-action{margin-top:24px;background:transparent;color:var(--gold);border:1px solid var(--borderg);padding:10px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .25s ease;}
+  .success-action:hover{border-color:var(--gold);color:var(--gold2);background:rgba(201,168,76,.08);}
 
   @keyframes riseIn{from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)}}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)}}
@@ -163,13 +177,105 @@ const STYLES = `
   @keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(1)} 10%{opacity:.6} 90%{opacity:.2} 100%{opacity:0;transform:translateY(-100vh) scale(.5)}}
 `;
 
+const COUNTRY_OPTIONS = [
+  "United States",
+  "China",
+  "European Union",
+  "India",
+  "United Kingdom",
+  "Canada",
+  "Germany",
+  "France",
+  "Japan",
+  "South Korea",
+  "Israel",
+  "Singapore",
+  "United Arab Emirates",
+  "Australia",
+  "Brazil",
+  "South Africa",
+  "Russia",
+  "Taiwan",
+  "Netherlands",
+  "Italy",
+  "Spain",
+  "Sweden",
+  "Norway",
+  "Finland",
+  "Saudi Arabia",
+];
+
+const ORGANISATION_OPTIONS = [
+  "OpenAI",
+  "Google DeepMind",
+  "Anthropic",
+  "Microsoft",
+  "Meta",
+  "Amazon",
+  "NVIDIA",
+  "IBM",
+  "Oracle",
+  "Intel",
+  "Baidu",
+  "Alibaba",
+  "Tencent",
+  "DeepSeek",
+  "xAI",
+  "Mistral AI",
+  "Stability AI",
+  "Hugging Face",
+  "Tesla",
+  "Palantir Technologies",
+  "Scale AI",
+  "UiPath",
+  "Boston Dynamics",
+  "Adobe",
+  "SAP",
+];
+
 function AITribunalRegistration() {
   useEffect(() => {
     document.title = "AI Tribunal — Registration";
+    const collectionName = process.env.REACT_APP_PB_AI_TRIBUNAL_COLLECTION || "aiTribunalRegistrations";
 
     let current = 1;
     const TOTAL = 4;
     let animating = false;
+    let isSubmitting = false;
+
+    function getValue(id) {
+      return document.getElementById(id)?.value?.trim() || "";
+    }
+
+    function getCheckedValues(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((el) => el.value);
+    }
+
+    function buildPayload() {
+      const role = document.querySelector('input[name="role"]:checked')?.value || "";
+      const countryPreferences = ["cp1", "cp2", "cp3"].map((id) => getValue(id)).filter(Boolean);
+      const orgPreferences = ["op1", "op2", "op3"].map((id) => getValue(id)).filter(Boolean);
+
+      return {
+        fullName: getValue("fullName"),
+        regNum: getValue("regNum"),
+        year: document.getElementById("year")?.value || "",
+        branch: getValue("branch"),
+        contact: getValue("contact"),
+        email: getValue("email"),
+        role,
+        countryPreferences,
+        organisationPreferences: orgPreferences,
+        stance: getValue("stance"),
+        experiences: getCheckedValues("exp"),
+        source: "ai_tribunal",
+      };
+    }
+
+    async function submitRegistration() {
+      const payload = buildPayload();
+      await pb.collection(collectionName).create(payload);
+    }
 
     function syncSelects(cls) {
       const sels = Array.from(document.querySelectorAll("." + cls));
@@ -217,14 +323,36 @@ function AITribunalRegistration() {
     });
 
     const expListeners = [];
+
+    function syncExperienceOptions() {
+      const checkboxes = Array.from(document.querySelectorAll('.exp-card input[type="checkbox"][name="exp"]'));
+      const noneCheckbox = checkboxes.find((cb) => cb.value === "None");
+      const noneSelected = !!noneCheckbox?.checked;
+
+      checkboxes.forEach((cb) => {
+        const box = cb.closest(".exp-card")?.querySelector(".exp-box");
+
+        if (cb.value !== "None") {
+          if (noneSelected) {
+            cb.checked = false;
+          }
+          cb.disabled = noneSelected;
+        } else {
+          cb.disabled = false;
+        }
+
+        if (box) box.textContent = cb.checked ? "✦" : "";
+      });
+    }
+
     document.querySelectorAll('.exp-card input[type="checkbox"]').forEach((cb) => {
       const handler = function handler() {
-        const box = this.closest(".exp-card")?.querySelector(".exp-box");
-        if (box) box.textContent = this.checked ? "✦" : "";
+        syncExperienceOptions();
       };
       cb.addEventListener("change", handler);
       expListeners.push({ el: cb, handler });
     });
+    syncExperienceOptions();
 
     function updateProgress(to) {
       for (let i = 1; i <= TOTAL; i += 1) {
@@ -331,17 +459,76 @@ function AITribunalRegistration() {
       return ok;
     }
 
+    function resetFormState() {
+      const formCard = document.querySelector(".form-card");
+      if (!formCard) return;
+
+      formCard
+        .querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea')
+        .forEach((el) => {
+          el.value = "";
+          el.classList.remove("field-err");
+        });
+
+      formCard.querySelectorAll("select").forEach((sel) => {
+        sel.value = "";
+        sel.classList.remove("field-err");
+      });
+
+      formCard.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((el) => {
+        el.checked = false;
+      });
+
+      document.querySelectorAll(".exp-box").forEach((box) => {
+        box.textContent = "";
+      });
+
+      const pmSection = document.getElementById("pmSection");
+      const afSection = document.getElementById("afSection");
+      if (pmSection) pmSection.classList.remove("visible");
+      if (afSection) afSection.classList.remove("visible");
+
+      document.querySelectorAll(".step-panel").forEach((panel, index) => {
+        panel.classList.remove("active", "panel-enter-right", "panel-enter-left", "panel-exit-left", "panel-exit-right");
+        if (index === 0) panel.classList.add("active");
+      });
+
+      current = 1;
+      updateProgress(1);
+      syncSelects("country-pref");
+      syncSelects("org-pref");
+      syncExperienceOptions();
+    }
+
+    const closeSuccessOverlay = () => {
+      const successOverlay = document.getElementById("successOverlay");
+      if (successOverlay) {
+        successOverlay.classList.remove("show");
+      }
+    };
+
     const btnNext = document.getElementById("btnNext");
     const btnBack = document.getElementById("btnBack");
+    const successCloseBtn = document.getElementById("successCloseBtn");
 
-    const handleNext = () => {
+    const handleNext = async () => {
       if (!validate(current)) return;
       if (current < TOTAL) goTo(current + 1, "forward");
       else {
-        const successOverlay = document.getElementById("successOverlay");
-        if (successOverlay) {
-          successOverlay.classList.add("show");
-          window.setTimeout(() => successOverlay.classList.remove("show"), 4500);
+        if (isSubmitting) return;
+        isSubmitting = true;
+        try {
+          await submitRegistration();
+          resetFormState();
+          const successOverlay = document.getElementById("successOverlay");
+          if (successOverlay) {
+            successOverlay.classList.add("show");
+          }
+        } catch (error) {
+          console.error("AI Tribunal registration submission failed:", error);
+          window.alert("Could not submit registration. Please try again.");
+        } finally {
+          isSubmitting = false;
         }
       }
     };
@@ -352,6 +539,7 @@ function AITribunalRegistration() {
 
     if (btnNext) btnNext.addEventListener("click", handleNext);
     if (btnBack) btnBack.addEventListener("click", handleBack);
+    if (successCloseBtn) successCloseBtn.addEventListener("click", closeSuccessOverlay);
 
     return () => {
       roleListeners.forEach(({ el, handler }) => el.removeEventListener("change", handler));
@@ -360,6 +548,7 @@ function AITribunalRegistration() {
       expListeners.forEach(({ el, handler }) => el.removeEventListener("change", handler));
       if (btnNext) btnNext.removeEventListener("click", handleNext);
       if (btnBack) btnBack.removeEventListener("click", handleBack);
+      if (successCloseBtn) successCloseBtn.removeEventListener("click", closeSuccessOverlay);
     };
   }, []);
 
@@ -390,21 +579,21 @@ function AITribunalRegistration() {
           </p>
         </div>
 
-        <div className="progress-wrap">
-          <div className="progress-steps">
-            <div className="step-item active" id="si-1"><div className="step-circle">I</div><div className="step-label">General</div></div>
-            <div className="step-conn" id="sc-1" />
-            <div className="step-item" id="si-2"><div className="step-circle">II</div><div className="step-label">Role</div></div>
-            <div className="step-conn" id="sc-2" />
-            <div className="step-item" id="si-3"><div className="step-circle">III</div><div className="step-label">Statement</div></div>
-            <div className="step-conn" id="sc-3" />
-            <div className="step-item" id="si-4"><div className="step-circle">IV</div><div className="step-label">Experience</div></div>
-          </div>
-        </div>
-
         <div className="form-card">
           <div className="corner tl" /><div className="corner tr" />
           <div className="corner bl" /><div className="corner br" />
+
+          <div className="progress-wrap embedded-progress">
+            <div className="progress-steps">
+              <div className="step-item active" id="si-1"><div className="step-circle">I</div><div className="step-label">General</div></div>
+              <div className="step-conn" id="sc-1" />
+              <div className="step-item" id="si-2"><div className="step-circle">II</div><div className="step-label">Role</div></div>
+              <div className="step-conn" id="sc-2" />
+              <div className="step-item" id="si-3"><div className="step-circle">III</div><div className="step-label">Statement</div></div>
+              <div className="step-conn" id="sc-3" />
+              <div className="step-item" id="si-4"><div className="step-circle">IV</div><div className="step-label">Experience</div></div>
+            </div>
+          </div>
 
           <div className="steps-container">
             <div className="step-panel active" id="step-1">
@@ -455,18 +644,18 @@ function AITribunalRegistration() {
               <div className="pref-section" id="pmSection">
                 <div className="pref-note"><strong>Country Preference</strong><br />Select your top 3 country choices in order of priority. Each country may only appear once across all preferences.</div>
                 <div className="pref-row">
-                  <div className="pref-field"><div className="pref-badge">Preference 1</div><div className="select-wrap"><select id="cp1" className="country-pref" defaultValue=""><option value="">— Select Country —</option><option value="United States">🇺🇸 United States</option><option value="European Union">🇪🇺 European Union</option><option value="India">🇮🇳 India</option><option value="China">🇨🇳 China</option></select></div></div>
-                  <div className="pref-field"><div className="pref-badge">Preference 2</div><div className="select-wrap"><select id="cp2" className="country-pref" defaultValue=""><option value="">— Select Country —</option><option value="United States">🇺🇸 United States</option><option value="European Union">🇪🇺 European Union</option><option value="India">🇮🇳 India</option><option value="China">🇨🇳 China</option></select></div></div>
-                  <div className="pref-field"><div className="pref-badge">Preference 3</div><div className="select-wrap"><select id="cp3" className="country-pref" defaultValue=""><option value="">— Select Country —</option><option value="United States">🇺🇸 United States</option><option value="European Union">🇪🇺 European Union</option><option value="India">🇮🇳 India</option><option value="China">🇨🇳 China</option></select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 1</div><div className="select-wrap"><select id="cp1" className="country-pref" defaultValue=""><option value="">— Select Country —</option>{COUNTRY_OPTIONS.map((country) => <option key={`cp1-${country}`} value={country}>{country}</option>)}</select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 2</div><div className="select-wrap"><select id="cp2" className="country-pref" defaultValue=""><option value="">— Select Country —</option>{COUNTRY_OPTIONS.map((country) => <option key={`cp2-${country}`} value={country}>{country}</option>)}</select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 3</div><div className="select-wrap"><select id="cp3" className="country-pref" defaultValue=""><option value="">— Select Country —</option>{COUNTRY_OPTIONS.map((country) => <option key={`cp3-${country}`} value={country}>{country}</option>)}</select></div></div>
                 </div>
               </div>
 
               <div className="pref-section" id="afSection">
                 <div className="pref-note"><strong>Organisation / Founder Preference</strong><br />Select your top 3 organisation choices in order of priority. Each organisation may only appear once across all preferences.</div>
                 <div className="pref-row">
-                  <div className="pref-field"><div className="pref-badge">Preference 1</div><div className="select-wrap"><select id="op1" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option><option value="OpenAI">OpenAI — Sam Altman</option><option value="Anthropic">Anthropic — Dario Amodei</option><option value="Google DeepMind">Google DeepMind — Demis Hassabis</option><option value="Meta AI">Meta AI — Yann LeCun</option></select></div></div>
-                  <div className="pref-field"><div className="pref-badge">Preference 2</div><div className="select-wrap"><select id="op2" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option><option value="OpenAI">OpenAI — Sam Altman</option><option value="Anthropic">Anthropic — Dario Amodei</option><option value="Google DeepMind">Google DeepMind — Demis Hassabis</option><option value="Meta AI">Meta AI — Yann LeCun</option></select></div></div>
-                  <div className="pref-field"><div className="pref-badge">Preference 3</div><div className="select-wrap"><select id="op3" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option><option value="OpenAI">OpenAI — Sam Altman</option><option value="Anthropic">Anthropic — Dario Amodei</option><option value="Google DeepMind">Google DeepMind — Demis Hassabis</option><option value="Meta AI">Meta AI — Yann LeCun</option></select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 1</div><div className="select-wrap"><select id="op1" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option>{ORGANISATION_OPTIONS.map((org) => <option key={`op1-${org}`} value={org}>{org}</option>)}</select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 2</div><div className="select-wrap"><select id="op2" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option>{ORGANISATION_OPTIONS.map((org) => <option key={`op2-${org}`} value={org}>{org}</option>)}</select></div></div>
+                  <div className="pref-field"><div className="pref-badge">Preference 3</div><div className="select-wrap"><select id="op3" className="org-pref" defaultValue=""><option value="">— Select Organisation —</option>{ORGANISATION_OPTIONS.map((org) => <option key={`op3-${org}`} value={org}>{org}</option>)}</select></div></div>
                 </div>
               </div>
             </div>
@@ -517,6 +706,7 @@ function AITribunalRegistration() {
           <span className="success-icon">⚖️</span>
           <div className="success-title">The Court Accepts</div>
           <p className="success-msg">Your registration has been received.<br />The tribunal convenes. Your role awaits.<br /><br /><em>May reason and evidence prevail.</em></p>
+          <button className="success-action" id="successCloseBtn">Back to Tribunal Form</button>
         </div>
       </div>
     </>
