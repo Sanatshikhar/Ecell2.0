@@ -706,7 +706,7 @@ function AITribunalRegistration() {
           <span className="success-icon">⚖️</span>
           <div className="success-title">The Court Accepts</div>
           <p className="success-msg">Your registration has been received.<br />The tribunal convenes. Your role awaits.<br /><br /><em>May reason and evidence prevail.</em></p>
-          <button className="success-action" id="successCloseBtn">Back to Tribunal Form</button>
+          <button className="success-action" id="successCloseBtn">LET'S GO →</button>
         </div>
       </div>
     </>

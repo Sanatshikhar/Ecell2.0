@@ -172,6 +172,7 @@ function ScratchLabsRegistration() {
     async function submitRegistration() {
       const payload = buildPayload();
       await pb.collection(collectionName).create(payload);
+      return payload;
     }
 
     function updateProgress(to) {
@@ -358,8 +359,18 @@ function ScratchLabsRegistration() {
         if (isSubmitting) return;
         isSubmitting = true;
         try {
-          await submitRegistration();
+          const payload = await submitRegistration();
           resetFormState();
+
+          // Set dynamic success message based on registration type
+          const successMsg = document.getElementById("successMsg");
+          if (successMsg) {
+            const isIndividual = payload.registrationType === "Individual";
+            successMsg.innerHTML = isIndividual
+              ? `Registration received for ScratchLabs.<br /><br />Worry not... We have a surprise waiting for you...`
+              : `Registration received for ScratchLabs.<br /><br />Get ready to build it all from scratch`;
+          }
+
           const successOverlay = document.getElementById("successOverlay");
           if (successOverlay) {
             successOverlay.classList.add("show");
@@ -509,15 +520,10 @@ function ScratchLabsRegistration() {
         <div className="success-box">
           <span className="success-icon">◆</span>
           <div className="success-title">You're In!</div>
-          <p className="success-msg">
+          <p className="success-msg" id="successMsg">
             Registration received for ScratchLabs.
-            <br />
-            GET READY TO
-            <br />
-            <br />
-            IDEATE · VALIDATE · EXECUTE
           </p>
-          <button className="success-action" id="successCloseBtn">Back to ScratchLabs Form</button>
+          <button className="success-action" id="successCloseBtn">LET'S GO →</button>
         </div>
       </div>
     </>
