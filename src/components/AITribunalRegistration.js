@@ -303,6 +303,13 @@ function AITribunalRegistration() {
         syncSelects("org-pref");
         if (this.value === "policy_maker" && pmSection) pmSection.classList.add("visible");
         else if (this.value === "ai_founder" && afSection) afSection.classList.add("visible");
+        // If User is selected, move to next section immediately
+        if (this.value === "user") {
+          setTimeout(() => {
+            const btnNext = document.getElementById("btnNext");
+            if (btnNext) btnNext.click();
+          }, 200);
+        }
       };
       r.addEventListener("change", handler);
       roleListeners.push({ el: r, handler });
@@ -636,6 +643,14 @@ function AITribunalRegistration() {
                       <div className="role-icon">🧠</div>
                       <div className="role-name">AI Founder</div>
                       <div className="role-desc">Defence</div>
+                    </div>
+                  </label>
+                  <label className="role-card">
+                    <input type="radio" name="role" value="user" />
+                    <div className="role-label">
+                      <div className="role-icon">👤</div>
+                      <div className="role-name">User</div>
+                      <div className="role-desc">Prosecution</div>
                     </div>
                   </label>
                 </div>
