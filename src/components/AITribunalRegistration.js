@@ -274,7 +274,14 @@ function AITribunalRegistration() {
 
     async function submitRegistration() {
       const payload = buildPayload();
-      await pb.collection(collectionName).create(payload);
+      const existing = await pb.collection(collectionName).getOneByEmail(payload.email).catch(() => null);
+    if (existing !== null) {
+      throw new Error("A registration with this email already exists.");  
+    }
+    else{
+      await pb.collection(collectionName).create(payload); 
+  }
+  return payload;  
     }
 
     function syncSelects(cls) {
@@ -430,9 +437,24 @@ function AITribunalRegistration() {
       }
     }
 
-    function validate(n) {
+    async function validate(n) {
       let ok = true;
       if (n === 1) {
+        const emailField = document.getElementById("email");
+    if (emailField && emailField.value.trim()) {
+      try {
+        const existing = await pb.collection(collectionName).getList(1, 1, { 
+          filter: `email="${emailField.value}"` 
+        });
+        if (existing.items.length > 0) {
+          markErr("email");
+          window.alert("⚠️ This email is already registered. Please use a different email address.");
+          ok = false;
+        }
+      } catch (err) {
+        console.error("Email check error:", err);
+      }
+    }
         ["fullName", "regNum", "branch", "contact", "email"].forEach((id) => {
           const e = document.getElementById(id);
           if (e && !e.value.trim()) {
@@ -519,26 +541,37 @@ function AITribunalRegistration() {
     const successCloseBtn = document.getElementById("successCloseBtn");
 
     const handleNext = async () => {
-      if (!validate(current)) return;
-      if (current < TOTAL) goTo(current + 1, "forward");
-      else {
-        if (isSubmitting) return;
-        isSubmitting = true;
-        try {
-          await submitRegistration();
-          resetFormState();
-          const successOverlay = document.getElementById("successOverlay");
-          if (successOverlay) {
-            successOverlay.classList.add("show");
-          }
-        } catch (error) {
-          console.error("AI Tribunal registration submission failed:", error);
-          window.alert("Could not submit registration. Please try again.");
-        } finally {
-          isSubmitting = false;
-        }
+  if (!(await validate(current))) return;
+  if (current < TOTAL) {
+    goTo(current + 1, "forward");
+  } else {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    try {
+      const payload = await submitRegistration();
+      resetFormState();
+
+      // Set dynamic success message based on registration type
+      const successMsg = document.getElementById("successMsg");
+      if (successMsg) {
+        const isIndividual = payload.registrationType === "Individual";
+        successMsg.innerHTML = isIndividual
+          ? `Registration received for ScratchLabs.<br /><br />Worry not... We have a surprise waiting for you...`
+          : `Registration received for ScratchLabs.<br /><br />Get ready to build it all from scratch`;
       }
-    };
+
+      const successOverlay = document.getElementById("successOverlay");
+      if (successOverlay) {
+        successOverlay.classList.add("show");
+      }
+    } catch (error) {
+      console.error("ScratchLabs registration submission failed:", error);
+      window.alert("Could not submit registration. Please try again.");
+    } finally {
+      isSubmitting = false;
+    }
+  }
+};
 
     const handleBack = () => {
       if (current > 1) goTo(current - 1, "back");

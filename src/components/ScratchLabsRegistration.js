@@ -171,7 +171,6 @@ function ScratchLabsRegistration() {
 
     async function submitRegistration() {
       const payload = buildPayload();
-      await pb.collection(collectionName).create(payload);
       return payload;
     }
 
@@ -256,50 +255,69 @@ function ScratchLabsRegistration() {
         );
       }
     }
-
-    function validate(n) {
-      let ok = true;
-      if (n === 1) {
-        ["fullName", "regNum", "branch", "contact", "email"].forEach((id) => {
-          const e = document.getElementById(id);
-          if (e && !e.value.trim()) {
-            markError(id);
-            ok = false;
-          }
+    
+    async function validate(n) {
+  let ok = true;
+  if (n === 1) {
+    // Check email first (async operation)
+    const emailField = document.getElementById("email");
+    if (emailField && emailField.value.trim()) {
+      try {
+        const existing = await pb.collection(collectionName).getList(1, 1, { 
+          filter: `email="${emailField.value}"` 
         });
-        const yr = document.getElementById("year");
-        if (yr && !yr.value) {
-          yr.classList.add("field-err");
+        if (existing.items.length > 0) {
+          markError("email");
+          window.alert("⚠️ This email is already registered. Please use a different email address.");
           ok = false;
         }
+      } catch (err) {
+        console.error("Email check error:", err);
       }
-      if (n === 2) {
-        if (!document.querySelector('input[name="regType"]:checked')) ok = false;
-      }
-      if (n === 3) {
-        const isTeam = document.querySelector('input[name="regType"]:checked')?.value === "Team";
-        if (isTeam) {
-          ["tm_name", "tm_reg", "tm_branch", "tm_contact", "tm_email"].forEach((id) => {
-            const e = document.getElementById(id);
-            if (e && !e.value.trim()) {
-              markError(id);
-              ok = false;
-            }
-          });
-        }
-      }
-      if (n === 4) {
-        if (!document.querySelector('input[name="experience"]:checked')) ok = false;
-      }
-      if (!ok) {
-        const formCard = document.querySelector(".form-card");
-        if (formCard) {
-          formCard.classList.add("shake");
-          window.setTimeout(() => formCard.classList.remove("shake"), 350);
-        }
-      }
-      return ok;
     }
+
+    // Check other required fields
+    ["fullName", "regNum", "branch", "contact", "email"].forEach((id) => {
+      const e = document.getElementById(id);
+      if (e && !e.value.trim()) {
+        markError(id);
+        ok = false;
+      }
+    });
+
+    const yr = document.getElementById("year");
+    if (yr && !yr.value) {
+      yr.classList.add("field-err");
+      ok = false;
+    }
+  }
+  if (n === 2) {
+    if (!document.querySelector('input[name="regType"]:checked')) ok = false;
+  }
+  if (n === 3) {
+    const isTeam = document.querySelector('input[name="regType"]:checked')?.value === "Team";
+    if (isTeam) {
+      ["tm_name", "tm_reg", "tm_branch", "tm_contact", "tm_email"].forEach((id) => {
+        const e = document.getElementById(id);
+        if (e && !e.value.trim()) {
+          markError(id);
+          ok = false;
+        }
+      });
+    }
+  }
+  if (n === 4) {
+    if (!document.querySelector('input[name="experience"]:checked')) ok = false;
+  }
+  if (!ok) {
+    const formCard = document.querySelector(".form-card");
+    if (formCard) {
+      formCard.classList.add("shake");
+      window.setTimeout(() => formCard.classList.remove("shake"), 350);
+    }
+  }
+  return ok;
+}
 
     function resetFormState() {
       const formCard = document.querySelector(".form-card");
@@ -348,41 +366,41 @@ function ScratchLabsRegistration() {
       document.querySelector('input[name="regType"]:checked')?.value === "Individual";
 
     const handleNext = async () => {
-      if (!validate(current)) return;
-      if (current < TOTAL) {
-        if (current === 2 && isIndividualSelected()) {
-          goTo(4, "forward");
-        } else {
-          goTo(current + 1, "forward");
-        }
-      } else {
-        if (isSubmitting) return;
-        isSubmitting = true;
-        try {
-          const payload = await submitRegistration();
-          resetFormState();
+  if (!(await validate(current))) return;
+  if (current < TOTAL) {
+    if (current === 2 && isIndividualSelected()) {
+      goTo(4, "forward");
+    } else {
+      goTo(current + 1, "forward");
+    }
+  } else {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    try {
+      const payload = await submitRegistration();
+      resetFormState();
 
-          // Set dynamic success message based on registration type
-          const successMsg = document.getElementById("successMsg");
-          if (successMsg) {
-            const isIndividual = payload.registrationType === "Individual";
-            successMsg.innerHTML = isIndividual
-              ? `Registration received for ScratchLabs.<br /><br />Worry not... We have a surprise waiting for you...`
-              : `Registration received for ScratchLabs.<br /><br />Get ready to build it all from scratch`;
-          }
-
-          const successOverlay = document.getElementById("successOverlay");
-          if (successOverlay) {
-            successOverlay.classList.add("show");
-          }
-        } catch (error) {
-          console.error("ScratchLabs registration submission failed:", error);
-          window.alert("Could not submit registration. Please try again.");
-        } finally {
-          isSubmitting = false;
-        }
+      // Set dynamic success message based on registration type
+      const successMsg = document.getElementById("successMsg");
+      if (successMsg) {
+        const isIndividual = payload.registrationType === "Individual";
+        successMsg.innerHTML = isIndividual
+          ? `Registration received for ScratchLabs.<br /><br />Worry not... We have a surprise waiting for you...`
+          : `Registration received for ScratchLabs.<br /><br />Get ready to build it all from scratch`;
       }
-    };
+
+      const successOverlay = document.getElementById("successOverlay");
+      if (successOverlay) {
+        successOverlay.classList.add("show");
+      }
+    } catch (error) {
+      console.error("ScratchLabs registration submission failed:", error);
+      window.alert("Could not submit registration. Please try again.");
+    } finally {
+      isSubmitting = false;
+    }
+  }
+};
 
     const handleBack = () => {
       if (current > 1) {
