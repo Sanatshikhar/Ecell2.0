@@ -171,7 +171,7 @@ function ScratchLabsRegistration() {
 
     async function submitRegistration() {
       const payload = buildPayload();
-      return payload;
+      await pb.collection(collectionName).create(payload);
     }
 
     function updateProgress(to) {

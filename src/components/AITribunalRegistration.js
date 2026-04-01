@@ -274,7 +274,7 @@ function AITribunalRegistration() {
 
     async function submitRegistration() {
       const payload = buildPayload();
-      return payload;  
+      await pb.collection(collectionName).create(payload);
     }
 
     function syncSelects(cls) {
