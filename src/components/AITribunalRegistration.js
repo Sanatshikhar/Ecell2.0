@@ -274,14 +274,7 @@ function AITribunalRegistration() {
 
     async function submitRegistration() {
       const payload = buildPayload();
-      const existing = await pb.collection(collectionName).getOneByEmail(payload.email).catch(() => null);
-    if (existing !== null) {
-      throw new Error("A registration with this email already exists.");  
-    }
-    else{
-      await pb.collection(collectionName).create(payload); 
-  }
-  return payload;  
+      return payload;  
     }
 
     function syncSelects(cls) {
