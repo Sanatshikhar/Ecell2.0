@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import pb from "../lib/pocketbase";
+
+const REGISTRATION_OPEN = false;
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@300;400;600;700&display=swap');
@@ -135,6 +138,8 @@ const STYLES = `
 function ScratchLabsRegistration() {
   useEffect(() => {
     document.title = "ScratchLabs — Registration";
+    if (!REGISTRATION_OPEN) return;
+
     const collectionName = process.env.REACT_APP_PB_SCRATCHLABS_COLLECTION || "scratchlabsRegistrations";
 
     let current = 1;
@@ -434,18 +439,29 @@ function ScratchLabsRegistration() {
 
       <div className="page-wrapper">
         <div className="header">
-          <div className="scratch-tag">REGISTRATION OPEN</div>
+          <div className="scratch-tag">{REGISTRATION_OPEN ? "REGISTRATION OPEN" : "REGISTRATION CLOSED"}</div>
           <h1 className="event-title">
             THE SCRATCH<span>LABS</span>
           </h1>
           <p className="header-desc">
-            Building From The Scratch — A 2-day startup simulation.
-            <br />
-            Ideate · Validate · Execute · Present
+            {REGISTRATION_OPEN ? (
+              <>
+                Building From The Scratch — A 2-day startup simulation.
+                <br />
+                Ideate · Validate · Execute · Present
+              </>
+            ) : (
+              <>
+                Sorry, registrations are now closed.
+                <br />
+                Thank you for the incredible response.
+              </>
+            )}
           </p>
         </div>
 
-        <div className="form-card">
+        {REGISTRATION_OPEN ? (
+          <div className="form-card">
           <div className="progress-wrap embedded-progress">
             <div className="progress-steps">
               <div className="step-item active" id="si-1"><div className="step-circle">01</div><div className="step-label">General</div></div>
@@ -532,19 +548,43 @@ function ScratchLabsRegistration() {
             <div className="step-counter">STEP <span id="stepNum">1</span> / 4</div>
             <button className="btn-next" id="btnNext">NEXT →</button>
           </div>
-        </div>
+          </div>
+        ) : (
+          <div className="form-card" style={{ padding: "40px 32px", textAlign: "center" }}>
+            <div className="section-header" style={{ justifyContent: "center", borderBottom: "none", marginBottom: "12px" }}>
+              <div className="section-num">!</div>
+              <div className="section-title">Registrations Closed</div>
+            </div>
+            <div className="info-box" style={{ maxWidth: "620px", margin: "0 auto", background: "rgba(255,107,0,.08)", border: "1px solid rgba(255,107,0,.3)", color: "#e8e8e8" }}>
+              Sorry, registrations are now closed for ScratchLabs.
+              <br />
+              We appreciate your interest and support.
+            </div>
+            <div style={{ marginTop: "20px" }}>
+              <Link
+                to="/audience-poll"
+                className="btn-next"
+                style={{ display: "inline-block", textDecoration: "none" }}
+              >
+                GO TO VOTING PAGE →
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="success-overlay" id="successOverlay">
-        <div className="success-box">
-          <span className="success-icon">◆</span>
-          <div className="success-title">You're In!</div>
-          <p className="success-msg" id="successMsg">
-            Registration received for ScratchLabs.
-          </p>
-          <button className="success-action" id="successCloseBtn">LET'S GO →</button>
+      {REGISTRATION_OPEN && (
+        <div className="success-overlay" id="successOverlay">
+          <div className="success-box">
+            <span className="success-icon">◆</span>
+            <div className="success-title">You're In!</div>
+            <p className="success-msg" id="successMsg">
+              Registration received for ScratchLabs.
+            </p>
+            <button className="success-action" id="successCloseBtn">LET'S GO →</button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

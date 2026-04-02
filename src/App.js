@@ -13,7 +13,6 @@ import ComingSoon from "./components/ComingSoon";
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import AudiencePollPage from './components/AudiencePollPage';
-import PocketBaseExport from './components/PocketBaseExport';
 import Verify from './components/Verify';
 import Login from './components/Login';
 import JoiningRegSheet from './components/JoiningRegSheet';
@@ -57,7 +56,6 @@ function AppContent() {
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/audience-poll" element={<AudiencePollPage />} />
-        <Route path="/data-export" element={<PocketBaseExport />} />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />

@@ -1,260 +1,325 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
+const PRODUCT_LIMIT = 25;
+
+const escapeFilterValue = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
 const AudiencePollPage = () => {
-  const [polls, setPolls] = useState([]);
-  const [activePoll, setActivePoll] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [voteStats, setVoteStats] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  
-  // Form state
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [isSubmittingVote, setIsSubmittingVote] = useState(false);
+  const [currentVoter, setCurrentVoter] = useState(null);
+  const [voteLocked, setVoteLocked] = useState(false);
+  const [votedProductId, setVotedProductId] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusType, setStatusType] = useState('info');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     registrationNumber: '',
   });
   const [formErrors, setFormErrors] = useState({});
-  const [userRecord, setUserRecord] = useState(null);
+  const hasLoadedProductsRef = useRef(false);
+  const [isTransitioningToVote, setIsTransitioningToVote] = useState(false);
 
-  // Form validation
+  const productCards = useMemo(() => products.slice(0, PRODUCT_LIMIT), [products]);
+
+  const setStatus = (message, type = 'info') => {
+    setStatusMessage(message);
+    setStatusType(type);
+  };
+
   const validateForm = () => {
     const errors = {};
+
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
     if (!formData.registrationNumber.trim()) errors.registrationNumber = 'Registration number is required';
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      setUserRecord({
-        ...formData,
-        timestamp: new Date().toISOString(),
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const records = await pb.collection('products').getFullList(100, {
+        sort: 'name',
+        requestKey: null,
       });
-      setFormSubmitted(true);
+
+      const normalized = records
+        .map((record) => ({
+          ...record,
+          count: Number(record.count || 0),
+        }))
+        .sort((a, b) => {
+          const aNumber = Number(String(a.name || '').match(/\d+/)?.[0] || 0);
+          const bNumber = Number(String(b.name || '').match(/\d+/)?.[0] || 0);
+          return aNumber - bNumber;
+        });
+
+      setProducts(normalized);
+
+      if (!normalized.length) {
+        setStatus('No products found in PocketBase. Seed the products collection first.', 'error');
+      }
+    } catch (error) {
+      const isAutoCancelled =
+        error?.name === 'AbortError' ||
+        String(error?.message || '').toLowerCase().includes('autocancel') ||
+        String(error?.message || '').toLowerCase().includes('aborted');
+
+      if (isAutoCancelled) {
+        return;
+      }
+
+      console.error('Error fetching products:', error);
+      setStatus(`Error loading products: ${error.message}`, 'error');
+    } finally {
+      setLoadingProducts(false);
+      setIsTransitioningToVote(false);
     }
   };
+
   useEffect(() => {
-    const fetchPolls = async () => {
-      try {
-        setLoading(true);
-        const records = await pb.collection('polls').getList(1, 50, {
-          sort: '-created',
-        });
-        setPolls(records.items);
-        if (records.items.length > 0) {
-          setActivePoll(records.items[0]);
-          fetchVoteStats(records.items[0].id);
-        }
-      } catch (error) {
-        console.error('Error fetching polls:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!formSubmitted || voteLocked || hasLoadedProductsRef.current) {
+      if (voteLocked) setIsTransitioningToVote(false);
+      return;
+    }
 
-    fetchPolls();
+    hasLoadedProductsRef.current = true;
+    fetchProducts();
+  }, [formSubmitted, voteLocked]);
 
-    // Set up real-time updates
-    pb.collection('polls').subscribe('*', () => {
-      fetchPolls();
+  const findVoterByRegistration = async (registrationNumber) => {
+    const result = await pb.collection('voters').getList(1, 1, {
+      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}"`,
     });
 
-    return () => {
-      pb.collection('polls').unsubscribe();
-    };
-  }, []);
+    return result.items[0] || null;
+  };
 
-  const fetchVoteStats = async (pollId) => {
-    try {
-      const votes = await pb.collection('votes').getList(1, 5000, {
-        filter: `poll="${pollId}"`,
-      });
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((previous) => ({ ...previous, [name]: value }));
 
-      const stats = {};
-      votes.items.forEach((vote) => {
-        stats[vote.option] = (stats[vote.option] || 0) + 1;
-      });
-      setVoteStats(stats);
-    } catch (error) {
-      console.error('Error fetching vote stats:', error);
+    if (formErrors[name]) {
+      setFormErrors((previous) => ({ ...previous, [name]: '' }));
     }
   };
 
-  const handleVote = async (optionId) => {
-    if (!activePoll || !userRecord) return;
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setIsSubmittingForm(true);
+    setIsTransitioningToVote(true);
+    setStatusMessage('');
+
+    const normalizedRegistrationNumber = formData.registrationNumber.trim();
+    const normalizedName = formData.name.trim();
+    const normalizedEmail = formData.email.trim();
 
     try {
-      setSelectedOption(optionId);
-      
-      // Create vote record with user info
-      await pb.collection('votes').create({
-        poll: activePoll.id,
-        option: optionId,
-        name: userRecord.name,
-        email: userRecord.email,
-        registrationNumber: userRecord.registrationNumber,
-        submittedAt: userRecord.timestamp,
+      const existingVoter = await findVoterByRegistration(normalizedRegistrationNumber);
+
+      if (existingVoter) {
+        setCurrentVoter(existingVoter);
+        setFormSubmitted(true);
+
+        if (existingVoter.selectedProductId) {
+          setVoteLocked(true);
+          setVotedProductId(existingVoter.selectedProductId || null);
+          setIsTransitioningToVote(false);
+          setStatus('This registration number has already voted.', 'error');
+        } else {
+          setVoteLocked(false);
+          setStatus('Details confirmed. You can vote once now.', 'success');
+        }
+
+        return;
+      }
+
+      const createdVoter = await pb.collection('voters').create({
+        name: normalizedName,
+        email: normalizedEmail,
+        registrationNumber: normalizedRegistrationNumber,
+        selectedProductId: '',
+        selectedProductName: '',
       });
 
-      setShowResults(true);
-      fetchVoteStats(activePoll.id);
+      setCurrentVoter(createdVoter);
+      setFormSubmitted(true);
+      setVoteLocked(false);
+      setStatus('Details saved. Choose one product to vote.', 'success');
+    } catch (error) {
+      console.error('Error saving voter details:', error);
+
+      try {
+        const existingVoter = await findVoterByRegistration(normalizedRegistrationNumber);
+        if (existingVoter) {
+          setCurrentVoter(existingVoter);
+          setFormSubmitted(true);
+          setVoteLocked(Boolean(existingVoter.selectedProductId));
+          setVotedProductId(existingVoter.selectedProductId || null);
+          if (existingVoter.selectedProductId) {
+            setIsTransitioningToVote(false);
+          }
+          setStatus(
+            existingVoter.selectedProductId
+              ? 'This registration number has already voted.'
+              : 'Details confirmed. You can vote once now.',
+            existingVoter.selectedProductId ? 'error' : 'success'
+          );
+          return;
+        }
+      } catch (fallbackError) {
+        console.error('Fallback voter lookup failed:', fallbackError);
+      }
+
+      setIsTransitioningToVote(false);
+      setStatus(`Unable to save voter details: ${error.message}`, 'error');
+    } finally {
+      setIsSubmittingForm(false);
+    }
+  };
+
+  const incrementProductCount = async (product) => {
+    const currentCount = Number(product.count || 0);
+    const nextCount = currentCount + 1;
+
+    await pb.collection('products').update(product.id, {
+      count: nextCount,
+    });
+
+    return nextCount;
+  };
+
+  const handleVote = async (product) => {
+    if (!currentVoter || voteLocked || isSubmittingVote) return;
+
+    setIsSubmittingVote(true);
+    setStatusMessage('');
+
+    try {
+      const nextCount = await incrementProductCount(product);
+
+      try {
+        const updatedVoter = await pb.collection('voters').update(currentVoter.id, {
+          selectedProductId: product.id,
+          selectedProductName: product.name,
+        });
+
+        setProducts((previousProducts) =>
+          previousProducts.map((item) =>
+            item.id === product.id ? { ...item, count: nextCount } : item
+          )
+        );
+        setCurrentVoter(updatedVoter);
+        setVoteLocked(true);
+        setVotedProductId(product.id);
+        setStatus(`Vote recorded for ${product.name}. You cannot vote again.`, 'success');
+      } catch (voterUpdateError) {
+        await pb.collection('products').update(product.id, {
+          count: Number(product.count || 0),
+        });
+        throw voterUpdateError;
+      }
     } catch (error) {
       console.error('Error recording vote:', error);
+      setStatus(`Vote failed: ${error.message}`, 'error');
+    } finally {
+      setIsSubmittingVote(false);
     }
   };
 
-  const handlePollChange = (pollId) => {
-    setActivePoll(polls.find((p) => p.id === pollId));
-    setShowResults(false);
-    setSelectedOption(null);
-    fetchVoteStats(pollId);
-  };
-
-  const getTotalVotes = () => {
-    return Object.values(voteStats).reduce((a, b) => a + b, 0);
-  };
-
-  const getPercentage = (optionId) => {
-    const total = getTotalVotes();
-    return total === 0 ? 0 : Math.round((voteStats[optionId] || 0 / total) * 100);
-  };
-
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-6 z-50">
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@300;400;600;700&display=swap');
-          @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-          .animate-spin { animation: spin 3s linear infinite; }
-        `}</style>
-        <div className="w-12 h-12 border-2 border-gray-700 border-t-lime-400 rounded-full animate-spin"></div>
-        <p className="font-mono text-xs text-gray-500 tracking-widest">Loading polls...</p>
-      </div>
-    );
-  }
+  const statusClassName =
+    statusType === 'error'
+      ? 'bg-red-900 bg-opacity-20 border-red-500 border-opacity-30 text-red-300'
+      : statusType === 'success'
+        ? 'bg-lime-400 bg-opacity-10 border-lime-400 border-opacity-25 text-lime-300'
+        : 'bg-gray-800 border-gray-700 text-gray-300';
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@300;400;600;700&display=swap');
-        
         body { font-family: 'Rajdhani', sans-serif; }
         .font-bebas { font-family: 'Bebas Neue', sans-serif; }
         .font-spacemono { font-family: 'Space Mono', monospace; }
-        
-        @keyframes slideDownFade { 
-          from { opacity: 0; transform: translateY(-24px); } 
-          to { opacity: 1; transform: translateY(0); } 
-        }
-        @keyframes slideUpFade { 
-          from { opacity: 0; transform: translateY(24px); } 
-          to { opacity: 1; transform: translateY(0); } 
-        }
-        @keyframes shimmer { 
-          0% { left: -100%; } 
-          100% { left: 100%; } 
-        }
-        @keyframes spin { 
-          from { transform: rotate(0deg); } 
-          to { transform: rotate(360deg); } 
-        }
-        @keyframes slideRight { 
-          from { transform: scaleX(0); transform-origin: left; } 
-          to { transform: scaleX(1); transform-origin: left; } 
-        }
-        @keyframes optionIn { 
-          from { opacity: 0; transform: translateY(12px); } 
-          to { opacity: 1; transform: translateY(0); } 
-        }
-        @keyframes barFill { 
-          from { transform: scaleX(0); transform-origin: left; } 
-          to { transform: scaleX(1); transform-origin: left; } 
-        }
-        @keyframes scaleCheck { 
-          0% { transform: scale(0) rotate(-45deg); } 
-          50% { transform: scale(1.2); } 
-          100% { transform: scale(1) rotate(0); } 
-        }
-        
+        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes slideRight { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slideDownFade { animation: slideDownFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; }
-        .animate-slideUpFade { animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-slideUpFade { animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; }
         .animate-shimmer { animation: shimmer 3s infinite 1s; }
         .animate-spin { animation: spin 3s linear infinite; }
         .animate-slideRight { animation: slideRight 1s ease-out forwards; }
-        .animate-optionIn-1 { animation: optionIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards; }
-        .animate-optionIn-2 { animation: optionIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards; }
-        .animate-optionIn-3 { animation: optionIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards; }
-        .animate-optionIn-4 { animation: optionIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards; }
-        .animate-barFill { animation: barFill 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        .animate-scaleCheck { animation: scaleCheck 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        
         .tag-clip { clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+        .card-anim { animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
       `}</style>
 
       <div className="relative min-h-screen bg-black text-gray-200 overflow-x-hidden">
-        {/* Background Grid */}
-        <div 
-          className="fixed inset-0 pointer-events-none z-0" 
+        <div
+          className="fixed inset-0 pointer-events-none z-0"
           style={{
-            backgroundImage: 'linear-gradient(rgba(200, 255, 0, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 255, 0, 0.025) 1px, transparent 1px)',
+            backgroundImage:
+              'linear-gradient(rgba(200, 255, 0, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 255, 0, 0.025) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-5 py-16 lg:py-20">
-          {/* Header Section */}
-          <div className="mb-16 animate-slideDownFade">
-            {/* Tag */}
+        <div className="relative z-10 max-w-7xl mx-auto px-5 py-16 lg:py-20">
+          <div className="mb-12 animate-slideDownFade">
             <div className="inline-block mb-5 relative overflow-hidden tag-clip bg-lime-400 bg-opacity-8 border border-lime-400 border-opacity-30 px-4 py-2">
               <span className="block font-spacemono text-xs text-lime-400 tracking-widest uppercase">
                 Poll Entry Form
               </span>
-              <div 
-                className="absolute top-0 left-0 w-full h-full animate-shimmer" 
+              <div
+                className="absolute top-0 left-0 w-full h-full animate-shimmer"
                 style={{
                   background: 'linear-gradient(90deg, transparent, rgba(200, 255, 0, 0.2), transparent)',
                 }}
               />
             </div>
 
-            {/* Title */}
             <h1 className="text-5xl md:text-7xl font-black tracking-wider mb-4 font-bebas leading-none">
               Submit Your <span className="block text-lime-400">Response</span>
             </h1>
 
-            {/* Subtitle */}
             <p className="font-spacemono text-xs text-gray-500 leading-relaxed tracking-wide border-l-2 border-lime-400 pl-4">
-              Enter your details • Complete the form • Submit your vote to PocketBase
+              Enter your details first, then vote for one product from PocketBase. One voter can only vote once.
             </p>
           </div>
 
-          {/* Registration Form - Show if not submitted */}
+          {statusMessage && (
+            <div className={`mb-6 border px-4 py-3 font-spacemono text-xs ${statusClassName}`}>
+              {statusMessage}
+            </div>
+          )}
+
           {!formSubmitted && (
-            <div className="mb-12 animate-slideUpFade" style={{ animationDelay: '0.3s' }}>
+            <div className="mb-10 animate-slideUpFade">
               <div className="bg-gray-900 border border-gray-800 relative p-8 md:p-10 shadow-2xl">
-                <div className="absolute top-0 left-0 right-0 h-0.5 animate-slideRight" style={{ background: 'linear-gradient(90deg, #c8ff00, #ff6b00, transparent)' }} />
-                
+                <div
+                  className="absolute top-0 left-0 right-0 h-0.5 animate-slideRight"
+                  style={{ background: 'linear-gradient(90deg, #c8ff00, #ff6b00, transparent)' }}
+                />
+
                 <h2 className="text-2xl md:text-3xl font-black tracking-wide font-bebas mb-8">
                   Enter Your Details
                 </h2>
 
                 <form onSubmit={handleFormSubmit} className="space-y-6">
-                  {/* Name Field */}
                   <div>
                     <label className="block font-spacemono text-xs text-gray-400 uppercase tracking-wider mb-2">
                       Full Name *
@@ -269,10 +334,9 @@ const AudiencePollPage = () => {
                         formErrors.name ? 'border-red-500' : 'border-gray-700 focus:border-lime-400'
                       }`}
                     />
-                    {formErrors.name && <p className="text-red-500 font-spacemono text-xs mt-1">{formErrors.name}</p>}
+                    {formErrors.name && <p className="text-red-400 font-spacemono text-xs mt-1">{formErrors.name}</p>}
                   </div>
 
-                  {/* Email Field */}
                   <div>
                     <label className="block font-spacemono text-xs text-gray-400 uppercase tracking-wider mb-2">
                       Email Address *
@@ -287,10 +351,9 @@ const AudiencePollPage = () => {
                         formErrors.email ? 'border-red-500' : 'border-gray-700 focus:border-lime-400'
                       }`}
                     />
-                    {formErrors.email && <p className="text-red-500 font-spacemono text-xs mt-1">{formErrors.email}</p>}
+                    {formErrors.email && <p className="text-red-400 font-spacemono text-xs mt-1">{formErrors.email}</p>}
                   </div>
 
-                  {/* Registration Number Field */}
                   <div>
                     <label className="block font-spacemono text-xs text-gray-400 uppercase tracking-wider mb-2">
                       Registration Number *
@@ -305,223 +368,151 @@ const AudiencePollPage = () => {
                         formErrors.registrationNumber ? 'border-red-500' : 'border-gray-700 focus:border-lime-400'
                       }`}
                     />
-                    {formErrors.registrationNumber && <p className="text-red-500 font-spacemono text-xs mt-1">{formErrors.registrationNumber}</p>}
+                    {formErrors.registrationNumber && (
+                      <p className="text-red-400 font-spacemono text-xs mt-1">{formErrors.registrationNumber}</p>
+                    )}
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
-                    className="w-full py-3 px-6 bg-lime-400 hover:bg-lime-500 text-black font-bold uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95"
-                    style={{ transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                    disabled={isSubmittingForm}
+                    className="w-full py-3 px-6 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:transform-none"
                   >
-                    Submit & Continue
+                    {isSubmittingForm ? 'Saving Details...' : 'Continue to Vote'}
                   </button>
                 </form>
               </div>
             </div>
           )}
 
-          {/* Polls Selector */}
-          {formSubmitted && polls.length > 1 && (
-            <div className="mb-12 animate-slideUpFade" style={{ animationDelay: '0.3s' }}>
-              <div className="font-spacemono text-xs text-lime-400 text-uppercase mb-4 pb-2 tracking-widest border-b border-lime-400 border-opacity-20">
-                Available Polls
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 scroll-smooth">
-                {polls.map((poll) => (
-                  <button
-                    key={poll.id}
-                    onClick={() => handlePollChange(poll.id)}
-                    className={`flex items-center gap-2 px-5 py-3 whitespace-nowrap font-spacemono text-xs tracking-wide transition-all duration-300 border ${
-                      activePoll?.id === poll.id
-                        ? 'bg-lime-400 bg-opacity-10 border-lime-400 text-lime-400 shadow-lg'
-                        : 'bg-gray-900 border-gray-700 text-gray-500 hover:border-lime-400 hover:text-lime-400'
-                    }`}
-                    style={{ 
-                      boxShadow: activePoll?.id === poll.id ? '0 0 20px rgba(200, 255, 0, 0.3)' : 'none',
-                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                  >
-                    <span 
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        activePoll?.id === poll.id 
-                          ? 'bg-lime-400 shadow-md scale-130' 
-                          : 'bg-gray-500'
-                      }`}
-                    />
-                    {poll.question.substring(0, 30)}...
-                  </button>
-                ))}
+          {formSubmitted && currentVoter && !voteLocked && (
+            <div className="mb-10 bg-gray-900 border border-gray-800 p-4 md:p-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-spacemono text-xs">
+                <div>
+                  <span className="text-gray-400 uppercase tracking-wider">Name</span>
+                  <p className="text-lime-400 font-bold">{currentVoter.name}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 uppercase tracking-wider">Email</span>
+                  <p className="text-lime-400 font-bold truncate">{currentVoter.email}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 uppercase tracking-wider">Reg. No.</span>
+                  <p className="text-lime-400 font-bold">{currentVoter.registrationNumber}</p>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Active Poll Container */}
-          {formSubmitted && activePoll && (
-            <div className="animate-slideUpFade" style={{ animationDelay: '0.5s' }}>
-              {/* Poll Card */}
-              <div className="bg-gray-900 border border-gray-800 relative p-10 md:p-12 shadow-2xl">
-                {/* Top gradient line */}
-                <div 
-                  className="absolute top-0 left-0 right-0 h-0.5 animate-slideRight" 
-                  style={{
-                    background: 'linear-gradient(90deg, #c8ff00, #ff6b00, transparent)',
-                  }}
-                />
+          {formSubmitted && voteLocked && currentVoter && (
+            <div className="mb-10 bg-lime-400 bg-opacity-10 border border-lime-400 border-opacity-25 p-5 md:p-6">
+              <p className="font-spacemono text-sm text-lime-300">
+                You have already voted. Your selection was{' '}
+                <span className="font-bold text-lime-400">{currentVoter.selectedProductName || 'saved'}</span>.
+              </p>
+            </div>
+          )}
 
-                {/* Corner accent */}
-                <div 
-                  className="absolute bottom-0 right-0 w-8 h-8" 
-                  style={{
-                    borderRight: '2px solid rgba(200, 255, 0, 0.3)',
-                    borderBottom: '2px solid rgba(200, 255, 0, 0.3)',
-                    animation: 'fadeIn 0.8s ease-out 0.3s forwards',
-                    animationFillMode: 'both',
-                  }}
-                />
-
-                {/* Header */}
-                <div className="flex gap-4 mb-8 relative z-10">
-                  <div className="w-10 h-10 flex-shrink-0 animate-spin">
-                    <svg viewBox="0 0 24 24" className="w-full h-full stroke-lime-400 fill-none" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
-                    </svg>
+          {formSubmitted && !voteLocked && (
+            <div className="animate-slideUpFade">
+              {isTransitioningToVote && (
+                <div className="mb-5 bg-gray-900 border border-gray-800 p-4">
+                  <div className="flex items-center gap-3 text-lime-400 mb-3">
+                    <div className="w-4 h-4 border-2 border-lime-400 border-t-transparent rounded-full animate-spin" />
+                    <span className="font-spacemono text-xs uppercase tracking-[0.2em]">
+                      Preparing voting section...
+                    </span>
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-black tracking-wide font-bebas leading-tight">
-                    {activePoll.question}
-                  </h2>
+                  <div className="w-full h-1 bg-gray-800 overflow-hidden">
+                    <div className="h-full w-1/3 bg-lime-400 animate-slideRight" />
+                  </div>
                 </div>
+              )}
 
-                {/* User Info Bar */}
-                {userRecord && (
-                  <div className="bg-lime-400 bg-opacity-5 border border-lime-400 border-opacity-20 p-4 mb-8 relative z-10">
-                    <div className="grid grid-cols-3 gap-4 font-spacemono text-xs">
-                      <div>
-                        <span className="text-gray-400 uppercase tracking-wider">Name</span>
-                        <p className="text-lime-400 font-bold">{userRecord.name}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-400 uppercase tracking-wider">Email</span>
-                        <p className="text-lime-400 font-bold truncate">{userRecord.email}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-400 uppercase tracking-wider">Reg. No.</span>
-                        <p className="text-lime-400 font-bold">{userRecord.registrationNumber}</p>
-                      </div>
-                    </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl md:text-2xl font-black font-bebas tracking-wide">Choose One Product</h2>
+                <p className="font-spacemono text-xs text-gray-500 uppercase tracking-[0.3em]">One vote only</p>
+              </div>
+
+              {loadingProducts ? (
+                <div className="bg-gray-900 border border-gray-800 p-10 text-center">
+                  <div className="inline-flex items-center gap-3 text-lime-400">
+                    <div className="w-5 h-5 border-2 border-lime-400 border-t-transparent rounded-full animate-spin" />
+                    <span className="font-spacemono text-sm">Loading products from PocketBase...</span>
                   </div>
-                )}
-
-                {/* Options Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  {activePoll.options?.map((option, index) => {
-                    const isSelected = selectedOption === option;
-                    const voteCount = voteStats[option] || 0;
-                    const percentage = getPercentage(option);
+                </div>
+              ) : productCards.length === 0 ? (
+                <div className="bg-gray-900 border border-gray-800 p-10 text-center font-spacemono text-sm text-gray-400">
+                  No products found in PocketBase.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                  {productCards.map((product, index) => {
+                    const isSelected = votedProductId === product.id;
+                    const isVotingThis = isSubmittingVote && votedProductId !== product.id;
 
                     return (
                       <div
-                        key={index}
-                        onClick={() => !showResults && handleVote(option)}
-                        className={`relative p-6 cursor-pointer transition-all duration-300 border ${
+                        key={product.id}
+                        className={`relative min-h-[240px] border transition-all duration-300 overflow-hidden card-anim ${
                           isSelected
-                            ? 'bg-lime-400 bg-opacity-10 border-lime-400 shadow-xl'
-                            : 'bg-gray-800 border-gray-700 hover:border-lime-400 hover:bg-opacity-50'
-                        } ${!showResults && 'hover:-translate-y-1'} animate-optionIn-${index + 1}`}
-                        style={{
-                          boxShadow: isSelected ? '0 0 30px rgba(200, 255, 0, 0.3)' : 'none',
-                        }}
+                            ? 'bg-lime-400 bg-opacity-10 border-lime-400 shadow-[0_0_25px_rgba(200,255,0,0.18)]'
+                            : 'bg-gray-800 border-gray-700 hover:border-lime-400 hover:-translate-y-1'
+                        } ${index < 10 ? '' : ''}`}
+                        style={{ animationDelay: `${Math.min(index, 12) * 0.03}s` }}
                       >
-                        <div className="relative z-20">
-                          {/* Option Header */}
-                          <div className="flex gap-3 mb-4">
-                            <div 
-                              className="flex items-center justify-center w-8 h-8 flex-shrink-0 text-xs font-bold text-black bg-lime-400 bg-opacity-10 border border-lime-400 tag-clip"
-                            >
-                              {String.fromCharCode(65 + index)}
+                        <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,rgba(200,255,0,0.08),transparent)]" />
+
+                        <div className="relative z-10 h-full flex flex-col p-4">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 flex items-center justify-center border border-lime-400 text-lime-400 font-spacemono text-xs font-bold tag-clip bg-lime-400 bg-opacity-10">
+                              {index + 1}
                             </div>
-                            <span className="text-base font-bold tracking-wide">{option}</span>
+                            <div className="text-right font-spacemono text-[10px] text-gray-500 uppercase tracking-widest">
+                              Product
+                            </div>
                           </div>
 
-                          {/* Vote Bar */}
-                          {showResults && (
-                            <div className="w-full h-1 bg-lime-400 bg-opacity-10 mb-3 rounded">
-                              <div
-                                className="h-full animate-barFill rounded shadow-lg"
-                                style={{
-                                  width: `${percentage}%`,
-                                  background: 'linear-gradient(90deg, #c8ff00, #ff6b00)',
-                                }}
-                              />
-                            </div>
-                          )}
+                          <div className="flex-1 flex flex-col justify-center">
+                            <h3 className="font-bebas text-3xl tracking-wide mb-2 text-gray-100">
+                              {product.name}
+                            </h3>
+                            <p className="font-spacemono text-[11px] text-gray-400 leading-relaxed">
+                              Votes so far: <span className="text-lime-400 font-bold">{product.count || 0}</span>
+                            </p>
+                          </div>
 
-                          {/* Stats */}
-                          {showResults && (
-                            <div className="flex justify-between font-spacemono text-xs text-gray-400">
-                              <span>{voteCount} votes</span>
-                              <span className="text-lime-400 font-bold">{percentage}%</span>
+                          <div className="mt-4 pt-3 border-t border-gray-700">
+                            <button
+                              type="button"
+                              disabled={voteLocked || isSubmittingVote || isVotingThis}
+                              onClick={() => handleVote(product)}
+                              className={`w-full py-2 text-xs font-spacemono uppercase tracking-[0.3em] border transition-all duration-300 ${
+                                voteLocked || isSubmittingVote || isVotingThis
+                                  ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                                  : 'bg-black text-lime-400 border-gray-700 hover:border-lime-400 hover:bg-lime-400 hover:text-black'
+                              }`}
+                            >
+                              Vote
+                            </button>
+                            <div className="mt-2 text-center font-spacemono text-[10px] uppercase tracking-[0.35em] text-gray-500">
+                              Vote
                             </div>
-                          )}
+                          </div>
                         </div>
-
-                        {/* Glow */}
-                        {isSelected && (
-                          <div 
-                            className="absolute inset-0" 
-                            style={{
-                              background: 'radial-gradient(circle at center, rgba(200, 255, 0, 0.1), transparent)',
-                            }}
-                          />
-                        )}
                       </div>
                     );
                   })}
                 </div>
-
-                {/* Vote Summary */}
-                {showResults && (
-                  <div 
-                    className="flex justify-around p-6 bg-lime-400 bg-opacity-5 border border-lime-400 border-opacity-20 mb-6 animate-slideUpFade" 
-                    style={{ animationDelay: '0.3s' }}
-                  >
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="font-spacemono text-xs text-gray-400 uppercase tracking-wider">Total Votes</span>
-                      <span className="font-black text-4xl text-lime-400 font-bebas">
-                        {getTotalVotes()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Action */}
-                <div className={`p-5 text-center border ${
-                  showResults
-                    ? 'bg-lime-400 bg-opacity-10 border-lime-400 border-opacity-30'
-                    : 'bg-lime-400 bg-opacity-5 border-lime-400 border-opacity-15'
-                }`}>
-                  {showResults ? (
-                    <>
-                      <div className="text-3xl mb-2 animate-scaleCheck">✓</div>
-                      <p className="font-spacemono text-xs text-lime-400 tracking-wide">Vote recorded! Results updating in real-time</p>
-                    </>
-                  ) : (
-                    <p className="font-spacemono text-xs text-gray-400 tracking-wide">← Select an option above to vote</p>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           )}
 
-          {/* Empty State */}
-          {!loading && formSubmitted && polls.length === 0 && (
-            <div className="text-center py-20 animate-slideUpFade" style={{ animationDelay: '0.4s' }}>
-              <div className="text-6xl text-lime-400 mb-6 animate-pulse">◉</div>
-              <h3 className="text-3xl font-black mb-3 font-bebas">
-                No Active Polls
-              </h3>
-              <p className="font-spacemono text-sm text-gray-500">Polls will appear here when they become available</p>
+          {formSubmitted && voteLocked && currentVoter && (
+            <div className="mt-8 bg-gray-900 border border-gray-800 p-5">
+              <p className="font-spacemono text-xs text-gray-400">
+                No more votes are allowed from this registration number.
+              </p>
             </div>
           )}
         </div>
