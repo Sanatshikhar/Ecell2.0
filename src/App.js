@@ -12,8 +12,8 @@ import Join from "./components/TechXperience";
 import ComingSoon from "./components/ComingSoon";
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
-import AudiencePoll from './components/AudiencePoll';
-import AudienceVote from './components/AudienceVote';
+import AudiencePollPage from './components/AudiencePollPage';
+import PocketBaseExport from './components/PocketBaseExport';
 import Verify from './components/Verify';
 import Login from './components/Login';
 import JoiningRegSheet from './components/JoiningRegSheet';
@@ -36,7 +36,7 @@ function AppContent() {
     return unsubscribe;
   }, []);
 
-  const hideHeaderPaths = ['/scratchlabs', '/ai-tribunal', '/registrations', '/verify', '/audience-poll', '/audience-vote', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = ['/scratchlabs', '/ai-tribunal', '/registrations', '/verify', '/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
     <>
@@ -56,8 +56,8 @@ function AppContent() {
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
-        <Route path="/audience-poll" element={auth ? <AudiencePoll /> : <Login onLogin={() => setAuth(true)} />} />
-        <Route path="/audience-vote" element={<AudienceVote />} />
+        <Route path="/audience-poll" element={<AudiencePollPage />} />
+        <Route path="/data-export" element={<PocketBaseExport />} />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />
