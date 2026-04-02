@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
@@ -27,10 +27,10 @@ const AudiencePollPage = () => {
 
   const productCards = useMemo(() => products.slice(0, PRODUCT_LIMIT), [products]);
 
-  const setStatus = (message, type = 'info') => {
+  const setStatus = useCallback((message, type = 'info') => {
     setStatusMessage(message);
     setStatusType(type);
-  };
+  }, []);
 
   const validateForm = () => {
     const errors = {};
@@ -44,7 +44,7 @@ const AudiencePollPage = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
       const records = await pb.collection('products').getFullList(100, {
@@ -84,7 +84,7 @@ const AudiencePollPage = () => {
       setLoadingProducts(false);
       setIsTransitioningToVote(false);
     }
-  };
+  }, [setStatus]);
 
   useEffect(() => {
     if (!formSubmitted || voteLocked || hasLoadedProductsRef.current) {
@@ -94,7 +94,7 @@ const AudiencePollPage = () => {
 
     hasLoadedProductsRef.current = true;
     fetchProducts();
-  }, [formSubmitted, voteLocked]);
+  }, [formSubmitted, voteLocked, fetchProducts]);
 
   const findVoterByRegistration = async (registrationNumber) => {
     const result = await pb.collection('voters').getList(1, 1, {
