@@ -135,12 +135,12 @@ const findVotedVoterByEmail = async (email) => {
     return null;
   }
 
-  const filter = `email="${escapeFilterValue(normalizedEmail)}" && votedFor != null && votedFor != ""`;
+  const filter = `email="${escapeFilterValue(normalizedEmail)}"`;
   const response = await fetch(
     `${POCKETBASE_URL}/api/collections/voters/records?${new URLSearchParams({
       filter,
       page: '1',
-      perPage: '1',
+      perPage: '50',
     }).toString()}`
   );
 
@@ -149,7 +149,32 @@ const findVotedVoterByEmail = async (email) => {
   }
 
   const payload = await response.json().catch(() => ({}));
-  return payload?.items?.[0] || null;
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+
+  const hasVote = (record) => {
+    if (!record) {
+      return false;
+    }
+
+    const selectedProductId = String(record.selectedProductId || '').trim();
+    if (selectedProductId) {
+      return true;
+    }
+
+    const selectedProductName = String(record.selectedProductName || '').trim();
+    if (selectedProductName) {
+      return true;
+    }
+
+    const votedFor = record.votedFor;
+    if (Array.isArray(votedFor)) {
+      return votedFor.some((entry) => String(entry || '').trim());
+    }
+
+    return Boolean(String(votedFor || '').trim());
+  };
+
+  return items.find(hasVote) || null;
 };
 
 const getVotedProductName = async (voter) => {
@@ -244,6 +269,13 @@ app.post('/api/send-otp', async (req, res) => {
     return res.status(400).json({ error: 'A valid email is required.' });
   }
 
+  if (!POCKETBASE_URL) {
+    return res.status(503).json({
+      success: false,
+      error: 'OTP service is temporarily unavailable. Please try again shortly.',
+    });
+  }
+
   try {
     const alreadyVotedVoter = await findVotedVoterByEmail(normalizedEmail);
     if (alreadyVotedVoter) {
@@ -265,6 +297,10 @@ app.post('/api/send-otp', async (req, res) => {
     }
   } catch (lookupError) {
     console.error('❌ Verified email lookup failed:', lookupError.message);
+    return res.status(503).json({
+      success: false,
+      error: 'Unable to validate voter status right now. Please try again shortly.',
+    });
   }
 
   const otp = generateOtp();

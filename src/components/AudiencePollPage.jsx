@@ -183,7 +183,7 @@ const AudiencePollPage = () => {
     }
 
     const result = await pb.collection('voters').getList(1, 50, {
-      filter: `email="${escapeFilterValue(normalizedEmail)}" && verified=true`,
+      filter: `email="${escapeFilterValue(normalizedEmail)}"`,
       requestKey: null,
     });
 
@@ -359,14 +359,19 @@ const AudiencePollPage = () => {
       });
 
       const responseBody = await response.json().catch(() => ({}));
-      if (responseBody.already_voted || response.status === 409) {
+      if (responseBody.already_voted) {
         setStatus(responseBody.error || 'This email has already voted in the audience poll.', 'error');
         return 'already_voted';
       }
 
-      if (responseBody.already_verified || response.status === 409) {
+      if (responseBody.already_verified) {
         setStatus('Email already verified. Choose a product to vote.', 'success');
         return 'already_verified';
+      }
+
+      if (response.status === 409) {
+        setStatus(responseBody.error || 'This email cannot request OTP right now.', 'error');
+        return false;
       }
 
       if (!response.ok) {
