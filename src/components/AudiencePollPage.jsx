@@ -42,6 +42,8 @@ const AudiencePollPage = () => {
   const [otpError, setOtpError] = useState('');
   const [otpMessage, setOtpMessage] = useState('');
   const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const otpAttemptsRef = useRef({});
 
   const backendUrl = useMemo(
     () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, ''),
@@ -255,6 +257,7 @@ const AudiencePollPage = () => {
       setOtpError('');
       setOtpMessage('Details changed. Send OTP again to continue.');
       setOtpExpiresAt(null);
+      setIsOtpModalOpen(false);
     }
   };
 
@@ -271,7 +274,7 @@ const AudiencePollPage = () => {
     try {
       const participantDetected = await isEligibleForPollOtp(normalizedEmail, normalizedRegistrationNumber);
       if (participantDetected) {
-        setOtpError('Participants cannot vote in this audience poll.');
+        setStatus('Participants cannot vote in this audience poll.', 'error');
         return false;
       }
 
@@ -282,7 +285,7 @@ const AudiencePollPage = () => {
 
       const matchedRegistrationVoter = existingByRegistration.items[0] || null;
       if (matchedRegistrationVoter && getVotedProductId(matchedRegistrationVoter)) {
-        setOtpError('This registration number is already used for voting.');
+        setStatus('This registration number is already used for voting.', 'error');
         return false;
       }
 
@@ -299,7 +302,16 @@ const AudiencePollPage = () => {
         return 'already_verified';
       }
     } catch (eligibilityError) {
-      setOtpError('Unable to validate eligibility right now. Please try again.');
+      setStatus('Unable to validate eligibility right now. Please try again.', 'error');
+      return false;
+    }
+
+    if (!otpAttemptsRef.current[normalizedEmail]) {
+      otpAttemptsRef.current[normalizedEmail] = 0;
+    }
+
+    if (otpAttemptsRef.current[normalizedEmail] >= 5) {
+      setStatus(`Maximum 5 OTP requests for this email. Please try again later.`, 'error');
       return false;
     }
 
@@ -327,7 +339,9 @@ const AudiencePollPage = () => {
       setOtpExpiresAt(Date.now() + expiresInSeconds * 1000);
       setOtpInput('');
       setOtpStepActive(true);
+      setIsOtpModalOpen(true);
       setOtpMessage('OTP sent. Verify your email to continue.');
+      otpAttemptsRef.current[normalizedEmail] += 1;
       return true;
     } catch (error) {
       setOtpError(error.message || 'Failed to send OTP.');
@@ -486,8 +500,8 @@ const AudiencePollPage = () => {
     try {
       const sent = await sendOtp();
       if (sent === 'already_verified') {
-        setStatus('Email already verified. Continuing to vote checks...', 'info');
-        await proceedToVoting();
+        setFormSubmitted(true);
+        setStatus('Email already verified. Choose a product to vote.', 'success');
         setIsPageLoading(false);
         return;
       }
@@ -655,7 +669,7 @@ const AudiencePollPage = () => {
                 <div className="w-16 h-16 border-4 border-gray-700 border-t-lime-400 rounded-full"></div>
               </div>
               <p className="font-spacemono text-lg text-lime-300 uppercase tracking-[0.2em]">
-                Sending OTP...
+                Loading
               </p>
             </div>
           </div>
@@ -772,58 +786,79 @@ const AudiencePollPage = () => {
                   >
                     {otpSending ? 'Sending OTP...' : 'Continue to Vote'}
                   </button>
-
-                  {otpStepActive && (
-                    <div className="mt-6 border border-lime-400 border-opacity-25 bg-lime-400 bg-opacity-5 p-4">
-                      <p className="font-spacemono text-xs uppercase tracking-[0.2em] text-lime-300 mb-3">
-                        Step 2: Verify Email OTP
-                      </p>
-
-                      <div className="flex flex-col sm:flex-row gap-3 mb-3">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={6}
-                          value={otpInput}
-                          onChange={(event) => setOtpInput(event.target.value.replace(/\D/g, ''))}
-                          placeholder="Enter 6-digit OTP"
-                          className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded text-gray-200 placeholder-gray-600 font-spacemono text-sm outline-none transition-all focus:border-lime-400"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleVerifyOtpAndContinue}
-                          disabled={otpVerifying || isSubmittingForm || otpSecondsLeft <= 0}
-                          className="sm:w-auto w-full px-5 py-3 border border-lime-400 text-lime-300 font-spacemono text-xs uppercase tracking-[0.2em] hover:bg-lime-400 hover:text-black transition-all disabled:bg-gray-700 disabled:text-gray-500 disabled:border-gray-600"
-                        >
-                          {otpVerifying || isSubmittingForm ? 'Verifying...' : 'Verify OTP'}
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={sendOtp}
-                          disabled={otpSending || otpVerifying}
-                          className="px-4 py-2 border border-gray-700 text-gray-300 font-spacemono text-[11px] uppercase tracking-[0.2em] hover:border-lime-400 hover:text-lime-300 transition-all disabled:opacity-50"
-                        >
-                          {otpSending ? 'Sending...' : 'Resend OTP'}
-                        </button>
-                        {otpSecondsLeft > 0 && (
-                          <p className="font-spacemono text-[11px] text-gray-400">
-                            Expires in {formatOtpTime(otpSecondsLeft)}
-                          </p>
-                        )}
-                      </div>
-
-                      {otpMessage && <p className="mt-3 font-spacemono text-xs text-lime-300">{otpMessage}</p>}
-                      {otpError && <p className="mt-2 font-spacemono text-xs text-red-400">{otpError}</p>}
-                    </div>
-                  )}
                 </form>
               </div>
             </div>
           )}
 
+          {isOtpModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center pointer-events-auto">
+              <div className="bg-gray-900 border border-lime-400 border-opacity-30 w-full max-w-md mx-4 relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOtpModalOpen(false);
+                    setOtpStepActive(false);
+                    setOtpInput('');
+                    setOtpError('');
+                    setOtpExpiresAt(null);
+                  }}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition-all text-2xl leading-none"
+                  aria-label="Close OTP modal"
+                >
+                  ✕
+                </button>
+
+                <div className="p-6">
+                  <p className="font-spacemono text-xs uppercase tracking-[0.2em] text-lime-300 mb-4">
+                    Step 2: Verify Email OTP
+                  </p>
+
+                  <div className="flex flex-col gap-3 mb-4">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={otpInput}
+                      onChange={(event) => setOtpInput(event.target.value.replace(/\D/g, ''))}
+                      placeholder="Enter 6-digit OTP"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded text-gray-200 placeholder-gray-600 font-spacemono text-sm outline-none transition-all focus:border-lime-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtpAndContinue}
+                      disabled={otpVerifying || isSubmittingForm || otpSecondsLeft <= 0}
+                      className="w-full px-5 py-3 border border-lime-400 text-lime-300 font-spacemono text-xs uppercase tracking-[0.2em] hover:bg-lime-400 hover:text-black transition-all disabled:bg-gray-700 disabled:text-gray-500 disabled:border-gray-600"
+                    >
+                      {otpVerifying || isSubmittingForm ? 'Verifying...' : 'Verify OTP'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-3">
+                    <button
+                      type="button"
+                      onClick={sendOtp}
+                      disabled={otpSending || otpVerifying}
+                      className="px-4 py-2 border border-gray-700 text-gray-300 font-spacemono text-[11px] uppercase tracking-[0.2em] hover:border-lime-400 hover:text-lime-300 transition-all disabled:opacity-50"
+                    >
+                      {otpSending ? 'Sending...' : 'Resend OTP'}
+                    </button>
+                    {otpSecondsLeft > 0 && (
+                      <p className="font-spacemono text-[11px] text-gray-400">
+                        Expires in {formatOtpTime(otpSecondsLeft)}
+                      </p>
+                    )}
+                  </div>
+
+                  {otpMessage && <p className="mb-2 font-spacemono text-xs text-lime-300">{otpMessage}</p>}
+                  {otpError && <p className="font-spacemono text-xs text-red-400">{otpError}</p>}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-5 py-16 lg:py-20">
           {formSubmitted && currentVoter && !voteLocked && (
             <div className="mb-10 bg-gray-900 border border-gray-800 p-4 md:p-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-spacemono text-xs">
