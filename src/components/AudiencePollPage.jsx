@@ -39,6 +39,7 @@ const AudiencePollPage = () => {
   const hasLoadedProductsRef = useRef(false);
   const [isTransitioningToVote, setIsTransitioningToVote] = useState(false);
   const [pageTimerSecondsLeft, setPageTimerSecondsLeft] = useState(0);
+  const [hasInitializedPageTimer, setHasInitializedPageTimer] = useState(false);
   const [otpStepActive, setOtpStepActive] = useState(false);
   const [otpInput, setOtpInput] = useState('');
   const [otpSending, setOtpSending] = useState(false);
@@ -58,7 +59,7 @@ const AudiencePollPage = () => {
   );
 
   const productCards = useMemo(() => products.slice(0, PRODUCT_LIMIT), [products]);
-  const isVotingClosed = pageTimerSecondsLeft <= 0;
+  const isVotingClosed = hasInitializedPageTimer && pageTimerSecondsLeft <= 0;
 
   const setStatus = useCallback((message, type = 'info') => {
     setStatusMessage(message);
@@ -107,6 +108,7 @@ const AudiencePollPage = () => {
     const updateTimer = () => {
       const remaining = Math.max(0, Math.ceil((targetAt - Date.now()) / 1000));
       setPageTimerSecondsLeft(remaining);
+      setHasInitializedPageTimer(true);
     };
 
     updateTimer();
