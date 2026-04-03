@@ -4,6 +4,10 @@ const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
+const otpStore = new Map();
+
+const OTP_TTL_MS = 5 * 60 * 1000;
+const OTP_MAX_ATTEMPTS = 5;
 const allowedOrigins = [
   'https://www.ecellsoa.in',
   'https://ecellsoa.in',
@@ -50,6 +54,10 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const SENDER_EMAIL = process.env.SENDER_EMAIL;
 const SENDER_PASSWORD = process.env.SENDER_PASSWORD;
+const SENDER_FROM_NAME = process.env.SENDER_FROM_NAME || 'E-Cell SOA';
+const SMTP_HOST = process.env.SENDER_SMTP_HOST || 'smtp.sender.net';
+const SMTP_PORT = Number(process.env.SENDER_SMTP_PORT || 465);
+const SMTP_SECURE = String(process.env.SENDER_SMTP_SECURE || 'true').toLowerCase() !== 'false';
 
 // Check if required environment variables are set
 if (!SENDER_EMAIL || !SENDER_PASSWORD) {
@@ -61,11 +69,112 @@ if (!SENDER_EMAIL || !SENDER_PASSWORD) {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_SECURE,
   auth: {
     user: SENDER_EMAIL,
     pass: SENDER_PASSWORD,
   },
+});
+
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+
+const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+
+const buildOtpEmail = ({ name, otp, purpose }) => {
+  const safeName = name && String(name).trim() ? String(name).trim() : 'Participant';
+  const safePurpose = purpose && String(purpose).trim() ? String(purpose).trim() : 'Audience Poll';
+
+  return `
+    <div style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f4f5fb;padding:32px 0;">
+      <div style="max-width:560px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+        <div style="background:#121212;padding:20px 24px;color:#c8ff00;text-align:center;">
+          <h2 style="margin:0;font-size:22px;letter-spacing:.3px;">E-Cell SOA ${safePurpose} Verification</h2>
+        </div>
+        <div style="padding:28px 24px;">
+          <p style="margin:0 0 12px;color:#222;font-size:15px;">Hello <strong>${safeName}</strong>,</p>
+          <p style="margin:0 0 16px;color:#444;font-size:14px;line-height:1.6;">Use the OTP below to verify your email and continue to voting.</p>
+          <div style="margin:18px 0;padding:16px;border:1px solid #ecf5be;background:#f8fddf;border-radius:10px;text-align:center;">
+            <div style="font-size:28px;letter-spacing:8px;font-weight:700;color:#111111;">${otp}</div>
+          </div>
+          <p style="margin:0;color:#666;font-size:13px;line-height:1.5;">This OTP is valid for <strong>5 minutes</strong>. Do not share it with anyone.</p>
+        </div>
+        <div style="padding:14px 24px;background:#fafafa;border-top:1px solid #eee;color:#888;font-size:12px;text-align:center;">
+          © ${new Date().getFullYear()} E-Cell SOA
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+app.post('/api/send-otp', async (req, res) => {
+  const { email, name, purpose } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+
+  if (!isValidEmail(normalizedEmail)) {
+    return res.status(400).json({ error: 'A valid email is required.' });
+  }
+
+  const otp = generateOtp();
+  const expiresAt = Date.now() + OTP_TTL_MS;
+
+  try {
+    await transporter.sendMail({
+      from: `"${SENDER_FROM_NAME}" <${SENDER_EMAIL}>`,
+      to: normalizedEmail,
+      subject: 'Email Verification OTP - Audience Poll',
+      html: buildOtpEmail({ name, otp, purpose: purpose || 'Audience Poll' }),
+    });
+
+    otpStore.set(normalizedEmail, {
+      otp,
+      expiresAt,
+      attempts: 0,
+    });
+
+    return res.json({
+      success: true,
+      expiresInSeconds: Math.floor(OTP_TTL_MS / 1000),
+    });
+  } catch (err) {
+    console.error('❌ OTP email send failed:', err.message);
+    return res.status(500).json({ error: 'Failed to send OTP email.' });
+  }
+});
+
+app.post('/api/verify-otp', (req, res) => {
+  const { email, otp } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const normalizedOtp = String(otp || '').trim();
+
+  if (!isValidEmail(normalizedEmail) || normalizedOtp.length !== 6) {
+    return res.status(400).json({ error: 'Invalid verification payload.' });
+  }
+
+  const record = otpStore.get(normalizedEmail);
+  if (!record) {
+    return res.status(400).json({ error: 'OTP not found. Please request a new one.' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    otpStore.delete(normalizedEmail);
+    return res.status(400).json({ error: 'OTP expired. Please request a new one.' });
+  }
+
+  if (record.attempts >= OTP_MAX_ATTEMPTS) {
+    otpStore.delete(normalizedEmail);
+    return res.status(429).json({ error: 'Maximum OTP attempts exceeded. Request a new OTP.' });
+  }
+
+  if (record.otp !== normalizedOtp) {
+    record.attempts += 1;
+    otpStore.set(normalizedEmail, record);
+    return res.status(400).json({ error: 'Incorrect OTP. Please try again.' });
+  }
+
+  otpStore.delete(normalizedEmail);
+  return res.json({ success: true, verified: true });
 });
 
 app.post('/api/send-email', async (req, res) => {
@@ -80,7 +189,7 @@ app.post('/api/send-email', async (req, res) => {
 
   try {
     const mailOptions = {
-      from: SENDER_EMAIL,
+      from: `"${SENDER_FROM_NAME}" <${SENDER_EMAIL}>`,
       to: to,
       subject: subject,
       html: html,

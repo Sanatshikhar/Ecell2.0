@@ -27,6 +27,17 @@ const Verify = () => {
     setScannedRegistration(null);
   };
 
+  const findRegistrationByField = async (field, safeToken) => {
+    try {
+      return await pb.collection('scratchlabsRegistrations').getFirstListItem(`${field}="${safeToken}"`);
+    } catch (err) {
+      if (err?.status === 404 || err?.status === 400) {
+        return null;
+      }
+      throw err;
+    }
+  };
+
   const verifyByRegNo = async (rawRegNo) => {
     setLoading(true);
     resetVerificationState();
@@ -42,10 +53,16 @@ const Verify = () => {
 
     const safeToken = regNo.replace(/"/g, '\\"');
     try {
-      const result = await pb.collection('scratchlabsRegistrations').getFirstListItem(`regNo="${safeToken}"`);
+      let result = await findRegistrationByField('regNo', safeToken);
+      if (!result) {
+        result = await findRegistrationByField('teammateRegNo', safeToken);
+      }
+      if (!result) {
+        result = await findRegistrationByField('teammateRegNum', safeToken);
+      }
       if (!result) {
         setStatus('invalid');
-        setMessage('Registration not found for this Reg No');
+        setMessage('Registration not found for this Reg No / Teammate Reg No');
         setIcon('invalid');
       } else if (result.arrived) {
         setStatus('already');
@@ -62,7 +79,7 @@ const Verify = () => {
     } catch (err) {
       if (err?.status === 404) {
         setStatus('invalid');
-        setMessage('Registration not found for this Reg No');
+        setMessage('Registration not found for this Reg No / Teammate Reg No');
         setIcon('invalid');
       } else {
         setStatus('invalid');
@@ -277,7 +294,7 @@ const Verify = () => {
         </div>
         <form onSubmit={handleManualSearch} className="w-full px-3 pb-4">
           <label htmlFor="manual-regno" className="block text-xs sm:text-sm font-semibold text-[#b0b3c6] mb-2">
-            Search by Reg No
+            Search by Reg No / Teammate Reg No
           </label>
           <div className="flex gap-2">
             <input
@@ -285,7 +302,7 @@ const Verify = () => {
               type="text"
               value={manualRegNo}
               onChange={(e) => setManualRegNo(e.target.value)}
-              placeholder="Enter Reg No"
+              placeholder="Enter Reg No / Teammate Reg No"
               className="flex-1 rounded-lg bg-[#161925] border border-[#2f3652] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00c3ff]"
             />
             <button
