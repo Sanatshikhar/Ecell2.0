@@ -22,6 +22,7 @@ import Shipping from './components/Shipping';
 import Privacy from './components/Privacy';
 import pb from './lib/pocketbase';
 import ScratchLabsRegistration from "./components/ScratchLabsRegistration";
+import ScratchLabsParticipantDashboard from "./components/ScratchLabsParticipantDashboard";
 import AITribunalRegistration from "./components/AITribunalRegistration";
 
 function AppContent() {
@@ -35,7 +36,7 @@ function AppContent() {
     return unsubscribe;
   }, []);
 
-  const hideHeaderPaths = ['/scratchlabs', '/ai-tribunal', '/registrations', '/verify', '/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = ['/scratchlabs', '/scratchlabs-participant-dashboard', '/ai-tribunal', '/registrations', '/verify', '/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
     <>
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
         <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
+        <Route path="/scratchlabs-participant-dashboard" element={<ScratchLabsParticipantDashboard />} />
         <Route path="/ai-tribunal" element={<AITribunalRegistration />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />

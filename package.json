@@ -14,6 +14,7 @@
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "framer-motion": "^12.23.12",
@@ -23,7 +24,7 @@
     "motion": "^12.23.12",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.5",
-    "pocketbase": "^0.26.2",
+    "pocketbase": "^0.26.8",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
@@ -74,5 +75,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sanatshikhar/Ecell2.0.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sanatshikhar/Ecell2.0/issues"
+  },
+  "homepage": "https://github.com/Sanatshikhar/Ecell2.0#readme"
 }

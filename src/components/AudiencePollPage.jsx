@@ -96,9 +96,17 @@ const AudiencePollPage = () => {
     fetchProducts();
   }, [formSubmitted, voteLocked, fetchProducts]);
 
-  const findVoterByRegistration = async (registrationNumber) => {
+  const findVoterByRegistrationAndEmail = async (registrationNumber, email) => {
     const result = await pb.collection('voters').getList(1, 1, {
-      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}"`,
+      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}" && email="${escapeFilterValue(email)}"`,
+    });
+
+    return result.items[0] || null;
+  };
+
+  const findVoterByRegistrationOrEmail = async (registrationNumber, email) => {
+    const result = await pb.collection('voters').getList(1, 50, {
+      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}" || email="${escapeFilterValue(email)}"`,
     });
 
     return result.items[0] || null;
@@ -124,10 +132,13 @@ const AudiencePollPage = () => {
 
     const normalizedRegistrationNumber = formData.registrationNumber.trim();
     const normalizedName = formData.name.trim();
-    const normalizedEmail = formData.email.trim();
+    const normalizedEmail = formData.email.trim().toLowerCase();
 
     try {
-      const existingVoter = await findVoterByRegistration(normalizedRegistrationNumber);
+      const existingVoter = await findVoterByRegistrationAndEmail(
+        normalizedRegistrationNumber,
+        normalizedEmail
+      );
 
       if (existingVoter) {
         setCurrentVoter(existingVoter);
@@ -143,6 +154,20 @@ const AudiencePollPage = () => {
           setStatus('Details confirmed. You can vote once now.', 'success');
         }
 
+        return;
+      }
+
+      const possibleMismatchVoter = await findVoterByRegistrationOrEmail(
+        normalizedRegistrationNumber,
+        normalizedEmail
+      );
+
+      if (possibleMismatchVoter) {
+        setIsTransitioningToVote(false);
+        setStatus(
+          'This email and registration number do not match our records. Please use the same details used during your first submission.',
+          'error'
+        );
         return;
       }
 
@@ -162,7 +187,10 @@ const AudiencePollPage = () => {
       console.error('Error saving voter details:', error);
 
       try {
-        const existingVoter = await findVoterByRegistration(normalizedRegistrationNumber);
+        const existingVoter = await findVoterByRegistrationAndEmail(
+          normalizedRegistrationNumber,
+          normalizedEmail
+        );
         if (existingVoter) {
           setCurrentVoter(existingVoter);
           setFormSubmitted(true);
@@ -297,7 +325,7 @@ const AudiencePollPage = () => {
             </h1>
 
             <p className="font-spacemono text-xs text-gray-500 leading-relaxed tracking-wide border-l-2 border-lime-400 pl-4">
-              Enter your details first, then vote for one product from PocketBase. One voter can only vote once.
+              Enter your details first, then vote for one product. One person can only vote once.
             </p>
           </div>
 
@@ -477,9 +505,6 @@ const AudiencePollPage = () => {
                             <h3 className="font-bebas text-3xl tracking-wide mb-2 text-gray-100">
                               {product.name}
                             </h3>
-                            <p className="font-spacemono text-[11px] text-gray-400 leading-relaxed">
-                              Votes so far: <span className="text-lime-400 font-bold">{product.count || 0}</span>
-                            </p>
                           </div>
 
                           <div className="mt-4 pt-3 border-t border-gray-700">
@@ -495,9 +520,6 @@ const AudiencePollPage = () => {
                             >
                               Vote
                             </button>
-                            <div className="mt-2 text-center font-spacemono text-[10px] uppercase tracking-[0.35em] text-gray-500">
-                              Vote
-                            </div>
                           </div>
                         </div>
                       </div>
