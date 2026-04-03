@@ -167,67 +167,13 @@ const AudiencePollPage = () => {
     fetchProducts();
   }, [formSubmitted, voteLocked, fetchProducts]);
 
-  const findVoterByRegistrationAndEmail = async (registrationNumber, email) => {
+  const findVoterByRegistrationNumber = async (registrationNumber) => {
     const result = await pb.collection('voters').getList(1, 1, {
-      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}" && email="${escapeFilterValue(email)}"`,
+      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}"`,
       requestKey: null,
     });
 
     return result.items[0] || null;
-  };
-
-  const findVoterByRegistrationOrEmail = async (registrationNumber, email) => {
-    const normalizedRegistrationNumber = String(registrationNumber || '').trim();
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    const filters = [];
-
-    if (normalizedRegistrationNumber) {
-      filters.push(`registrationNumber="${escapeFilterValue(normalizedRegistrationNumber)}"`);
-    }
-
-    if (normalizedEmail) {
-      filters.push(`email="${escapeFilterValue(normalizedEmail)}"`);
-    }
-
-    if (!filters.length) {
-      return null;
-    }
-
-    const results = await Promise.all(
-      filters.map((filter) => pb.collection('voters').getList(1, 50, { filter, requestKey: null }))
-    );
-
-    const matches = [];
-    const seenIds = new Set();
-
-    for (const result of results) {
-      for (const item of result.items || []) {
-        if (!item?.id || seenIds.has(item.id)) continue;
-        seenIds.add(item.id);
-        matches.push(item);
-      }
-    }
-
-    if (!matches.length) {
-      return null;
-    }
-
-    const exactMatch = matches.find(
-      (item) =>
-        String(item.registrationNumber || '').trim() === normalizedRegistrationNumber &&
-        String(item.email || '').trim().toLowerCase() === normalizedEmail
-    );
-
-    if (exactMatch) {
-      return exactMatch;
-    }
-
-    const votedMatch = matches.find((item) => getVotedProductId(item));
-    if (votedMatch) {
-      return votedMatch;
-    }
-
-    return matches[0];
   };
 
   const isEligibleForPollOtp = useCallback(async (email, registrationNumber) => {
@@ -335,19 +281,6 @@ const AudiencePollPage = () => {
         setStatus('This registration number is already used for voting.', 'error');
         return false;
       }
-
-      const existingByEmail = await pb.collection('voters').getList(1, 1, {
-        filter: `email="${escapeFilterValue(normalizedEmail)}" && verified=true`,
-        requestKey: null,
-      });
-
-      if (existingByEmail.items.length > 0) {
-        setOtpStepActive(false);
-        setOtpInput('');
-        setOtpExpiresAt(null);
-        setOtpMessage('Email is already verified. Continuing to voting checks...');
-        return 'already_verified';
-      }
     } catch (eligibilityError) {
       setStatus('Unable to validate eligibility right now. Please try again.', 'error');
       return false;
@@ -407,30 +340,7 @@ const AudiencePollPage = () => {
     const normalizedEmail = formData.email.trim().toLowerCase();
 
     try {
-      const existingByEither = await findVoterByRegistrationOrEmail(
-        normalizedRegistrationNumber,
-        normalizedEmail
-      );
-
-      if (existingByEither && getVotedProductId(existingByEither)) {
-        const voterWithProduct = await resolveVotedProductName(existingByEither);
-        const voterName = voterWithProduct.name || 'This voter';
-        setCurrentVoter(voterWithProduct);
-        setFormSubmitted(true);
-        setVoteLocked(true);
-        setVotedProductId(getVotedProductId(voterWithProduct));
-        setIsTransitioningToVote(false);
-        setStatus(
-          `${voterName} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`,
-          'error'
-        );
-        return;
-      }
-
-      const existingVoter = await findVoterByRegistrationAndEmail(
-        normalizedRegistrationNumber,
-        normalizedEmail
-      );
+      const existingVoter = await findVoterByRegistrationNumber(normalizedRegistrationNumber);
 
       if (existingVoter) {
         let verifiedVoter = existingVoter;
@@ -445,7 +355,13 @@ const AudiencePollPage = () => {
         }
 
         const voterWithProduct = await resolveVotedProductName(verifiedVoter);
-        setCurrentVoter(voterWithProduct);
+        setCurrentVoter({
+          ...voterWithProduct,
+          name: formData.name.trim() || voterWithProduct.name,
+          email: normalizedEmail || voterWithProduct.email,
+          registrationNumber: normalizedRegistrationNumber || voterWithProduct.registrationNumber,
+          verified: true,
+        });
         setFormSubmitted(true);
 
         if (getVotedProductId(voterWithProduct)) {
@@ -462,17 +378,6 @@ const AudiencePollPage = () => {
           setStatus('Details verified. You can vote once now.', 'success');
         }
 
-        return;
-      }
-
-      const possibleMismatchVoter = existingByEither;
-
-      if (possibleMismatchVoter) {
-        setIsTransitioningToVote(false);
-        setStatus(
-          'This email and registration number do not match our records. Please use the same details used during your first submission.',
-          'error'
-        );
         return;
       }
 
@@ -495,10 +400,7 @@ const AudiencePollPage = () => {
       console.error('Error saving voter details:', error);
 
       try {
-        const existingVoter = await findVoterByRegistrationAndEmail(
-          normalizedRegistrationNumber,
-          normalizedEmail
-        );
+        const existingVoter = await findVoterByRegistrationNumber(normalizedRegistrationNumber);
         if (existingVoter) {
           let verifiedVoter = existingVoter;
           if (!existingVoter.verified) {
@@ -512,7 +414,13 @@ const AudiencePollPage = () => {
           }
 
           const voterWithProduct = await resolveVotedProductName(verifiedVoter);
-          setCurrentVoter(voterWithProduct);
+          setCurrentVoter({
+            ...voterWithProduct,
+            name: formData.name.trim() || voterWithProduct.name,
+            email: normalizedEmail || voterWithProduct.email,
+            registrationNumber: normalizedRegistrationNumber || voterWithProduct.registrationNumber,
+            verified: true,
+          });
           setFormSubmitted(true);
           const votedProduct = getVotedProductId(voterWithProduct);
           setVoteLocked(Boolean(votedProduct));
@@ -547,13 +455,6 @@ const AudiencePollPage = () => {
     setIsPageLoading(true);
     try {
       const sent = await sendOtp();
-      if (sent === 'already_verified') {
-        setFormSubmitted(true);
-        setStatus('Email already verified. Choose a product to vote.', 'success');
-        setIsPageLoading(false);
-        return;
-      }
-
       if (sent) {
         setStatus('OTP sent to your email. Verify it to access voting.', 'info');
       }
