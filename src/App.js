@@ -37,6 +37,7 @@ function AppContent() {
   }, []);
 
   const hideHeaderPaths = ['/scratchlabs', '/scratchlabs/participant-portal', '/ai-tribunal', '/registrations', '/verify', '/scratchlabs/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const showQueryBar = hideHeaderPaths.includes(location.pathname);
 
   return (
     <>
@@ -63,6 +64,14 @@ function AppContent() {
         <Route path="/shipping" element={<Shipping />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>
+
+      {showQueryBar && (
+        <div className="global-query-bar" role="contentinfo" aria-label="Query contact details">
+          <span>For any queries or question contact </span>
+          <span className="global-query-label">@IEC Technical Team :</span>
+          <a href="tel:+917091318966" className="global-query-phone">+91 70913 18966</a>
+        </div>
+      )}
     </>
   );
 }

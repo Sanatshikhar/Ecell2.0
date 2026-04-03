@@ -39,3 +39,38 @@
         transform: rotate(360deg);
       }
     }
+
+    .global-query-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.92);
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f4f4f5;
+      font-size: 14px;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    .global-query-label {
+      font-weight: 600;
+    }
+
+    .global-query-phone {
+      color: #9ef01a;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .global-query-phone:hover {
+      color: #bef264;
+    }
