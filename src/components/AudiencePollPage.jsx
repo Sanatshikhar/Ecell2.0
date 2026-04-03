@@ -170,17 +170,64 @@ const AudiencePollPage = () => {
   const findVoterByRegistrationAndEmail = async (registrationNumber, email) => {
     const result = await pb.collection('voters').getList(1, 1, {
       filter: `registrationNumber="${escapeFilterValue(registrationNumber)}" && email="${escapeFilterValue(email)}"`,
+      requestKey: null,
     });
 
     return result.items[0] || null;
   };
 
   const findVoterByRegistrationOrEmail = async (registrationNumber, email) => {
-    const result = await pb.collection('voters').getList(1, 50, {
-      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}" || email="${escapeFilterValue(email)}"`,
-    });
+    const normalizedRegistrationNumber = String(registrationNumber || '').trim();
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const filters = [];
 
-    return result.items[0] || null;
+    if (normalizedRegistrationNumber) {
+      filters.push(`registrationNumber="${escapeFilterValue(normalizedRegistrationNumber)}"`);
+    }
+
+    if (normalizedEmail) {
+      filters.push(`email="${escapeFilterValue(normalizedEmail)}"`);
+    }
+
+    if (!filters.length) {
+      return null;
+    }
+
+    const results = await Promise.all(
+      filters.map((filter) => pb.collection('voters').getList(1, 50, { filter, requestKey: null }))
+    );
+
+    const matches = [];
+    const seenIds = new Set();
+
+    for (const result of results) {
+      for (const item of result.items || []) {
+        if (!item?.id || seenIds.has(item.id)) continue;
+        seenIds.add(item.id);
+        matches.push(item);
+      }
+    }
+
+    if (!matches.length) {
+      return null;
+    }
+
+    const exactMatch = matches.find(
+      (item) =>
+        String(item.registrationNumber || '').trim() === normalizedRegistrationNumber &&
+        String(item.email || '').trim().toLowerCase() === normalizedEmail
+    );
+
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    const votedMatch = matches.find((item) => getVotedProductId(item));
+    if (votedMatch) {
+      return votedMatch;
+    }
+
+    return matches[0];
   };
 
   const isEligibleForPollOtp = useCallback(async (email, registrationNumber) => {
@@ -467,16 +514,17 @@ const AudiencePollPage = () => {
           const voterWithProduct = await resolveVotedProductName(verifiedVoter);
           setCurrentVoter(voterWithProduct);
           setFormSubmitted(true);
-          setVoteLocked(Boolean(getVotedProductId(voterWithProduct)));
-          setVotedProductId(getVotedProductId(voterWithProduct));
-          if (getVotedProductId(voterWithProduct)) {
+          const votedProduct = getVotedProductId(voterWithProduct);
+          setVoteLocked(Boolean(votedProduct));
+          setVotedProductId(votedProduct);
+          if (votedProduct) {
             setIsTransitioningToVote(false);
           }
           setStatus(
-            getVotedProductId(voterWithProduct)
+            votedProduct
               ? `${voterWithProduct.name || 'This voter'} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`
               : 'Details verified. You can vote once now.',
-            getVotedProductId(voterWithProduct) ? 'error' : 'success'
+            votedProduct ? 'error' : 'success'
           );
           return;
         }
@@ -980,7 +1028,8 @@ const AudiencePollPage = () => {
           {formSubmitted && voteLocked && currentVoter && (
             <div className="mt-8 bg-gray-900 border border-gray-800 p-5">
               <p className="font-spacemono text-xs text-gray-400">
-                No more votes are allowed from this registration number.
+                No more votes are allowed from this registration number. Your selection was{' '}
+                <span className="font-bold text-lime-400">{currentVoter.selectedProductName || 'saved'}</span>.
               </p>
             </div>
           )}
