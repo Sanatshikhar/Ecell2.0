@@ -4,11 +4,15 @@ import pb from '../lib/pocketbase';
 const PRODUCT_LIMIT = 25;
 const REGISTRATION_NUMBER_REGEX = /^(25|24|23|22)[A-Z0-9\-/]{3,16}$/;
 
-const getTomorrowEightAmTimestamp = () => {
+const getNextEightAmTimestamp = () => {
   const now = new Date();
   const target = new Date(now);
-  target.setDate(now.getDate() + 1);
   target.setHours(8, 0, 0, 0);
+
+  if (target.getTime() <= now.getTime()) {
+    target.setDate(target.getDate() + 1);
+  }
+
   return target.getTime();
 };
 
@@ -46,6 +50,7 @@ const AudiencePollPage = () => {
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const otpAttemptsRef = useRef({});
+  const hasAnnouncedVotingClosedRef = useRef(false);
 
   const backendUrl = useMemo(
     () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, ''),
@@ -53,6 +58,7 @@ const AudiencePollPage = () => {
   );
 
   const productCards = useMemo(() => products.slice(0, PRODUCT_LIMIT), [products]);
+  const isVotingClosed = pageTimerSecondsLeft <= 0;
 
   const setStatus = useCallback((message, type = 'info') => {
     setStatusMessage(message);
@@ -96,7 +102,7 @@ const AudiencePollPage = () => {
   }, [otpExpiresAt]);
 
   useEffect(() => {
-    const targetAt = getTomorrowEightAmTimestamp();
+    const targetAt = getNextEightAmTimestamp();
 
     const updateTimer = () => {
       const remaining = Math.max(0, Math.ceil((targetAt - Date.now()) / 1000));
@@ -108,6 +114,22 @@ const AudiencePollPage = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!isVotingClosed || hasAnnouncedVotingClosedRef.current) {
+      return;
+    }
+
+    hasAnnouncedVotingClosedRef.current = true;
+    setIsOtpModalOpen(false);
+    setOtpStepActive(false);
+    setOtpInput('');
+    setOtpExpiresAt(null);
+    setOtpError('');
+    setOtpMessage('');
+    setIsTransitioningToVote(false);
+    setStatus('Voting has been closed.', 'error');
+  }, [isVotingClosed, setStatus]);
 
   const formatPageTimer = useCallback((seconds) => {
     const safe = Math.max(0, Number(seconds || 0));
@@ -167,14 +189,14 @@ const AudiencePollPage = () => {
   }, [setStatus]);
 
   useEffect(() => {
-    if (!formSubmitted || voteLocked || hasLoadedProductsRef.current) {
+    if (isVotingClosed || !formSubmitted || voteLocked || hasLoadedProductsRef.current) {
       if (voteLocked) setIsTransitioningToVote(false);
       return;
     }
 
     hasLoadedProductsRef.current = true;
     fetchProducts();
-  }, [formSubmitted, voteLocked, fetchProducts]);
+  }, [formSubmitted, voteLocked, fetchProducts, isVotingClosed]);
 
   const findVoterByRegistrationNumber = async (registrationNumber) => {
     const normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
@@ -311,6 +333,11 @@ const AudiencePollPage = () => {
   };
 
   const sendOtp = async () => {
+    if (isVotingClosed) {
+      setStatus('Voting has been closed.', 'error');
+      return false;
+    }
+
     if (!backendUrl) {
       setOtpError('REACT_APP_BACKEND_URL is not configured.');
       return false;
@@ -418,6 +445,12 @@ const AudiencePollPage = () => {
   };
 
   const proceedToVoting = async () => {
+    if (isVotingClosed) {
+      setStatus('Voting has been closed.', 'error');
+      setIsTransitioningToVote(false);
+      return;
+    }
+
     setIsSubmittingForm(true);
     setIsTransitioningToVote(true);
     setStatusMessage('');
@@ -558,6 +591,11 @@ const AudiencePollPage = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    if (isVotingClosed) {
+      setStatus('Voting has been closed.', 'error');
+      return;
+    }
+
     if (!validateForm()) return;
 
     setIsPageLoading(true);
@@ -584,6 +622,11 @@ const AudiencePollPage = () => {
   };
 
   const handleVerifyOtpAndContinue = async () => {
+    if (isVotingClosed) {
+      setOtpError('Voting has been closed.');
+      return;
+    }
+
     if (!backendUrl) {
       setOtpError('REACT_APP_BACKEND_URL is not configured.');
       return;
@@ -641,7 +684,12 @@ const AudiencePollPage = () => {
   };
 
   const handleVote = async (product) => {
-    if (!currentVoter || voteLocked || isSubmittingVote) return;
+    if (!currentVoter || voteLocked || isSubmittingVote || isVotingClosed) {
+      if (isVotingClosed) {
+        setStatus('Voting has been closed.', 'error');
+      }
+      return;
+    }
 
     setIsSubmittingVote(true);
     setStatusMessage('');
@@ -769,7 +817,7 @@ const AudiencePollPage = () => {
 
             <div className="mt-6 inline-flex items-center gap-3 border border-lime-400 border-opacity-30 bg-lime-400 bg-opacity-10 px-4 py-2">
               <span className="font-spacemono text-[10px] uppercase tracking-[0.25em] text-gray-300">
-                Ends Tomorrow 08:00 AM
+                {isVotingClosed ? 'Voting Closed' : 'Ends Tomorrow 08:00 AM'}
               </span>
               <span className="font-spacemono text-lg font-bold text-lime-300 tracking-widest">
                 {formatPageTimer(pageTimerSecondsLeft)}
@@ -777,13 +825,19 @@ const AudiencePollPage = () => {
             </div>
           </div>
 
+          {isVotingClosed && (
+            <div className="mb-6 border border-red-500 border-opacity-35 bg-red-900 bg-opacity-15 px-4 py-3 font-spacemono text-xs text-red-300">
+              Voting has been closed. The countdown has ended.
+            </div>
+          )}
+
           {statusMessage && (
             <div className={`mb-6 border px-4 py-3 font-spacemono text-xs ${statusClassName}`}>
               {statusMessage}
             </div>
           )}
 
-          {!formSubmitted && (
+          {!formSubmitted && !isVotingClosed && (
             <div className="mb-10 animate-slideUpFade">
               <div className="bg-gray-900 border border-gray-800 relative p-8 md:p-10 shadow-2xl">
                 <div
@@ -860,6 +914,17 @@ const AudiencePollPage = () => {
                   </button>
                 </form>
               </div>
+            </div>
+          )}
+
+          {!formSubmitted && isVotingClosed && (
+            <div className="mb-10 bg-gray-900 border border-gray-800 p-6 md:p-8">
+              <p className="font-spacemono text-xs uppercase tracking-[0.2em] text-red-300 mb-2">
+                Voting Window Closed
+              </p>
+              <p className="font-spacemono text-sm text-gray-300">
+                New votes are not being accepted right now.
+              </p>
             </div>
           )}
 
@@ -959,7 +1024,7 @@ const AudiencePollPage = () => {
             </div>
           )}
 
-          {formSubmitted && !voteLocked && (
+          {formSubmitted && !voteLocked && !isVotingClosed && (
             <div className="animate-slideUpFade">
               {isTransitioningToVote && (
                 <div className="mb-5 bg-gray-900 border border-gray-800 p-4">
@@ -1028,10 +1093,10 @@ const AudiencePollPage = () => {
                           <div className="mt-4 pt-3 border-t border-gray-700">
                             <button
                               type="button"
-                              disabled={voteLocked || isSubmittingVote || isVotingThis}
+                              disabled={voteLocked || isSubmittingVote || isVotingThis || isVotingClosed}
                               onClick={() => handleVote(product)}
                               className={`w-full py-2 text-xs font-spacemono uppercase tracking-[0.3em] border transition-all duration-300 ${
-                                voteLocked || isSubmittingVote || isVotingThis
+                                voteLocked || isSubmittingVote || isVotingThis || isVotingClosed
                                   ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
                                   : 'bg-black text-lime-400 border-gray-700 hover:border-lime-400 hover:bg-lime-400 hover:text-black'
                               }`}
@@ -1045,6 +1110,14 @@ const AudiencePollPage = () => {
                   })}
                 </div>
               )}
+            </div>
+          )}
+
+          {formSubmitted && !voteLocked && isVotingClosed && (
+            <div className="mt-8 bg-red-900 bg-opacity-15 border border-red-500 border-opacity-30 p-5">
+              <p className="font-spacemono text-xs text-red-300">
+                Voting has been closed. New votes are no longer accepted.
+              </p>
             </div>
           )}
 
