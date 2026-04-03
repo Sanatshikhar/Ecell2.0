@@ -41,6 +41,7 @@ const AudiencePollPage = () => {
   const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
   const [otpError, setOtpError] = useState('');
   const [otpMessage, setOtpMessage] = useState('');
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   const backendUrl = useMemo(
     () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, ''),
@@ -481,15 +482,21 @@ const AudiencePollPage = () => {
 
     if (!validateForm()) return;
 
-    const sent = await sendOtp();
-    if (sent === 'already_verified') {
-      setStatus('Email already verified. Continuing to vote checks...', 'info');
-      await proceedToVoting();
-      return;
-    }
+    setIsPageLoading(true);
+    try {
+      const sent = await sendOtp();
+      if (sent === 'already_verified') {
+        setStatus('Email already verified. Continuing to vote checks...', 'info');
+        await proceedToVoting();
+        setIsPageLoading(false);
+        return;
+      }
 
-    if (sent) {
-      setStatus('OTP sent to your email. Verify it to access voting.', 'info');
+      if (sent) {
+        setStatus('OTP sent to your email. Verify it to access voting.', 'info');
+      }
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -640,6 +647,19 @@ const AudiencePollPage = () => {
             backgroundSize: '40px 40px',
           }}
         />
+
+        {isPageLoading && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center pointer-events-auto">
+            <div className="text-center">
+              <div className="animate-spin inline-block mb-4">
+                <div className="w-16 h-16 border-4 border-gray-700 border-t-lime-400 rounded-full"></div>
+              </div>
+              <p className="font-spacemono text-lg text-lime-300 uppercase tracking-[0.2em]">
+                Sending OTP...
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="relative z-10 max-w-7xl mx-auto px-5 py-16 lg:py-20">
           <div className="mb-12 animate-slideDownFade">
