@@ -55,6 +55,7 @@ const SENDER_FROM_NAME = process.env.SENDER_FROM_NAME || 'E-Cell SOA';
 const SMTP_HOST = process.env.SENDER_SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = Number(process.env.SENDER_SMTP_PORT || 465);
 const SMTP_SECURE = String(process.env.SENDER_SMTP_SECURE || 'true').toLowerCase() !== 'false';
+const POCKETBASE_URL = (process.env.REACT_APP_DB_URL || process.env.POCKETBASE_URL || process.env.PB_URL || '').replace(/\/$/, '');
 
 // Check if required environment variables are set.
 if (!SENDER_EMAIL || !SENDER_PASSWORD) {
@@ -94,6 +95,90 @@ const sendEmailViaSmtp = async ({ to, subject, html }) => {
 };
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+
+const escapeFilterValue = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+const findVerifiedVoterByEmail = async (email) => {
+  if (!POCKETBASE_URL) {
+    return null;
+  }
+
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  const filter = `email="${escapeFilterValue(normalizedEmail)}" && verified=true`;
+  const response = await fetch(
+    `${POCKETBASE_URL}/api/collections/voters/records?${new URLSearchParams({
+      filter,
+      page: '1',
+      perPage: '1',
+    }).toString()}`
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = await response.json().catch(() => ({}));
+  return payload?.items?.[0] || null;
+};
+
+const findVotedVoterByEmail = async (email) => {
+  if (!POCKETBASE_URL) {
+    return null;
+  }
+
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  const filter = `email="${escapeFilterValue(normalizedEmail)}" && votedFor != null && votedFor != ""`;
+  const response = await fetch(
+    `${POCKETBASE_URL}/api/collections/voters/records?${new URLSearchParams({
+      filter,
+      page: '1',
+      perPage: '1',
+    }).toString()}`
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = await response.json().catch(() => ({}));
+  return payload?.items?.[0] || null;
+};
+
+const getVotedProductName = async (voter) => {
+  if (!voter) {
+    return '';
+  }
+
+  const directName = String(voter.selectedProductName || '').trim();
+  if (directName) {
+    return directName;
+  }
+
+  const productId = String(voter.selectedProductId || voter.votedFor || '').trim();
+  if (!POCKETBASE_URL || !productId) {
+    return '';
+  }
+
+  try {
+    const response = await fetch(`${POCKETBASE_URL}/api/collections/products/records/${encodeURIComponent(productId)}`);
+    if (!response.ok) {
+      return '';
+    }
+
+    const payload = await response.json().catch(() => ({}));
+    return String(payload?.name || '').trim();
+  } catch (error) {
+    return '';
+  }
+};
 
 const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
@@ -157,6 +242,29 @@ app.post('/api/send-otp', async (req, res) => {
 
   if (!isValidEmail(normalizedEmail)) {
     return res.status(400).json({ error: 'A valid email is required.' });
+  }
+
+  try {
+    const alreadyVotedVoter = await findVotedVoterByEmail(normalizedEmail);
+    if (alreadyVotedVoter) {
+      const votedProductName = await getVotedProductName(alreadyVotedVoter);
+      return res.status(409).json({
+        success: false,
+        already_voted: true,
+        error: `This email has already voted${votedProductName ? ` for ${votedProductName}` : ''}.`,
+      });
+    }
+
+    const alreadyVerifiedVoter = await findVerifiedVoterByEmail(normalizedEmail);
+    if (alreadyVerifiedVoter) {
+      return res.status(409).json({
+        success: false,
+        already_verified: true,
+        error: 'Email already verified. Choose a product to vote.',
+      });
+    }
+  } catch (lookupError) {
+    console.error('❌ Verified email lookup failed:', lookupError.message);
   }
 
   const otp = generateOtp();

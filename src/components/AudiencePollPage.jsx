@@ -190,6 +190,20 @@ const AudiencePollPage = () => {
     return (result.items || []).find((item) => getVotedProductId(item)) || null;
   };
 
+  const findVerifiedVoterByEmail = async (email) => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    if (!normalizedEmail) {
+      return null;
+    }
+
+    const result = await pb.collection('voters').getList(1, 1, {
+      filter: `email="${escapeFilterValue(normalizedEmail)}" && verified=true`,
+      requestKey: null,
+    });
+
+    return result.items[0] || null;
+  };
+
   const isEligibleForPollOtp = useCallback(async (email, registrationNumber) => {
     const safeEmail = escapeFilterValue(String(email || '').trim().toLowerCase());
     const safeReg = escapeFilterValue(String(registrationNumber || '').trim());
@@ -279,6 +293,22 @@ const AudiencePollPage = () => {
     const normalizedRegistrationNumber = formData.registrationNumber.trim();
 
     try {
+      const alreadyVotedVoter = await findVotedVoterByEmail(normalizedEmail);
+      if (alreadyVotedVoter) {
+        const voterWithProduct = await resolveVotedProductName(alreadyVotedVoter);
+        setStatus(
+          `${voterWithProduct.name || 'This email'} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`,
+          'error'
+        );
+        return 'already_voted';
+      }
+
+      const alreadyVerifiedVoter = await findVerifiedVoterByEmail(normalizedEmail);
+      if (alreadyVerifiedVoter) {
+        setStatus('Email already verified. Choose a product to vote.', 'success');
+        return 'already_verified';
+      }
+
       const participantDetected = await isEligibleForPollOtp(normalizedEmail, normalizedRegistrationNumber);
       if (participantDetected) {
         setStatus('Participants cannot vote in this audience poll.', 'error');
@@ -292,7 +322,11 @@ const AudiencePollPage = () => {
 
       const matchedRegistrationVoter = existingByRegistration.items[0] || null;
       if (matchedRegistrationVoter && getVotedProductId(matchedRegistrationVoter)) {
-        setStatus('This registration number is already used for voting.', 'error');
+        const voterWithProduct = await resolveVotedProductName(matchedRegistrationVoter);
+        setStatus(
+          `${voterWithProduct.name || 'This registration number'} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`,
+          'error'
+        );
         return false;
       }
     } catch (eligibilityError) {
@@ -325,6 +359,16 @@ const AudiencePollPage = () => {
       });
 
       const responseBody = await response.json().catch(() => ({}));
+      if (responseBody.already_voted || response.status === 409) {
+        setStatus(responseBody.error || 'This email has already voted in the audience poll.', 'error');
+        return 'already_voted';
+      }
+
+      if (responseBody.already_verified || response.status === 409) {
+        setStatus('Email already verified. Choose a product to vote.', 'success');
+        return 'already_verified';
+      }
+
       if (!response.ok) {
         throw new Error(responseBody.error || 'Unable to send OTP right now.');
       }
