@@ -190,6 +190,20 @@ const AudiencePollPage = () => {
     return (result.items || []).find((item) => getVotedProductId(item)) || null;
   };
 
+  const findVotedVoterByRegistrationNumber = async (registrationNumber) => {
+    const normalizedRegistrationNumber = String(registrationNumber || '').trim();
+    if (!normalizedRegistrationNumber) {
+      return null;
+    }
+
+    const result = await pb.collection('voters').getList(1, 50, {
+      filter: `registrationNumber="${escapeFilterValue(normalizedRegistrationNumber)}"`,
+      requestKey: null,
+    });
+
+    return (result.items || []).find((item) => getVotedProductId(item)) || null;
+  };
+
   const findVerifiedVoterByEmail = async (email) => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!normalizedEmail) {
@@ -315,19 +329,14 @@ const AudiencePollPage = () => {
         return false;
       }
 
-      const existingByRegistration = await pb.collection('voters').getList(1, 1, {
-        filter: `registrationNumber="${escapeFilterValue(normalizedRegistrationNumber)}"`,
-        requestKey: null,
-      });
-
-      const matchedRegistrationVoter = existingByRegistration.items[0] || null;
+      const matchedRegistrationVoter = await findVotedVoterByRegistrationNumber(normalizedRegistrationNumber);
       if (matchedRegistrationVoter && getVotedProductId(matchedRegistrationVoter)) {
         const voterWithProduct = await resolveVotedProductName(matchedRegistrationVoter);
         setStatus(
           `${voterWithProduct.name || 'This registration number'} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`,
           'error'
         );
-        return false;
+        return 'already_voted';
       }
     } catch (eligibilityError) {
       setStatus('Unable to validate eligibility right now. Please try again.', 'error');
@@ -547,7 +556,12 @@ const AudiencePollPage = () => {
         return;
       }
 
-      if (sent) {
+      if (sent === 'already_voted') {
+        setIsPageLoading(false);
+        return;
+      }
+
+      if (sent === true) {
         setStatus('OTP sent to your email. Verify it to access voting.', 'info');
       }
     } finally {
