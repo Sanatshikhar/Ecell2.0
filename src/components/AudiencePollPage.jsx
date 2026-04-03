@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
-const REGISTRATION_NUMBER_REGEX = /^(25|24|23|22)\d{7,8}$/;
+const REGISTRATION_NUMBER_REGEX = /^(25|24|23|22)[A-Z0-9\-/]{3,16}$/;
 
 const getTomorrowEightAmTimestamp = () => {
   const now = new Date();
@@ -13,6 +13,7 @@ const getTomorrowEightAmTimestamp = () => {
 };
 
 const escapeFilterValue = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+const normalizeRegistrationNumber = (value) => String(value || '').trim().toUpperCase();
 
 const AudiencePollPage = () => {
   const [products, setProducts] = useState([]);
@@ -60,16 +61,17 @@ const AudiencePollPage = () => {
 
   const validateForm = () => {
     const errors = {};
+    const normalizedRegistrationNumber = normalizeRegistrationNumber(formData.registrationNumber);
 
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
-    if (!formData.registrationNumber.trim()) errors.registrationNumber = 'Registration number is required';
+    if (!normalizedRegistrationNumber) errors.registrationNumber = 'Registration number is required';
     if (
-      formData.registrationNumber.trim() &&
-      !REGISTRATION_NUMBER_REGEX.test(formData.registrationNumber.trim())
+      normalizedRegistrationNumber &&
+      !REGISTRATION_NUMBER_REGEX.test(normalizedRegistrationNumber)
     ) {
-      errors.registrationNumber = 'Invalid registration number';
+      errors.registrationNumber = 'Use a valid registration number (letters/numbers allowed)';
     }
 
     setFormErrors(errors);
@@ -175,8 +177,9 @@ const AudiencePollPage = () => {
   }, [formSubmitted, voteLocked, fetchProducts]);
 
   const findVoterByRegistrationNumber = async (registrationNumber) => {
+    const normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
     const result = await pb.collection('voters').getList(1, 1, {
-      filter: `registrationNumber="${escapeFilterValue(registrationNumber)}"`,
+      filter: `registrationNumber="${escapeFilterValue(normalizedRegistrationNumber)}"`,
       requestKey: null,
     });
 
@@ -198,7 +201,7 @@ const AudiencePollPage = () => {
   };
 
   const findVotedVoterByRegistrationNumber = async (registrationNumber) => {
-    const normalizedRegistrationNumber = String(registrationNumber || '').trim();
+    const normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
     if (!normalizedRegistrationNumber) {
       return null;
     }
@@ -227,7 +230,7 @@ const AudiencePollPage = () => {
 
   const isEligibleForPollOtp = useCallback(async (email, registrationNumber) => {
     const safeEmail = escapeFilterValue(String(email || '').trim().toLowerCase());
-    const safeReg = escapeFilterValue(String(registrationNumber || '').trim());
+    const safeReg = escapeFilterValue(normalizeRegistrationNumber(registrationNumber));
 
     if (!safeEmail && !safeReg) return false;
 
@@ -288,7 +291,9 @@ const AudiencePollPage = () => {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     const nextValue =
-      name === 'registrationNumber' ? value.replace(/\D/g, '').slice(0, 10) : value;
+      name === 'registrationNumber'
+        ? value.replace(/[^a-zA-Z0-9\-/]/g, '').toUpperCase().slice(0, 20)
+        : value;
     setFormData((previous) => ({ ...previous, [name]: nextValue }));
 
     if (formErrors[name]) {
@@ -313,7 +318,7 @@ const AudiencePollPage = () => {
 
     const normalizedEmail = formData.email.trim().toLowerCase();
     const normalizedName = formData.name.trim();
-    const normalizedRegistrationNumber = formData.registrationNumber.trim();
+    const normalizedRegistrationNumber = normalizeRegistrationNumber(formData.registrationNumber);
 
     try {
       const alreadyVotedVoter = await findVotedVoterByEmail(normalizedEmail);
@@ -417,7 +422,7 @@ const AudiencePollPage = () => {
     setIsTransitioningToVote(true);
     setStatusMessage('');
 
-    const normalizedRegistrationNumber = formData.registrationNumber.trim();
+    const normalizedRegistrationNumber = normalizeRegistrationNumber(formData.registrationNumber);
     const normalizedEmail = formData.email.trim().toLowerCase();
 
     try {
@@ -834,8 +839,8 @@ const AudiencePollPage = () => {
                       name="registrationNumber"
                       value={formData.registrationNumber}
                       onChange={handleFormChange}
-                      inputMode="numeric"
-                      maxLength={10}
+                      inputMode="text"
+                      maxLength={20}
                       placeholder="Enter your registration number"
                       className={`w-full px-4 py-3 bg-gray-800 border rounded text-gray-200 placeholder-gray-600 font-spacemono text-sm outline-none transition-all ${
                         formErrors.registrationNumber ? 'border-red-500' : 'border-gray-700 focus:border-lime-400'
