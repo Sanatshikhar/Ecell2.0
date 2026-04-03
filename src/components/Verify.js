@@ -13,6 +13,7 @@ const Verify = () => {
   const [message, setMessage] = useState('');
   const [verifiedName, setVerifiedName] = useState('');
   const [scannedRegistration, setScannedRegistration] = useState(null);
+  const [matchedRegistrationField, setMatchedRegistrationField] = useState('');
   const [manualRegNo, setManualRegNo] = useState('');
   const [showBulkMailPopup, setShowBulkMailPopup] = useState(false);
   const [bulkMailStatus, setBulkMailStatus] = useState({ step: 'idle', count: 0, sent: 0 });
@@ -25,6 +26,7 @@ const Verify = () => {
     setIcon(null);
     setVerifiedName('');
     setScannedRegistration(null);
+    setMatchedRegistrationField('');
   };
 
   const findRegistrationByField = async (field, safeToken) => {
@@ -54,17 +56,20 @@ const Verify = () => {
     const safeToken = regNo.replace(/"/g, '\\"');
     try {
       let result = await findRegistrationByField('regNo', safeToken);
+      let matchedField = 'regNo';
       if (!result) {
         result = await findRegistrationByField('teammateRegNo', safeToken);
+        matchedField = 'teammateRegNo';
       }
       if (!result) {
         result = await findRegistrationByField('teammateRegNum', safeToken);
+        matchedField = 'teammateRegNum';
       }
       if (!result) {
         setStatus('invalid');
         setMessage('Registration not found for this Reg No / Teammate Reg No');
         setIcon('invalid');
-      } else if (result.arrived) {
+      } else if ((matchedField === 'regNo' && result.arrived) || (matchedField !== 'regNo' && result.teammateArrived)) {
         setStatus('already');
         setMessage('Already Marked Arrived');
         setIcon('already');
@@ -75,6 +80,7 @@ const Verify = () => {
         setIcon('found');
         setVerifiedName(result.name || '');
         setScannedRegistration(result);
+        setMatchedRegistrationField(matchedField);
       }
     } catch (err) {
       if (err?.status === 404) {
@@ -132,12 +138,15 @@ const Verify = () => {
     if (!scannedRegistration?.id) return;
     setLoading(true);
     try {
-      await pb.collection('scratchlabsRegistrations').update(scannedRegistration.id, { arrived: true });
+      await pb.collection('scratchlabsRegistrations').update(scannedRegistration.id, {
+        ...(matchedRegistrationField === 'regNo' ? { arrived: true } : { teammateArrived: true }),
+      });
       setStatus('arrived');
       setMessage('Marked Arrived Successfully');
       setIcon('verified');
       setVerifiedName(scannedRegistration.name || '');
       setScannedRegistration(null);
+      setMatchedRegistrationField('');
       setManualRegNo('');
     } catch (error) {
       setStatus('invalid');
