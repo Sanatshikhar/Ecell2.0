@@ -176,6 +176,20 @@ const AudiencePollPage = () => {
     return result.items[0] || null;
   };
 
+  const findVotedVoterByEmail = async (email) => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    if (!normalizedEmail) {
+      return null;
+    }
+
+    const result = await pb.collection('voters').getList(1, 50, {
+      filter: `email="${escapeFilterValue(normalizedEmail)}" && verified=true`,
+      requestKey: null,
+    });
+
+    return (result.items || []).find((item) => getVotedProductId(item)) || null;
+  };
+
   const isEligibleForPollOtp = useCallback(async (email, registrationNumber) => {
     const safeEmail = escapeFilterValue(String(email || '').trim().toLowerCase());
     const safeReg = escapeFilterValue(String(registrationNumber || '').trim());
@@ -340,6 +354,28 @@ const AudiencePollPage = () => {
     const normalizedEmail = formData.email.trim().toLowerCase();
 
     try {
+      const emailVotedVoter = await findVotedVoterByEmail(normalizedEmail);
+      if (emailVotedVoter) {
+        const voterWithProduct = await resolveVotedProductName(emailVotedVoter);
+        const voterName = voterWithProduct.name || 'This voter';
+        setCurrentVoter({
+          ...voterWithProduct,
+          name: formData.name.trim() || voterWithProduct.name,
+          email: normalizedEmail || voterWithProduct.email,
+          registrationNumber: normalizedRegistrationNumber || voterWithProduct.registrationNumber,
+          verified: true,
+        });
+        setFormSubmitted(true);
+        setVoteLocked(true);
+        setVotedProductId(getVotedProductId(voterWithProduct));
+        setIsTransitioningToVote(false);
+        setStatus(
+          `${voterName} has already voted for ${voterWithProduct.selectedProductName || 'a product'}.`,
+          'error'
+        );
+        return;
+      }
+
       const existingVoter = await findVoterByRegistrationNumber(normalizedRegistrationNumber);
 
       if (existingVoter) {
@@ -455,6 +491,13 @@ const AudiencePollPage = () => {
     setIsPageLoading(true);
     try {
       const sent = await sendOtp();
+      if (sent === 'already_verified') {
+        setFormSubmitted(true);
+        setStatus('Email already verified. Choose a product to vote.', 'success');
+        setIsPageLoading(false);
+        return;
+      }
+
       if (sent) {
         setStatus('OTP sent to your email. Verify it to access voting.', 'info');
       }
