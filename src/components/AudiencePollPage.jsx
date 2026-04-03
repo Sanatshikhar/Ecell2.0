@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
+const PAGE_TIMER_DURATION_SECONDS = 24 * 60 * 60;
+const PAGE_TIMER_STORAGE_KEY = 'audiencePoll24hEndAt';
 
 const escapeFilterValue = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
@@ -32,6 +34,7 @@ const AudiencePollPage = () => {
   const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
   const [otpError, setOtpError] = useState('');
   const [otpMessage, setOtpMessage] = useState('');
+  const [pageTimerSecondsLeft, setPageTimerSecondsLeft] = useState(PAGE_TIMER_DURATION_SECONDS);
 
   const backendUrl = useMemo(
     () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, ''),
@@ -58,6 +61,35 @@ const AudiencePollPage = () => {
   };
 
   useEffect(() => {
+    let existingEndAt = 0;
+
+    try {
+      existingEndAt = Number(window.localStorage.getItem(PAGE_TIMER_STORAGE_KEY) || 0);
+    } catch (error) {
+      existingEndAt = 0;
+    }
+
+    if (!existingEndAt || existingEndAt <= Date.now()) {
+      existingEndAt = Date.now() + PAGE_TIMER_DURATION_SECONDS * 1000;
+      try {
+        window.localStorage.setItem(PAGE_TIMER_STORAGE_KEY, String(existingEndAt));
+      } catch (error) {
+        // Ignore storage write failures and keep timer in-memory.
+      }
+    }
+
+    const updateTimer = () => {
+      const remaining = Math.max(0, Math.ceil((existingEndAt - Date.now()) / 1000));
+      setPageTimerSecondsLeft(remaining);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (!otpExpiresAt) {
       setOtpSecondsLeft(0);
       return;
@@ -79,6 +111,14 @@ const AudiencePollPage = () => {
     const mm = String(Math.floor(safe / 60)).padStart(2, '0');
     const ss = String(safe % 60).padStart(2, '0');
     return `${mm}:${ss}`;
+  }, []);
+
+  const formatPageTimer = useCallback((seconds) => {
+    const safe = Math.max(0, Number(seconds || 0));
+    const hh = String(Math.floor(safe / 3600)).padStart(2, '0');
+    const mm = String(Math.floor((safe % 3600) / 60)).padStart(2, '0');
+    const ss = String(safe % 60).padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
   }, []);
 
   const fetchProducts = useCallback(async () => {
@@ -467,6 +507,15 @@ const AudiencePollPage = () => {
             <p className="font-spacemono text-xs text-gray-500 leading-relaxed tracking-wide border-l-2 border-lime-400 pl-4">
               Enter your details first, then vote for one product. One person can only vote once.
             </p>
+
+            <div className="mt-6 inline-flex items-center gap-3 border border-lime-400 border-opacity-30 bg-lime-400 bg-opacity-10 px-4 py-2">
+              <span className="font-spacemono text-[10px] uppercase tracking-[0.25em] text-gray-300">
+                24hr Timer
+              </span>
+              <span className="font-spacemono text-lg font-bold text-lime-300 tracking-widest">
+                {formatPageTimer(pageTimerSecondsLeft)}
+              </span>
+            </div>
           </div>
 
           {statusMessage && (

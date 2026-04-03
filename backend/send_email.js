@@ -1,6 +1,5 @@
 const express = require('express');
-const cors = require('cors');
-const nodemailer = require('nodemailer');
+const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
@@ -8,38 +7,25 @@ const otpStore = new Map();
 
 const OTP_TTL_MS = 5 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
-const allowedOrigins = [
-  'https://www.ecellsoa.in',
-  'https://ecellsoa.in',
-  'https://email.ecellsoa.in',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-];
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser requests and approved browser origins.
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 204,
+  return (
+    /^https:\/\/(www\.)?ecellsoa\.in$/.test(origin) ||
+    /^https:\/\/email\.ecellsoa\.in$/.test(origin) ||
+    /^http:\/\/localhost:\d+$/.test(origin) ||
+    /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
+  );
 };
 
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
-
-// Ensure CORS headers are consistently present even behind strict proxies.
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && isAllowedOrigin(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Vary', 'Origin');
     res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
   }
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
@@ -52,31 +38,56 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 
-const SENDER_EMAIL = process.env.SENDER_EMAIL;
-const SENDER_PASSWORD = process.env.SENDER_PASSWORD;
-const SENDER_FROM_NAME = process.env.SENDER_FROM_NAME || 'E-Cell SOA';
-const SMTP_HOST = process.env.SENDER_SMTP_HOST || 'smtp.sender.net';
-const SMTP_PORT = Number(process.env.SENDER_SMTP_PORT || 465);
-const SMTP_SECURE = String(process.env.SENDER_SMTP_SECURE || 'true').toLowerCase() !== 'false';
+const SES_REGION = process.env.AWS_SES_REGION || process.env.AWS_REGION || 'ap-south-1';
+const SENDER_EMAIL = process.env.AWS_SES_FROM_EMAIL || process.env.SENDER_EMAIL;
+const SENDER_FROM_NAME = process.env.AWS_SES_FROM_NAME || process.env.SENDER_FROM_NAME || 'E-Cell SOA';
 
-// Check if required environment variables are set
-if (!SENDER_EMAIL || !SENDER_PASSWORD) {
+// Check if required environment variables are set.
+if (!SENDER_EMAIL) {
   console.error('❌ Missing required environment variables:');
-  if (!SENDER_EMAIL) console.error('  - SENDER_EMAIL is required');
-  if (!SENDER_PASSWORD) console.error('  - SENDER_PASSWORD is required');
-  console.error('Please create a .env file with these variables');
+  console.error('  - AWS_SES_FROM_EMAIL (or SENDER_EMAIL) is required');
+  console.error('  - AWS credentials should be available via env or IAM role');
+  console.error('  - AWS_SES_REGION/AWS_REGION should be set if not using default ap-south-1');
   process.exit(1);
 }
 
-const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: SMTP_SECURE,
-  auth: {
-    user: SENDER_EMAIL,
-    pass: SENDER_PASSWORD,
-  },
+const sesClient = new SESv2Client({
+  region: SES_REGION,
 });
+
+const sendEmailViaSes = async ({ to, subject, html }) => {
+  const toAddresses = String(to || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  if (!toAddresses.length) {
+    throw new Error('Recipient email is required.');
+  }
+
+  const command = new SendEmailCommand({
+    FromEmailAddress: `${SENDER_FROM_NAME} <${SENDER_EMAIL}>`,
+    Destination: {
+      ToAddresses: toAddresses,
+    },
+    Content: {
+      Simple: {
+        Subject: {
+          Data: String(subject || ''),
+          Charset: 'UTF-8',
+        },
+        Body: {
+          Html: {
+            Data: String(html || ''),
+            Charset: 'UTF-8',
+          },
+        },
+      },
+    },
+  });
+
+  return sesClient.send(command);
+};
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
 
@@ -120,8 +131,7 @@ app.post('/api/send-otp', async (req, res) => {
   const expiresAt = Date.now() + OTP_TTL_MS;
 
   try {
-    await transporter.sendMail({
-      from: `"${SENDER_FROM_NAME}" <${SENDER_EMAIL}>`,
+    await sendEmailViaSes({
       to: normalizedEmail,
       subject: 'Email Verification OTP - Audience Poll',
       html: buildOtpEmail({ name, otp, purpose: purpose || 'Audience Poll' }),
@@ -188,14 +198,11 @@ app.post('/api/send-email', async (req, res) => {
   }
 
   try {
-    const mailOptions = {
-      from: `"${SENDER_FROM_NAME}" <${SENDER_EMAIL}>`,
+    await sendEmailViaSes({
       to: to,
       subject: subject,
       html: html,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
     console.log(`✅ EMAIL SENT TO ${to}`);
     res.json({ success: true });
   } catch (err) {

@@ -10,7 +10,7 @@ const Dashboard = () => {
     let abortController = new AbortController();
     const fetchData = async () => {
       try {
-        const result = await pb.collection('workshops').getFullList({
+        const result = await pb.collection('scratchlabsRegistrations').getFullList({
           sort: '-created',
           requestOptions: { signal: abortController.signal },
         });
@@ -23,12 +23,12 @@ const Dashboard = () => {
     };
     fetchData();
     // Real-time subscription
-    const subscriptionId = pb.collection('workshops').subscribe('*', () => {
+    const subscriptionId = pb.collection('scratchlabsRegistrations').subscribe('*', () => {
       fetchData();
     });
     return () => {
       abortController.abort();
-      pb.collection('workshops').unsubscribe(subscriptionId);
+      pb.collection('scratchlabsRegistrations').unsubscribe(subscriptionId);
     };
   }, []);
 
@@ -49,16 +49,25 @@ const Dashboard = () => {
     if (filtered.length === 0) return;
 
     const columns = [
-      'name',
-      'email',
-      'phone',
-      'course',
-      'regNo',
-      'referral',
-      'iecMember',
-      'mailSent',
+      'id',
+      'fullName',
+      'regNum',
+      'contact',
       'arrived',
+      'year',
+      'branch',
+      'email',
+      'registrationType',
+      'experience',
+      'teammateName',
+      'teammateRegNum',
+      'teammateYear',
+      'teammateBranch',
+      'teammateContact',
+      'teammateEmail',
+      'teammateArrived',
       'created',
+      'updated',
     ];
 
     const escapeCsv = (value) => {
@@ -74,11 +83,11 @@ const Dashboard = () => {
     const dataRows = filtered.map((record) =>
       columns
         .map((column) => {
-          if (column === 'mailSent' || column === 'arrived') {
+          if (column === 'arrived' || column === 'teammateArrived') {
             return escapeCsv(record[column] ? 'Yes' : 'No');
           }
-          if (column === 'created') {
-            return escapeCsv(record.created ? new Date(record.created).toISOString() : '');
+          if (column === 'created' || column === 'updated') {
+            return escapeCsv(record[column] ? new Date(record[column]).toISOString() : '');
           }
           return escapeCsv(record[column] ?? '');
         })
@@ -91,7 +100,7 @@ const Dashboard = () => {
     const link = document.createElement('a');
 
     link.href = url;
-    link.setAttribute('download', `workshop-registrations-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `scratchlabs-registrations-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
