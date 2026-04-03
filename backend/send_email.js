@@ -18,14 +18,25 @@ const isAllowedOrigin = (origin) => {
   );
 };
 
+const shouldHandleCorsInApp = (origin) => {
+  if (!origin) return false;
+
+  // Production traffic is expected to be handled by the edge proxy CORS rules.
+  if (/^https:\/\/(www\.)?ecellsoa\.in$/.test(origin) || /^https:\/\/email\.ecellsoa\.in$/.test(origin)) {
+    return false;
+  }
+
+  return /^http:\/\/localhost:\d+$/.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin);
+};
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && isAllowedOrigin(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Vary', 'Origin');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
+  if (origin && isAllowedOrigin(origin) && shouldHandleCorsInApp(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
