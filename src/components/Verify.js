@@ -55,8 +55,8 @@ const Verify = () => {
 
     const safeToken = regNo.replace(/"/g, '\\"');
     try {
-      let result = await findRegistrationByField('regNo', safeToken);
-      let matchedField = 'regNo';
+      let result = await findRegistrationByField('regNum', safeToken);
+      let matchedField = 'regNum';
       if (!result) {
         result = await findRegistrationByField('teammateRegNo', safeToken);
         matchedField = 'teammateRegNo';
@@ -69,7 +69,7 @@ const Verify = () => {
         setStatus('invalid');
         setMessage('Registration not found for this Reg No / Teammate Reg No');
         setIcon('invalid');
-      } else if ((matchedField === 'regNo' && result.arrived) || (matchedField !== 'regNo' && result.teammateArrived)) {
+      } else if ((matchedField === 'regNum' && result.arrived) || (matchedField !== 'regNum' && result.teammateArrived)) {
         setStatus('already');
         setMessage('Already Marked Arrived');
         setIcon('already');
@@ -139,7 +139,7 @@ const Verify = () => {
     setLoading(true);
     try {
       await pb.collection('scratchlabsRegistrations').update(scannedRegistration.id, {
-        ...(matchedRegistrationField === 'regNo' ? { arrived: true } : { teammateArrived: true }),
+        ...(matchedRegistrationField === 'regNum' ? { arrived: true } : { teammateArrived: true }),
       });
       setStatus('arrived');
       setMessage('Marked Arrived Successfully');
