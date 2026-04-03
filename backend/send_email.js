@@ -1,5 +1,5 @@
 const express = require('express');
-const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
+const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
@@ -38,24 +38,33 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 
-const SES_REGION = process.env.AWS_SES_REGION || process.env.AWS_REGION || 'ap-south-1';
-const SENDER_EMAIL = process.env.AWS_SES_FROM_EMAIL || process.env.SENDER_EMAIL;
-const SENDER_FROM_NAME = process.env.AWS_SES_FROM_NAME || process.env.SENDER_FROM_NAME || 'E-Cell SOA';
+const SENDER_EMAIL = process.env.SENDER_EMAIL;
+const SENDER_PASSWORD = process.env.SENDER_PASSWORD;
+const SENDER_FROM_NAME = process.env.SENDER_FROM_NAME || 'E-Cell SOA';
+const SMTP_HOST = process.env.SENDER_SMTP_HOST || 'smtp.gmail.com';
+const SMTP_PORT = Number(process.env.SENDER_SMTP_PORT || 465);
+const SMTP_SECURE = String(process.env.SENDER_SMTP_SECURE || 'true').toLowerCase() !== 'false';
 
 // Check if required environment variables are set.
-if (!SENDER_EMAIL) {
+if (!SENDER_EMAIL || !SENDER_PASSWORD) {
   console.error('❌ Missing required environment variables:');
-  console.error('  - AWS_SES_FROM_EMAIL (or SENDER_EMAIL) is required');
-  console.error('  - AWS credentials should be available via env or IAM role');
-  console.error('  - AWS_SES_REGION/AWS_REGION should be set if not using default ap-south-1');
+  if (!SENDER_EMAIL) console.error('  - SENDER_EMAIL is required');
+  if (!SENDER_PASSWORD) console.error('  - SENDER_PASSWORD (Gmail app password) is required');
+  console.error('  - Optional: SENDER_SMTP_HOST, SENDER_SMTP_PORT, SENDER_SMTP_SECURE');
   process.exit(1);
 }
 
-const sesClient = new SESv2Client({
-  region: SES_REGION,
+const transporter = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_SECURE,
+  auth: {
+    user: SENDER_EMAIL,
+    pass: SENDER_PASSWORD,
+  },
 });
 
-const sendEmailViaSes = async ({ to, subject, html }) => {
+const sendEmailViaSmtp = async ({ to, subject, html }) => {
   const toAddresses = String(to || '')
     .split(',')
     .map((entry) => entry.trim())
@@ -65,28 +74,12 @@ const sendEmailViaSes = async ({ to, subject, html }) => {
     throw new Error('Recipient email is required.');
   }
 
-  const command = new SendEmailCommand({
-    FromEmailAddress: `${SENDER_FROM_NAME} <${SENDER_EMAIL}>`,
-    Destination: {
-      ToAddresses: toAddresses,
-    },
-    Content: {
-      Simple: {
-        Subject: {
-          Data: String(subject || ''),
-          Charset: 'UTF-8',
-        },
-        Body: {
-          Html: {
-            Data: String(html || ''),
-            Charset: 'UTF-8',
-          },
-        },
-      },
-    },
+  await transporter.sendMail({
+    from: `"${SENDER_FROM_NAME}" <${SENDER_EMAIL}>`,
+    to: toAddresses,
+    subject: String(subject || ''),
+    html: String(html || ''),
   });
-
-  return sesClient.send(command);
 };
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
@@ -119,6 +112,34 @@ const buildOtpEmail = ({ name, otp, purpose }) => {
   `;
 };
 
+const buildAudiencePollConfirmationEmail = ({ name, registrationNumber }) => {
+  const safeName = name && String(name).trim() ? String(name).trim() : 'Participant';
+  const safeRegNo = registrationNumber && String(registrationNumber).trim()
+    ? String(registrationNumber).trim().toUpperCase()
+    : 'N/A';
+
+  return `
+    <div style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f4f5fb;padding:32px 0;">
+      <div style="max-width:560px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+        <div style="background:#121212;padding:20px 24px;color:#c8ff00;text-align:center;">
+          <h2 style="margin:0;font-size:22px;letter-spacing:.3px;">E-Cell SOA Audience Poll</h2>
+        </div>
+        <div style="padding:28px 24px;">
+          <p style="margin:0 0 12px;color:#222;font-size:15px;">Hello <strong>${safeName}</strong>,</p>
+          <p style="margin:0 0 14px;color:#444;font-size:14px;line-height:1.6;">Your details were verified successfully. You can now vote in the audience poll.</p>
+          <div style="margin:18px 0;padding:14px;border:1px solid #ecf5be;background:#f8fddf;border-radius:10px;">
+            <p style="margin:0;color:#333;font-size:13px;">Registration Number: <strong>${safeRegNo}</strong></p>
+          </div>
+          <p style="margin:0;color:#666;font-size:13px;line-height:1.5;">You are allowed only one vote.</p>
+        </div>
+        <div style="padding:14px 24px;background:#fafafa;border-top:1px solid #eee;color:#888;font-size:12px;text-align:center;">
+          © ${new Date().getFullYear()} E-Cell SOA
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 app.post('/api/send-otp', async (req, res) => {
   const { email, name, purpose } = req.body || {};
   const normalizedEmail = String(email || '').trim().toLowerCase();
@@ -131,7 +152,7 @@ app.post('/api/send-otp', async (req, res) => {
   const expiresAt = Date.now() + OTP_TTL_MS;
 
   try {
-    await sendEmailViaSes({
+    await sendEmailViaSmtp({
       to: normalizedEmail,
       subject: 'Email Verification OTP - Audience Poll',
       html: buildOtpEmail({ name, otp, purpose: purpose || 'Audience Poll' }),
@@ -198,7 +219,7 @@ app.post('/api/send-email', async (req, res) => {
   }
 
   try {
-    await sendEmailViaSes({
+    await sendEmailViaSmtp({
       to: to,
       subject: subject,
       html: html,
@@ -208,6 +229,32 @@ app.post('/api/send-email', async (req, res) => {
   } catch (err) {
     console.error('❌ Email send failed:', err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/audience-poll/send-confirmation', async (req, res) => {
+  const { email, name, registrationNumber } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+
+  if (!isValidEmail(normalizedEmail)) {
+    return res.status(400).json({ error: 'A valid email is required.' });
+  }
+
+  try {
+    await sendEmailViaSmtp({
+      to: normalizedEmail,
+      subject: 'Audience Poll Entry Confirmed',
+      html: buildAudiencePollConfirmationEmail({
+        name,
+        registrationNumber,
+      }),
+    });
+
+    console.log(`✅ AUDIENCE POLL CONFIRMATION SENT TO ${normalizedEmail}`);
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Audience poll confirmation email failed:', err.message);
+    return res.status(500).json({ error: 'Failed to send confirmation email.' });
   }
 });
 

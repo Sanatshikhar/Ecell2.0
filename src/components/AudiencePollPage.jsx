@@ -2,8 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
-const PAGE_TIMER_DURATION_SECONDS = 24 * 60 * 60;
-const PAGE_TIMER_STORAGE_KEY = 'audiencePoll24hEndAt';
+
+const getTomorrowEightAmTimestamp = () => {
+  const now = new Date();
+  const target = new Date(now);
+  target.setDate(now.getDate() + 1);
+  target.setHours(8, 0, 0, 0);
+  return target.getTime();
+};
 
 const escapeFilterValue = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
@@ -26,7 +32,20 @@ const AudiencePollPage = () => {
   const [formErrors, setFormErrors] = useState({});
   const hasLoadedProductsRef = useRef(false);
   const [isTransitioningToVote, setIsTransitioningToVote] = useState(false);
-  const [pageTimerSecondsLeft, setPageTimerSecondsLeft] = useState(PAGE_TIMER_DURATION_SECONDS);
+  const [pageTimerSecondsLeft, setPageTimerSecondsLeft] = useState(0);
+  const [otpStepActive, setOtpStepActive] = useState(false);
+  const [otpInput, setOtpInput] = useState('');
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpExpiresAt, setOtpExpiresAt] = useState(null);
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
+  const [otpError, setOtpError] = useState('');
+  const [otpMessage, setOtpMessage] = useState('');
+
+  const backendUrl = useMemo(
+    () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, ''),
+    []
+  );
 
   const productCards = useMemo(() => products.slice(0, PRODUCT_LIMIT), [products]);
 
@@ -48,25 +67,27 @@ const AudiencePollPage = () => {
   };
 
   useEffect(() => {
-    let existingEndAt = 0;
-
-    try {
-      existingEndAt = Number(window.localStorage.getItem(PAGE_TIMER_STORAGE_KEY) || 0);
-    } catch (error) {
-      existingEndAt = 0;
+    if (!otpExpiresAt) {
+      setOtpSecondsLeft(0);
+      return;
     }
 
-    if (!existingEndAt || existingEndAt <= Date.now()) {
-      existingEndAt = Date.now() + PAGE_TIMER_DURATION_SECONDS * 1000;
-      try {
-        window.localStorage.setItem(PAGE_TIMER_STORAGE_KEY, String(existingEndAt));
-      } catch (error) {
-        // Ignore storage write failures and keep timer in-memory.
-      }
-    }
+    const updateOtpCountdown = () => {
+      const remaining = Math.max(0, Math.ceil((otpExpiresAt - Date.now()) / 1000));
+      setOtpSecondsLeft(remaining);
+    };
+
+    updateOtpCountdown();
+    const interval = setInterval(updateOtpCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [otpExpiresAt]);
+
+  useEffect(() => {
+    const targetAt = getTomorrowEightAmTimestamp();
 
     const updateTimer = () => {
-      const remaining = Math.max(0, Math.ceil((existingEndAt - Date.now()) / 1000));
+      const remaining = Math.max(0, Math.ceil((targetAt - Date.now()) / 1000));
       setPageTimerSecondsLeft(remaining);
     };
 
@@ -82,6 +103,13 @@ const AudiencePollPage = () => {
     const mm = String(Math.floor((safe % 3600) / 60)).padStart(2, '0');
     const ss = String(safe % 60).padStart(2, '0');
     return `${hh}:${mm}:${ss}`;
+  }, []);
+
+  const formatOtpTime = useCallback((seconds) => {
+    const safe = Math.max(0, Number(seconds || 0));
+    const mm = String(Math.floor(safe / 60)).padStart(2, '0');
+    const ss = String(safe % 60).padStart(2, '0');
+    return `${mm}:${ss}`;
   }, []);
 
   const fetchProducts = useCallback(async () => {
@@ -159,6 +187,57 @@ const AudiencePollPage = () => {
     if (formErrors[name]) {
       setFormErrors((previous) => ({ ...previous, [name]: '' }));
     }
+
+    if (otpStepActive && ['name', 'email', 'registrationNumber'].includes(name)) {
+      setOtpStepActive(false);
+      setOtpInput('');
+      setOtpError('');
+      setOtpMessage('Details changed. Send OTP again to continue.');
+      setOtpExpiresAt(null);
+    }
+  };
+
+  const sendOtp = async () => {
+    if (!backendUrl) {
+      setOtpError('REACT_APP_BACKEND_URL is not configured.');
+      return false;
+    }
+
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    const normalizedName = formData.name.trim();
+
+    setOtpSending(true);
+    setOtpError('');
+    setOtpMessage('');
+
+    try {
+      const response = await fetch(`${backendUrl}/api/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          name: normalizedName,
+          purpose: 'Audience Poll',
+        }),
+      });
+
+      const responseBody = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(responseBody.error || 'Unable to send OTP right now.');
+      }
+
+      const expiresInSeconds = Number(responseBody.expiresInSeconds || 300);
+      setOtpExpiresAt(Date.now() + expiresInSeconds * 1000);
+      setOtpInput('');
+      setOtpStepActive(true);
+      setOtpMessage('OTP sent. Verify your email to continue.');
+      return true;
+    } catch (error) {
+      setOtpError(error.message || 'Failed to send OTP.');
+      return false;
+    } finally {
+      setOtpSending(false);
+    }
   };
 
   const proceedToVoting = async () => {
@@ -167,7 +246,6 @@ const AudiencePollPage = () => {
     setStatusMessage('');
 
     const normalizedRegistrationNumber = formData.registrationNumber.trim();
-    const normalizedName = formData.name.trim();
     const normalizedEmail = formData.email.trim().toLowerCase();
 
     try {
@@ -207,18 +285,12 @@ const AudiencePollPage = () => {
         return;
       }
 
-      const createdVoter = await pb.collection('voters').create({
-        name: normalizedName,
-        email: normalizedEmail,
-        registrationNumber: normalizedRegistrationNumber,
-        selectedProductId: '',
-        selectedProductName: '',
-      });
-
-      setCurrentVoter(createdVoter);
-      setFormSubmitted(true);
-      setVoteLocked(false);
-      setStatus('Details verified. Choose one product to vote.', 'success');
+      setIsTransitioningToVote(false);
+      setStatus(
+        'Verification failed. Your details are not found in verified voter records.',
+        'error'
+      );
+      return;
     } catch (error) {
       console.error('Error saving voter details:', error);
 
@@ -259,7 +331,55 @@ const AudiencePollPage = () => {
 
     if (!validateForm()) return;
 
-    await proceedToVoting();
+    const sent = await sendOtp();
+    if (sent) {
+      setStatus('OTP sent to your email. Verify it to access voting.', 'info');
+    }
+  };
+
+  const handleVerifyOtpAndContinue = async () => {
+    if (!backendUrl) {
+      setOtpError('REACT_APP_BACKEND_URL is not configured.');
+      return;
+    }
+
+    const normalizedOtp = otpInput.trim();
+    if (!normalizedOtp || normalizedOtp.length !== 6) {
+      setOtpError('Enter the 6-digit OTP.');
+      return;
+    }
+
+    if (otpSecondsLeft <= 0) {
+      setOtpError('OTP expired. Please request a new one.');
+      return;
+    }
+
+    setOtpVerifying(true);
+    setOtpError('');
+    setOtpMessage('');
+
+    try {
+      const response = await fetch(`${backendUrl}/api/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email.trim().toLowerCase(),
+          otp: normalizedOtp,
+        }),
+      });
+
+      const responseBody = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(responseBody.error || 'OTP verification failed.');
+      }
+
+      setOtpMessage('Email verified successfully. Redirecting to voting...');
+      await proceedToVoting();
+    } catch (error) {
+      setOtpError(error.message || 'OTP verification failed.');
+    } finally {
+      setOtpVerifying(false);
+    }
   };
 
   const incrementProductCount = async (product) => {
@@ -374,7 +494,7 @@ const AudiencePollPage = () => {
 
             <div className="mt-6 inline-flex items-center gap-3 border border-lime-400 border-opacity-30 bg-lime-400 bg-opacity-10 px-4 py-2">
               <span className="font-spacemono text-[10px] uppercase tracking-[0.25em] text-gray-300">
-                24hr Timer
+                Ends Tomorrow 08:00 AM
               </span>
               <span className="font-spacemono text-lg font-bold text-lime-300 tracking-widest">
                 {formatPageTimer(pageTimerSecondsLeft)}
@@ -456,11 +576,58 @@ const AudiencePollPage = () => {
 
                   <button
                     type="submit"
-                    disabled={isSubmittingForm}
+                    disabled={isSubmittingForm || otpSending || otpVerifying}
                     className="w-full py-3 px-6 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:transform-none"
                   >
-                    {isSubmittingForm ? 'Submitting...' : 'Continue to Vote'}
+                    {otpSending ? 'Sending OTP...' : 'Continue to Vote'}
                   </button>
+
+                  {otpStepActive && (
+                    <div className="mt-6 border border-lime-400 border-opacity-25 bg-lime-400 bg-opacity-5 p-4">
+                      <p className="font-spacemono text-xs uppercase tracking-[0.2em] text-lime-300 mb-3">
+                        Step 2: Verify Email OTP
+                      </p>
+
+                      <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          value={otpInput}
+                          onChange={(event) => setOtpInput(event.target.value.replace(/\D/g, ''))}
+                          placeholder="Enter 6-digit OTP"
+                          className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded text-gray-200 placeholder-gray-600 font-spacemono text-sm outline-none transition-all focus:border-lime-400"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyOtpAndContinue}
+                          disabled={otpVerifying || isSubmittingForm || otpSecondsLeft <= 0}
+                          className="sm:w-auto w-full px-5 py-3 border border-lime-400 text-lime-300 font-spacemono text-xs uppercase tracking-[0.2em] hover:bg-lime-400 hover:text-black transition-all disabled:bg-gray-700 disabled:text-gray-500 disabled:border-gray-600"
+                        >
+                          {otpVerifying || isSubmittingForm ? 'Verifying...' : 'Verify OTP'}
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={sendOtp}
+                          disabled={otpSending || otpVerifying}
+                          className="px-4 py-2 border border-gray-700 text-gray-300 font-spacemono text-[11px] uppercase tracking-[0.2em] hover:border-lime-400 hover:text-lime-300 transition-all disabled:opacity-50"
+                        >
+                          {otpSending ? 'Sending...' : 'Resend OTP'}
+                        </button>
+                        {otpSecondsLeft > 0 && (
+                          <p className="font-spacemono text-[11px] text-gray-400">
+                            Expires in {formatOtpTime(otpSecondsLeft)}
+                          </p>
+                        )}
+                      </div>
+
+                      {otpMessage && <p className="mt-3 font-spacemono text-xs text-lime-300">{otpMessage}</p>}
+                      {otpError && <p className="mt-2 font-spacemono text-xs text-red-400">{otpError}</p>}
+                    </div>
+                  )}
                 </form>
               </div>
             </div>
