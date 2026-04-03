@@ -36,7 +36,7 @@ function AppContent() {
     return unsubscribe;
   }, []);
 
-  const hideHeaderPaths = ['/scratchlabs', '/scratchlabs-participant-dashboard', '/ai-tribunal', '/registrations', '/verify', '/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = ['/scratchlabs', '/scratchlabs/participant-portal', '/ai-tribunal', '/registrations', '/verify', '/scratchlabs/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
 
   return (
     <>
@@ -51,13 +51,13 @@ function AppContent() {
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
         <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
-        <Route path="/scratchlabs-participant-dashboard" element={<ScratchLabsParticipantDashboard />} />
+        <Route path="/scratchlabs/participant-portal" element={<ScratchLabsParticipantDashboard />} />
         <Route path="/ai-tribunal" element={<AITribunalRegistration />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
-        <Route path="/audience-poll" element={<AudiencePollPage />} />
+        <Route path="/scratchlabs/audience-poll" element={<AudiencePollPage />} />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />
