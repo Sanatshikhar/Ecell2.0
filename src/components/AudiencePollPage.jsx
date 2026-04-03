@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
+const REGISTRATION_NUMBER_REGEX = /^(25|24|23|22)\d{7,8}$/;
 
 const getTomorrowEightAmTimestamp = () => {
   const now = new Date();
@@ -64,6 +65,12 @@ const AudiencePollPage = () => {
     if (!formData.email.trim()) errors.email = 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
     if (!formData.registrationNumber.trim()) errors.registrationNumber = 'Registration number is required';
+    if (
+      formData.registrationNumber.trim() &&
+      !REGISTRATION_NUMBER_REGEX.test(formData.registrationNumber.trim())
+    ) {
+      errors.registrationNumber = 'Invalid registration number';
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -280,7 +287,9 @@ const AudiencePollPage = () => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((previous) => ({ ...previous, [name]: value }));
+    const nextValue =
+      name === 'registrationNumber' ? value.replace(/\D/g, '').slice(0, 10) : value;
+    setFormData((previous) => ({ ...previous, [name]: nextValue }));
 
     if (formErrors[name]) {
       setFormErrors((previous) => ({ ...previous, [name]: '' }));
@@ -825,6 +834,8 @@ const AudiencePollPage = () => {
                       name="registrationNumber"
                       value={formData.registrationNumber}
                       onChange={handleFormChange}
+                      inputMode="numeric"
+                      maxLength={10}
                       placeholder="Enter your registration number"
                       className={`w-full px-4 py-3 bg-gray-800 border rounded text-gray-200 placeholder-gray-600 font-spacemono text-sm outline-none transition-all ${
                         formErrors.registrationNumber ? 'border-red-500' : 'border-gray-700 focus:border-lime-400'
