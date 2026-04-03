@@ -551,6 +551,7 @@ const AudiencePollPage = () => {
       }
 
       setOtpMessage('Email verified successfully. Redirecting to voting...');
+      setIsOtpModalOpen(false);
       await proceedToVoting();
     } catch (error) {
       setOtpError(error.message || 'OTP verification failed.');
