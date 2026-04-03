@@ -68,8 +68,10 @@ function AppContent() {
       {showQueryBar && (
         <div className="global-query-bar" role="contentinfo" aria-label="Query contact details">
           <span>For any queries or question contact </span>
-          <span className="global-query-label">@IEC Technical Team :</span>
-          <a href="tel:+917091318966" className="global-query-phone">+91 70913 18966</a>
+          <span className="global-query-team-contact">
+            <span className="global-query-label">@IEC Technical Team :</span>
+            <a href="tel:+917091318966" className="global-query-phone">+91 70913 18966</a>
+          </span>
         </div>
       )}
     </>

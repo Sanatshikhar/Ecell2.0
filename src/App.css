@@ -64,6 +64,13 @@
       font-weight: 600;
     }
 
+    .global-query-team-contact {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
     .global-query-phone {
       color: #9ef01a;
       font-weight: 700;
