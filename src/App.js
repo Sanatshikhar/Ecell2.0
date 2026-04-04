@@ -1,5 +1,6 @@
 import "./App.css";
 import React from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from "./components/Header";
 import Home from "./components/Home";
 import About from "./components/About";
@@ -10,9 +11,9 @@ import TechTeam from "./components/TechTeam";
 import Members from "./components/Join";
 import Join from "./components/TechXperience";
 import ComingSoon from "./components/ComingSoon";
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import AudiencePollPage from './components/AudiencePollPage';
+import AudiencePollResultsPage from './components/AudiencePollResultsPage';
 import Verify from './components/Verify';
 import Login from './components/Login';
 import JoiningRegSheet from './components/JoiningRegSheet';
@@ -33,16 +34,33 @@ function AppContent() {
     const unsubscribe = pb.authStore.onChange(() => {
       setAuth(pb.authStore.isValid);
     });
+
     return unsubscribe;
   }, []);
 
-  const hideHeaderPaths = ['/scratchlabs', '/scratchlabs/participant-portal', '/ai-tribunal', '/registrations', '/verify', '/scratchlabs/audience-poll', '/data-export', '/joining-registrations', '/cancellation-refunds', '/terms-conditions', '/shipping', '/privacy'];
+  const hideHeaderPaths = [
+    '/scratchlabs',
+    '/scratchlabs/participant-portal',
+    '/ai-tribunal',
+    '/registrations',
+    '/verify',
+    '/scratchlabs/audience-poll',
+    '/scratchlabs/audience-poll/results',
+    '/data-export',
+    '/joining-registrations',
+    '/cancellation-refunds',
+    '/terms-conditions',
+    '/shipping',
+    '/privacy',
+  ];
+
   const showQueryBar = hideHeaderPaths.includes(location.pathname);
 
   return (
     <>
       {!hideHeaderPaths.includes(location.pathname) && <Header />}
       <Routes>
+        <Route path="/audience-poll" element={<Navigate to="/scratchlabs/audience-poll" replace />} />
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
         <Route path="/" element={<Home />} />
@@ -59,6 +77,7 @@ function AppContent() {
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/scratchlabs/audience-poll" element={<AudiencePollPage />} />
+        <Route path="/scratchlabs/audience-poll/results" element={<AudiencePollResultsPage />} />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />
