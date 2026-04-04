@@ -334,14 +334,15 @@ export default function ScratchLabsMarketingLinksForm() {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={addUrlField}
-                disabled={urls.length >= MAX_URLS}
-                className="rounded-lg border border-[#c8ff00] px-4 py-2 text-sm font-semibold text-[#c8ff00] transition-colors hover:bg-[#c8ff00] hover:text-black"
-              >
-                + Add Another URL
-              </button>
+              {urls.length < MAX_URLS && (
+                <button
+                  type="button"
+                  onClick={addUrlField}
+                  className="rounded-lg border border-[#c8ff00] px-4 py-2 text-sm font-semibold text-[#c8ff00] transition-colors hover:bg-[#c8ff00] hover:text-black"
+                >
+                  + Add Another URL
+                </button>
+              )}
               <button
                 type="submit"
                 disabled={isSubmitting}
