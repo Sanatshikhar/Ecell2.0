@@ -30,7 +30,7 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="relative min-h-screen w-screen overflow-hidden bg-[#050805] text-[#ecffe0]">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#050805] text-[#ecffe0]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(200,255,0,0.14),transparent_38%),radial-gradient(circle_at_85%_10%,rgba(22,163,74,0.2),transparent_40%),radial-gradient(circle_at_50%_90%,rgba(200,255,0,0.12),transparent_48%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(200,255,0,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(200,255,0,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
 

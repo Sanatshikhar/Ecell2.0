@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import pb from "../lib/pocketbase";
+import ambientAudioFile from "./Assets/Ask the Audience Poll.mp3";
 
 const BAR_MAX_H = 280;
+const AMBIENT_AUDIO_SOURCE = ambientAudioFile;
 
 const MEDAL_COLORS = {
   1: { fill: "linear-gradient(180deg,#ecff99 0%,#c8ff00 45%,#8ab700 100%)", text: "#deff72", glow: "rgba(200,255,0,0.48)" },
@@ -142,11 +144,6 @@ const GLOBAL_CSS = `
 
   .bar-baseline { width: min(60px, 100%); height: 2px; background: rgba(255,255,255,.12); }
 
-  .bar-rank {
-    width: 28px; height: 28px; border-radius: 50%; margin-top: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Bebas Neue', sans-serif; font-size: 12px; border: 1px solid;
-  }
   .bar-name {
     font-size: 12px; font-weight: 600; text-align: center; color: #9ec4ad;
     line-height: 1.35; margin-top: 6px; word-break: break-word; max-width: 76px;
@@ -157,11 +154,6 @@ const GLOBAL_CSS = `
     font-size: 10px; letter-spacing: 3px; color: #2d3d35; text-transform: uppercase;
   }
 `;
-
-function hexRgb(hex) {
-  const h = hex.replace("#", "");
-  return `${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)}`;
-}
 
 function StarField() {
   const stars = useMemo(() =>
@@ -262,7 +254,7 @@ function PhaseReady({ eventName, onStart }) {
   );
 }
 
-function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }) {
+function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName, isRankSorted, onRankThem }) {
   const gridPcts = [0.25, 0.5, 0.75, 1.0];
 
   return (
@@ -273,6 +265,26 @@ function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }
         <p style={{ fontSize: 11, color: "#3A4060", letterSpacing: 3, marginTop: 4 }}>
           {totalVotes.toLocaleString()} TOTAL VOTES · {sorted.length} PRODUCTS
         </p>
+        <button
+          type="button"
+          onClick={onRankThem}
+          disabled={isRankSorted}
+          style={{
+            marginTop: 14,
+            border: "1px solid rgba(200,255,0,.45)",
+            background: isRankSorted ? "rgba(200,255,0,.18)" : "linear-gradient(180deg,#c8ff00,#9fce00)",
+            color: isRankSorted ? "#c8ff00" : "#102000",
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            padding: "9px 14px",
+            cursor: isRankSorted ? "default" : "pointer",
+            opacity: isRankSorted ? 0.78 : 1,
+          }}
+        >
+          {isRankSorted ? "Ranked" : "Rank Them"}
+        </button>
       </div>
 
       <div className="chart-scroll">
@@ -294,10 +306,6 @@ function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }
             const vpct = totalVotes > 0 ? ((product.votes / totalVotes) * 100).toFixed(1) : "0.0";
             const shown = idx < revealedCount;
             const textCol = medal?.text ?? (rank <= 7 ? "#a7ff4b" : "#7ccc3f");
-            const bdColor = medal
-              ? `rgba(${hexRgb(medal.text)},.28)`
-              : "rgba(90,111,160,.18)";
-            const rankBg = medal?.glow ?? "rgba(124,204,63,.14)";
             const delay = `${idx * 0.07}s`;
 
             return (
@@ -334,10 +342,6 @@ function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }
 
                 <div className="bar-baseline" />
 
-                <div className="bar-rank" style={{ color: textCol, borderColor: bdColor, background: rankBg }}>
-                  {rank}
-                </div>
-
                 <div className="bar-name" title={product.name}>{product.name}</div>
               </div>
             );
@@ -358,12 +362,14 @@ export default function AudiencePollResultsPage() {
   const [countdownNum, setCountdownNum] = useState(3);
   const [countingNum, setCountingNum] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
+  const [isRankSorted, setIsRankSorted] = useState(false);
 
   const [products, setProducts] = useState([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError, setDataError] = useState("");
   const audioCtxRef = useRef(null);
   const ambientNodesRef = useRef([]);
+  const ambientAudioElRef = useRef(null);
 
   const eventName = "ScratchLabs Voting Result";
 
@@ -375,6 +381,12 @@ export default function AudiencePollResultsPage() {
   }, []);
 
   const stopAmbientSound = useCallback(async () => {
+    if (ambientAudioElRef.current) {
+      ambientAudioElRef.current.pause();
+      ambientAudioElRef.current.currentTime = 0;
+      ambientAudioElRef.current = null;
+    }
+
     ambientNodesRef.current.forEach((entry) => {
       try {
         if (entry?.node?.stop) entry.node.stop();
@@ -395,7 +407,22 @@ export default function AudiencePollResultsPage() {
   }, []);
 
   const startAmbientSound = useCallback(async () => {
-    if (audioCtxRef.current) return;
+    if (ambientAudioElRef.current || audioCtxRef.current) return;
+
+    if (AMBIENT_AUDIO_SOURCE) {
+      try {
+        const audio = new Audio(AMBIENT_AUDIO_SOURCE);
+        audio.loop = false;
+        audio.preload = "auto";
+        audio.volume = 0.35;
+        await audio.play();
+        ambientAudioElRef.current = audio;
+        return;
+      } catch (err) {
+        // Keep silent if configured file audio fails instead of switching to synth.
+        return;
+      }
+    }
 
     try {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -495,11 +522,21 @@ export default function AudiencePollResultsPage() {
   }, []);
 
   const sorted = useMemo(
-    () => [...products].sort((a, b) => b.votes - a.votes),
-    [products]
+    () => {
+      if (isRankSorted) {
+        return [...products].sort(
+          (a, b) => b.votes - a.votes || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+        );
+      }
+      return [...products].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    },
+    [products, isRankSorted]
   );
 
-  const maxVotes = sorted[0]?.votes || 0;
+  const maxVotes = useMemo(
+    () => products.reduce((max, p) => Math.max(max, Number(p.votes || 0)), 0),
+    [products]
+  );
   const totalVotes = useMemo(
     () => products.reduce((sum, p) => sum + Number(p.votes || 0), 0),
     [products]
@@ -514,6 +551,7 @@ export default function AudiencePollResultsPage() {
     setCountdownNum(3);
     setCountingNum(0);
     setRevealedCount(0);
+    setIsRankSorted(false);
 
     const t = [
       setTimeout(() => setPhase(1), 2_000),
@@ -530,6 +568,10 @@ export default function AudiencePollResultsPage() {
   const handleStartReveal = async () => {
     await startAmbientSound();
     setHasStartedReveal(true);
+  };
+
+  const handleRankThem = () => {
+    setIsRankSorted(true);
   };
 
   useEffect(() => {
@@ -611,6 +653,8 @@ export default function AudiencePollResultsPage() {
           maxVotes={maxVotes}
           totalVotes={totalVotes}
           eventName={eventName}
+          isRankSorted={isRankSorted}
+          onRankThem={handleRankThem}
         />
       )}
     </div>
