@@ -7,6 +7,7 @@ const Login = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const isScannerLogin = window.location.pathname === '/verify';
+  const isResultsLogin = window.location.pathname === '/scratchlabs/audience-poll/results';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,10 +44,10 @@ const Login = ({ onLogin }) => {
               ScratchLabs Access
             </span>
             <h2 className="mt-3 text-3xl font-black uppercase tracking-[0.06em] text-[#ebffd2]">
-              {isScannerLogin ? 'Scanner Login' : 'Dashboard Login'}
+              {isScannerLogin ? 'Scanner Login' : isResultsLogin ? 'Results Access' : 'Secure Access'}
             </h2>
             <p className="mt-2 text-xs tracking-[0.08em] text-[#95ab86] uppercase">
-              Authorized Staff Only
+              Results Are Locked
             </p>
           </div>
 

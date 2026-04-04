@@ -28,11 +28,15 @@ import AITribunalRegistration from "./components/AITribunalRegistration";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
+  const [resultsRouteUnlocked, setResultsRouteUnlocked] = React.useState(false);
   const location = useLocation();
 
   React.useEffect(() => {
     const unsubscribe = pb.authStore.onChange(() => {
       setAuth(pb.authStore.isValid);
+      if (!pb.authStore.isValid) {
+        setResultsRouteUnlocked(false);
+      }
     });
 
     return unsubscribe;
@@ -77,7 +81,13 @@ function AppContent() {
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/scratchlabs/audience-poll" element={<AudiencePollPage />} />
-        <Route path="/scratchlabs/audience-poll/results" element={auth ? <AudiencePollResultsPage /> : <Login onLogin={() => setAuth(true)} />} />
+        <Route
+          path="/scratchlabs/audience-poll/results"
+          element={auth && resultsRouteUnlocked ? <AudiencePollResultsPage /> : <Login onLogin={() => {
+            setAuth(true);
+            setResultsRouteUnlocked(true);
+          }} />}
+        />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import pb from "../lib/pocketbase";
 
 const BAR_MAX_H = 280;
@@ -231,6 +231,37 @@ function PhaseReveal() {
   );
 }
 
+function PhaseReady({ eventName, onStart }) {
+  return (
+    <div className="pr-center">
+      <span className="pr-tag" style={{ animation: "fadeUp .9s ease both" }}>{eventName}</span>
+      <h1 className="hero-title">Results<br />Locked</h1>
+      <p style={{ fontSize: 14, color: "#73806f", marginTop: 14, letterSpacing: 1 }}>
+        Start the reveal when you are ready.
+      </p>
+      <button
+        type="button"
+        onClick={onStart}
+        style={{
+          marginTop: 28,
+          border: "1px solid rgba(200,255,0,.55)",
+          background: "linear-gradient(180deg,#c8ff00,#9fce00)",
+          color: "#102000",
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          padding: "12px 22px",
+          cursor: "pointer",
+          boxShadow: "0 0 28px rgba(200,255,0,.3)",
+        }}
+      >
+        Start Result Reveal
+      </button>
+    </div>
+  );
+}
+
 function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }) {
   const gridPcts = [0.25, 0.5, 0.75, 1.0];
 
@@ -322,6 +353,7 @@ function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName }
 }
 
 export default function AudiencePollResultsPage() {
+  const [hasStartedReveal, setHasStartedReveal] = useState(false);
   const [phase, setPhase] = useState(0);
   const [countdownNum, setCountdownNum] = useState(3);
   const [countingNum, setCountingNum] = useState(0);
@@ -330,6 +362,8 @@ export default function AudiencePollResultsPage() {
   const [products, setProducts] = useState([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError, setDataError] = useState("");
+  const audioCtxRef = useRef(null);
+  const ambientNodesRef = useRef([]);
 
   const eventName = "ScratchLabs Voting Result";
 
@@ -339,6 +373,86 @@ export default function AudiencePollResultsPage() {
     document.head.appendChild(el);
     return () => document.head.removeChild(el);
   }, []);
+
+  const stopAmbientSound = useCallback(async () => {
+    ambientNodesRef.current.forEach((entry) => {
+      try {
+        if (entry?.node?.stop) entry.node.stop();
+      } catch (err) {
+        // Ignore if node already stopped.
+      }
+    });
+    ambientNodesRef.current = [];
+
+    if (audioCtxRef.current) {
+      try {
+        await audioCtxRef.current.close();
+      } catch (err) {
+        // Ignore close failures from browser context state.
+      }
+      audioCtxRef.current = null;
+    }
+  }, []);
+
+  const startAmbientSound = useCallback(async () => {
+    if (audioCtxRef.current) return;
+
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const ctx = new AudioContextClass();
+      const master = ctx.createGain();
+      master.gain.value = 0.035;
+      master.connect(ctx.destination);
+
+      const droneA = ctx.createOscillator();
+      droneA.type = "sine";
+      droneA.frequency.value = 196;
+
+      const droneB = ctx.createOscillator();
+      droneB.type = "triangle";
+      droneB.frequency.value = 261.63;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 620;
+
+      const pulse = ctx.createOscillator();
+      pulse.type = "sine";
+      pulse.frequency.value = 0.15;
+
+      const pulseGain = ctx.createGain();
+      pulseGain.gain.value = 0.01;
+
+      pulse.connect(pulseGain);
+      pulseGain.connect(master.gain);
+
+      droneA.connect(filter);
+      droneB.connect(filter);
+      filter.connect(master);
+
+      const now = ctx.currentTime;
+      droneA.start(now);
+      droneB.start(now);
+      pulse.start(now);
+
+      audioCtxRef.current = ctx;
+      ambientNodesRef.current = [
+        { node: droneA },
+        { node: droneB },
+        { node: pulse },
+      ];
+    } catch (err) {
+      // If audio fails in the browser environment, continue reveal without sound.
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopAmbientSound();
+    };
+  }, [stopAmbientSound]);
 
   useEffect(() => {
     let disposed = false;
@@ -392,7 +506,7 @@ export default function AudiencePollResultsPage() {
   );
 
   useEffect(() => {
-    if (isLoadingData || dataError || sorted.length === 0) {
+    if (isLoadingData || dataError || sorted.length === 0 || !hasStartedReveal) {
       return undefined;
     }
 
@@ -411,7 +525,12 @@ export default function AudiencePollResultsPage() {
     ];
 
     return () => t.forEach(clearTimeout);
-  }, [isLoadingData, dataError, sorted.length]);
+  }, [isLoadingData, dataError, sorted.length, hasStartedReveal]);
+
+  const handleStartReveal = async () => {
+    await startAmbientSound();
+    setHasStartedReveal(true);
+  };
 
   useEffect(() => {
     if (phase !== 1) return undefined;
@@ -480,11 +599,12 @@ export default function AudiencePollResultsPage() {
   return (
     <div className="pr-root">
       <StarField />
-      {phase === 0 && <PhaseIntro eventName={eventName} totalVotes={totalVotes} productsCount={sorted.length} />}
-      {phase === 1 && <PhaseCounting count={countingNum} />}
-      {phase === 2 && <PhaseCountdown num={countdownNum} />}
-      {phase === 3 && <PhaseReveal />}
-      {phase === 4 && (
+      {!hasStartedReveal && <PhaseReady eventName={eventName} onStart={handleStartReveal} />}
+      {hasStartedReveal && phase === 0 && <PhaseIntro eventName={eventName} totalVotes={totalVotes} productsCount={sorted.length} />}
+      {hasStartedReveal && phase === 1 && <PhaseCounting count={countingNum} />}
+      {hasStartedReveal && phase === 2 && <PhaseCountdown num={countdownNum} />}
+      {hasStartedReveal && phase === 3 && <PhaseReveal />}
+      {hasStartedReveal && phase === 4 && (
         <PhaseResults
           revealedCount={revealedCount}
           sorted={sorted}
