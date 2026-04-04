@@ -5,6 +5,7 @@ const TEAM_COLLECTION = 'scratchlabs_teams';
 const PRODUCT_COLLECTION = 'products';
 const MARKETING_LINKS_COLLECTION =
   process.env.REACT_APP_PB_MARKETING_LINKS_COLLECTION || 'ScratcLabURL';
+const MAX_URLS = 4;
 
 function escapeFilterValue(value) {
   return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -25,6 +26,23 @@ function chunkUrls(urlList, size = 4) {
     chunks.push(urlList.slice(i, i + size));
   }
   return chunks;
+}
+
+function getPocketBaseErrorMessage(error, fallback) {
+  const fieldErrors = error?.response?.data || error?.data;
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const firstKey = Object.keys(fieldErrors)[0];
+    const firstMessage = fieldErrors[firstKey]?.message;
+    if (typeof firstMessage === 'string' && firstMessage.trim()) {
+      return `${firstKey}: ${firstMessage}`;
+    }
+  }
+
+  if (typeof error?.message === 'string' && error.message.trim()) {
+    return error.message;
+  }
+
+  return fallback;
 }
 
 async function findProductByName(inputName) {
@@ -91,7 +109,10 @@ export default function ScratchLabsMarketingLinksForm() {
   };
 
   const addUrlField = () => {
-    setUrls((prev) => [...prev, '']);
+    setUrls((prev) => {
+      if (prev.length >= MAX_URLS) return prev;
+      return [...prev, ''];
+    });
   };
 
   const removeUrlField = (index) => {
@@ -176,23 +197,25 @@ export default function ScratchLabsMarketingLinksForm() {
     setIsSubmitting(true);
 
     try {
-
       const urlChunks = chunkUrls(cleanedUrls, 4);
 
-      await Promise.all(
-        urlChunks.map((chunk) => pb.collection(MARKETING_LINKS_COLLECTION).create({
+      for (const chunk of urlChunks) {
+        const payload = {
           product_name: verifiedProductId,
-          url1: chunk[0] || '',
-          url2: chunk[1] || '',
-          url3: chunk[2] || '',
-          url4: chunk[3] || '',
-        }))
-      );
+        };
+
+        if (chunk[0]) payload.url1 = chunk[0];
+        if (chunk[1]) payload.url2 = chunk[1];
+        if (chunk[2]) payload.url3 = chunk[2];
+        if (chunk[3]) payload.url4 = chunk[3];
+
+        await pb.collection(MARKETING_LINKS_COLLECTION).create(payload);
+      }
 
       setStatus(`Submitted ${cleanedUrls.length} URL(s) successfully.`);
       setUrls(['']);
-    } catch {
-      setError('Unable to submit links right now. Please try again in a moment.');
+    } catch (submitError) {
+      setError(getPocketBaseErrorMessage(submitError, 'Unable to submit links right now. Please try again in a moment.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -314,6 +337,7 @@ export default function ScratchLabsMarketingLinksForm() {
               <button
                 type="button"
                 onClick={addUrlField}
+                disabled={urls.length >= MAX_URLS}
                 className="rounded-lg border border-[#c8ff00] px-4 py-2 text-sm font-semibold text-[#c8ff00] transition-colors hover:bg-[#c8ff00] hover:text-black"
               >
                 + Add Another URL
@@ -326,6 +350,8 @@ export default function ScratchLabsMarketingLinksForm() {
                 {isSubmitting ? 'Submitting...' : 'Submit Links'}
               </button>
             </div>
+
+            <p className="mt-3 text-xs text-[#8a8a8a]">You can add up to 4 URLs.</p>
           </form>
         )}
 
