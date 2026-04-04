@@ -25,6 +25,7 @@ import pb from './lib/pocketbase';
 import ScratchLabsRegistration from "./components/ScratchLabsRegistration";
 import ScratchLabsParticipantDashboard from "./components/ScratchLabsParticipantDashboard";
 import AITribunalRegistration from "./components/AITribunalRegistration";
+import ScratchLabsMarketingLinksForm from "./components/ScratchLabsMarketingLinksForm";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -45,6 +46,7 @@ function AppContent() {
   const hideHeaderPaths = [
     '/scratchlabs',
     '/scratchlabs/participant-portal',
+    '/scratchlabs/marketing-links',
     '/ai-tribunal',
     '/registrations',
     '/verify',
@@ -75,6 +77,7 @@ function AppContent() {
         <Route path="/join" element={<Join />} />
         <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
         <Route path="/scratchlabs/participant-portal" element={<ScratchLabsParticipantDashboard />} />
+        <Route path="/scratchlabs/marketing-links" element={<ScratchLabsMarketingLinksForm />} />
         <Route path="/ai-tribunal" element={<AITribunalRegistration />} />
         <Route path="/registrations" element={auth ? <Dashboard /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/joining-registrations" element={auth ? <JoiningRegSheet /> : <Login onLogin={() => setAuth(true)} />} />

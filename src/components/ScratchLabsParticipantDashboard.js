@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Shuffle, Users, CheckCircle, ArrowRight, Zap } from 'lucide-react';
 import pb from '../lib/pocketbase';
 
@@ -616,7 +617,15 @@ export default function ScratchLabsParticipantDashboard() {
         </div>
 
         <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl shadow-lg p-6 text-white">
-          <h2 className="text-lg font-semibold mb-4">Next Steps</h2>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
+            <h2 className="text-lg font-semibold">Next Steps</h2>
+            <Link
+              to="/scratchlabs/marketing-links"
+              className="inline-flex items-center justify-center rounded-lg border border-transparent bg-[#c8ff00] px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-[#b7ea00]"
+            >
+              Submit Marketing Post Links
+            </Link>
+          </div>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-4 rounded-lg">
               <div className="font-bold text-[#c8ff00] mb-1">1. Ideate</div>
