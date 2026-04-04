@@ -137,6 +137,13 @@ const GLOBAL_CSS = `
     animation: barRise var(--dur) cubic-bezier(.25,1,.5,1) both;
     animation-delay: var(--delay);
   }
+  .bar-rank-inside {
+    position: absolute; top: 6px; left: 0; right: 0;
+    text-align: center; font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; letter-spacing: 1px; color: rgba(0,0,0,.55);
+    text-shadow: 0 1px 0 rgba(255,255,255,.18);
+    pointer-events: none;
+  }
   .bar-fill::after {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 35%;
     border-radius: 6px 6px 0 0; background: rgba(255,255,255,.13);
@@ -336,7 +343,9 @@ function PhaseResults({ revealedCount, sorted, maxVotes, totalVotes, eventName, 
                         "--delay": delay,
                         boxShadow: medal ? `0 -6px 18px ${medal.glow}` : "none",
                       }}
-                    />
+                    >
+                      {isRankSorted && <span className="bar-rank-inside">#{rank}</span>}
+                    </div>
                   )}
                 </div>
 
@@ -367,6 +376,7 @@ export default function AudiencePollResultsPage() {
   const [products, setProducts] = useState([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError, setDataError] = useState("");
+  const hasStoppedAudioAtRevealEndRef = useRef(false);
   const audioCtxRef = useRef(null);
   const ambientNodesRef = useRef([]);
   const ambientAudioElRef = useRef(null);
@@ -552,6 +562,7 @@ export default function AudiencePollResultsPage() {
     setCountingNum(0);
     setRevealedCount(0);
     setIsRankSorted(false);
+    hasStoppedAudioAtRevealEndRef.current = false;
 
     const t = [
       setTimeout(() => setPhase(1), 2_000),
@@ -602,6 +613,15 @@ export default function AudiencePollResultsPage() {
     }, 120);
     return () => clearInterval(iv);
   }, [phase, sorted.length]);
+
+  useEffect(() => {
+    if (phase !== 4 || sorted.length === 0) return;
+    if (revealedCount < sorted.length) return;
+    if (hasStoppedAudioAtRevealEndRef.current) return;
+
+    hasStoppedAudioAtRevealEndRef.current = true;
+    void stopAmbientSound();
+  }, [phase, revealedCount, sorted.length, stopAmbientSound]);
 
   if (isLoadingData) {
     return (
