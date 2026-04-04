@@ -6,6 +6,7 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isScannerLogin = window.location.pathname === '/verify';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,38 +29,76 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-[#ede9fe] via-[#a78bfa] to-[#7c3aed]">
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col gap-6">
-        <h2 className="text-2xl font-bold text-violet-900 text-center mb-2">
-          {window.location.pathname === '/verify' ? 'Scanner Login' : 'Dashboard Login'}
-        </h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          autoComplete="username"
-          className="rounded-xl px-4 py-3 border border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] bg-[#ede9fe] text-violet-900 placeholder:text-violet-400"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          autoComplete="current-password"
-          className="rounded-xl px-4 py-3 border border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] bg-[#ede9fe] text-violet-900 placeholder:text-violet-400"
-          required
-        />
-        {error && <div className="text-red-600 text-center font-semibold">{error}</div>}
-        <button
-          type="submit"
-          className="bg-[#7c3aed] text-white font-bold py-3 rounded-xl shadow hover:bg-[#a78bfa] transition"
-          disabled={loading}
+    <div className="relative min-h-screen w-screen overflow-hidden bg-[#050805] text-[#ecffe0]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(200,255,0,0.14),transparent_38%),radial-gradient(circle_at_85%_10%,rgba(22,163,74,0.2),transparent_40%),radial-gradient(circle_at_50%_90%,rgba(200,255,0,0.12),transparent_48%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(200,255,0,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(200,255,0,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
+
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md border border-[#2a3720] bg-[#0c120c]/95 shadow-[0_0_0_1px_rgba(200,255,0,0.1),0_20px_65px_rgba(0,0,0,0.7)]"
         >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+          <div className="border-b border-[#25311f] bg-gradient-to-r from-[#162310] via-[#131b11] to-[#0f180f] px-6 py-5">
+            <span className="inline-flex items-center gap-2 border border-[#455839] bg-[#1f2d18] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c8ff00]">
+              ScratchLabs Access
+            </span>
+            <h2 className="mt-3 text-3xl font-black uppercase tracking-[0.06em] text-[#ebffd2]">
+              {isScannerLogin ? 'Scanner Login' : 'Dashboard Login'}
+            </h2>
+            <p className="mt-2 text-xs tracking-[0.08em] text-[#95ab86] uppercase">
+              Authorized Staff Only
+            </p>
+          </div>
+
+          <div className="space-y-5 px-6 py-6">
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-[#96b082]" htmlFor="login-username">
+                Username
+              </label>
+              <input
+                id="login-username"
+                type="text"
+                placeholder="Enter username"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                autoComplete="username"
+                className="w-full border border-[#31432a] bg-[#111911] px-4 py-3 text-[#ecffe0] placeholder:text-[#67805a] outline-none transition focus:border-[#c8ff00] focus:shadow-[0_0_0_2px_rgba(200,255,0,0.18)]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-[#96b082]" htmlFor="login-password">
+                Password
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className="w-full border border-[#31432a] bg-[#111911] px-4 py-3 text-[#ecffe0] placeholder:text-[#67805a] outline-none transition focus:border-[#c8ff00] focus:shadow-[0_0_0_2px_rgba(200,255,0,0.18)]"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="border border-[#6b1e1e] bg-[#271414] px-3 py-2 text-center text-sm font-semibold text-[#ff8d8d]">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full border border-[#9ecf00] bg-[#c8ff00] px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#142007] transition hover:bg-[#d8ff4d] disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={loading}
+            >
+              {loading ? 'Authenticating...' : 'Login'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

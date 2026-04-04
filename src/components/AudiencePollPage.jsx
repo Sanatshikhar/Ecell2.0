@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import pb from '../lib/pocketbase';
 
 const PRODUCT_LIMIT = 25;
@@ -831,17 +830,6 @@ const AudiencePollPage = () => {
           {isVotingClosed && (
             <div className="mb-6 border border-red-500 border-opacity-35 bg-red-900 bg-opacity-15 px-4 py-3 font-spacemono text-xs text-red-300">
               Voting has been closed. The countdown has ended.
-            </div>
-          )}
-
-          {isVotingClosed && (
-            <div className="mb-8 flex flex-wrap items-center gap-3">
-              <Link
-                to="/scratchlabs/audience-poll/results"
-                className="inline-flex items-center justify-center border border-lime-400 border-opacity-30 bg-lime-400 bg-opacity-10 px-4 py-2 font-spacemono text-[11px] uppercase tracking-[0.25em] text-lime-300 transition-all hover:bg-lime-400 hover:text-black"
-              >
-                View Results
-              </Link>
             </div>
           )}
 

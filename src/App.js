@@ -77,7 +77,7 @@ function AppContent() {
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/scratchlabs/audience-poll" element={<AudiencePollPage />} />
-        <Route path="/scratchlabs/audience-poll/results" element={<AudiencePollResultsPage />} />
+        <Route path="/scratchlabs/audience-poll/results" element={auth ? <AudiencePollResultsPage /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/cancellation-refunds" element={<CancellationRefunds />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/shipping" element={<Shipping />} />
