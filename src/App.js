@@ -26,6 +26,7 @@ import ScratchLabsRegistration from "./components/ScratchLabsRegistration";
 import ScratchLabsParticipantDashboard from "./components/ScratchLabsParticipantDashboard";
 import AITribunalRegistration from "./components/AITribunalRegistration";
 import ScratchLabsMarketingLinksForm from "./components/ScratchLabsMarketingLinksForm";
+import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -55,6 +56,7 @@ function AppContent() {
     '/data-export',
     '/joining-registrations',
     '/cancellation-refunds',
+    '/workshop',
     '/terms-conditions',
     '/shipping',
     '/privacy',
@@ -67,6 +69,7 @@ function AppContent() {
       {!hideHeaderPaths.includes(location.pathname) && <Header />}
       <Routes>
         <Route path="/audience-poll" element={<Navigate to="/scratchlabs/audience-poll" replace />} />
+        <Route path="/workshop" element={<RegistrationSlider />} />
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
         <Route path="/" element={<Home />} />
