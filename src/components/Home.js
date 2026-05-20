@@ -82,7 +82,7 @@ const Home = () => {
     {
       name: "Sachin Kumar",
       role: "Assistant Manager at JSW Group",
-      link: https://media.licdn.com/dms/image/v2/D5603AQGgyZJqN2S0pA/profile-displayphoto-scale_200_200/B56Z4yGImiIEAg-/0/1778956930080?e=2147483647&v=beta&t=xeA5G-7r0MsMA-LIcQmuzjNh2jl7xqQFr2lj3S3fKaM",
+      link:" https://media.licdn.com/dms/image/v2/D5603AQGgyZJqN2S0pA/profile-displayphoto-scale_200_200/B56Z4yGImiIEAg-/0/1778956930080?e=2147483647&v=beta&t=xeA5G-7r0MsMA-LIcQmuzjNh2jl7xqQFr2lj3S3fKaM",
       review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an 'OUT OF THE BOX' Journey",
       avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1681490671010?e=1762992000&v=beta&t=DSxxDh2u0qKU-dcK1JCvDm4pAN8oPwSPRF32F_zobog"
     },
