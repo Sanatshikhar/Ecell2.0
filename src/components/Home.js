@@ -17,6 +17,11 @@ import BibhuImg from "./Assets/bibhubahalia.jpg";
 import AyushImg from "./Assets/ayushpattnaik.jpg";
 import SachinImg from "./Assets/sachinkumar.png";
 import SanskarImg from "./Assets/sanskarpani.jpg";
+import kiitcollab from "./Assets/kiit logo.png";
+import vssutcollab from "./Assets/vssut logo.png";
+import iiitcollab from "./Assets/iiit logo.jpeg";
+import cetcollab from "./Assets/cet logo.png";
+
 // Speaker section background refinement
 
 const Home = () => {
@@ -168,29 +173,50 @@ const Home = () => {
             At IEC SOA, we are committed to fostering a culture of innovation, research, and entrepreneurship. By providing mentorship, resources, and opportunities, we empower students to transform ideas into impactful ventures.
           </p>
 
-          {/* Logo slider */}
-          <div className="w-full mt-6 sm:mt-12 md:mt-20 overflow-x-hidden overflow-y-hidden">
-            <div className="flex flex-col items-center">
-              <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent  tracking-tight text-center uppercase">In Association With</h2>
-              <div className="relative w-full overflow-hidden">
-                <div className="flex items-center gap-8 animate-logo-ticker whitespace-nowrap min-w-max" style={{ animation: 'logo-ticker 20s linear infinite' }}>
-                  {Array.from({ length: 32 }).map((_, i) => (
-                    <div key={i} className="w-12 xs:w-16 sm:w-24 h-10 xs:h-14 sm:h-20 md:w-40 md:h-32 flex-shrink-0">
-                      <img
-                        src={logo}
-                        alt="Partner logo"
-                        className="w-full h-full object-contain opacity-50 hover:opacity-100 transition-opacity duration-300"
-                      />
-                    </div>
-                  ))}
+          {/* Logo slider */ }
+                  <div className="w-full mt-6 sm:mt-12 md:mt-20 overflow-x-hidden overflow-y-hidden">
+                    <div className="flex flex-col items-center">
+                    <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-[#B909F0] bg-clip-text text-transparent tracking-tight text-center uppercase">
+                      In Association With
+                    </h2>
+
+                    <div className="relative w-full overflow-hidden group">
+                      <div
+                      className="flex items-center gap-8 animate-logo-ticker whitespace-nowrap min-w-max hover:[animation-play-state:paused]"
+                      style={{ animation: "logo-ticker 20s linear infinite" }}
+                      >
+                      {(() => {
+                    const collablogos = [
+                      kiitcollab,
+                      vssutcollab,
+                      iiitcollab,
+                      cetcollab,
+                    ];
+                    // Repeat the logos array enough times to create a smooth ticker
+                    const repeated = Array.from({ length: 10 }).flatMap(() => collablogos);
+                    return repeated.map((src, i) => (
+                      <div
+                      key={i}
+                      className="flex-shrink-0 flex items-center justify-center w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 p-2"
+                      >
+                      <div className="w-full h-full bg-gradient-to-br from-black/40 via-white/5 to-black/20 rounded-2xl border border-blue-400/20 shadow-lg flex items-center justify-center overflow-hidden backdrop-blur-sm">
+                        <img
+                        src={src}
+                        alt={`partner-${i}`}
+                        className="max-w-[70%] max-h-[70%] object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
+                        />
+                      </div>
+                      </div>
+                    ));
+                    })()}
+                  </div>
+                  </div>
+                </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+              </section>
 
-      {/* Past Events Section - Modern Dark Redesign */}
+              {/* Past Events Section - Modern Dark Redesign */}
       <section className="relative py-20 px-4 md:px-8 bg-black overflow-hidden">
         {/* Abstract shapes */}
         <svg className="absolute left-0 top-0 w-96 h-96 opacity-20 z-0" viewBox="0 0 400 400" fill="none"><circle cx="200" cy="200" r="200" fill="#60a5fa" fillOpacity="0.08" /></svg>
