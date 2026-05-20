@@ -82,21 +82,21 @@ const Home = () => {
     {
       name: "Sachin Kumar",
       role: "Assistant Manager at JSW Group",
-      link: "https://www.linkedin.com/in/sachin-kumar-0637081a7/",
+      link: https://media.licdn.com/dms/image/v2/D5603AQGgyZJqN2S0pA/profile-displayphoto-scale_200_200/B56Z4yGImiIEAg-/0/1778956930080?e=2147483647&v=beta&t=xeA5G-7r0MsMA-LIcQmuzjNh2jl7xqQFr2lj3S3fKaM",
       review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an 'OUT OF THE BOX' Journey",
       avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1681490671010?e=1762992000&v=beta&t=DSxxDh2u0qKU-dcK1JCvDm4pAN8oPwSPRF32F_zobog"
     },
     {
       name: "Ayush Pattnaik",
       role: "Software Engineer at Comviva",
-      link: "https://www.linkedin.com/in/ayupattnaik19/",
+      link: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1732265064518?e=2147483647&v=beta&t=qI0e-vW8_0aOhfa0lhNcKFnQfW2-1YmbaxgdJ_VR9Cw",
       review: "IEC gave me the platform to explore, learn, and grow beyond the classroom. The guidance, opportunities, and exposure I received here have truly shaped my journey and boosted my confidence. And the best part — I found a cool team for life.",
       avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1762992000&v=beta&t=GmMU9zHQDJYKQRfm57scRvOLC-8V1oYuYq5kVFW73ec"
     },
     {
       name: "Sanskar Pani",
       role: "Founder and CEO at SCALE",
-      link: "https://www.linkedin.com/in/sanskarpani/",
+      link: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_200_200/B4EZU4ekvhGgAg-/0/1740409294803?e=2147483647&v=beta&t=iQvTgQZwauemDFRrox8aZJaW54Ez2dc0tHXTiSt6WEs",
       review: "The Startup Awareness and Mentorship Program at IEC has been a true game-changer for me. Most importantly, it connected me with a passionate and like-minded team that feels like family for life.",
       avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_400_400/B4EZU4ekvhGgAo-/0/1740409294803?e=1762992000&v=beta&t=blc7vvdLcVbFPwcJLi4BiX4pNzlzva54zzITuT1Nyho"
     }
