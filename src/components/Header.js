@@ -65,9 +65,9 @@ const Header = () => {
         <NavLink to="/contact" className={({ isActive }) => isActive ? 'text-[#ab49f6] underline underline-offset-8 font-bold' : ''}>
         Contact
         </NavLink>
-        <NavLink to="/workshop" className={({ isActive }) => isActive ? 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold' : 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold'}>
+        {/* <NavLink to="/workshop" className={({ isActive }) => isActive ? 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold' : 'px-4 py-2 rounded-lg bg-[#00f5d4] text-black font-bold'}>
         Workshop
-        </NavLink>
+        </NavLink> */}
       </div>
 
       {/* Hamburger/Cross Button */}
@@ -153,13 +153,13 @@ const Header = () => {
             >
               About
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/workshop"
               onClick={toggleMenu}
               className={({ isActive }) => isActive ? 'text-[#00f5d4] underline underline-offset-8 font-bold' : ''}
             >
               Workshop
-            </NavLink>
+            </NavLink> */}
             <NavLink
               to="/contact"
               onClick={toggleMenu}

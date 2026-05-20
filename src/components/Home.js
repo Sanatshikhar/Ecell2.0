@@ -11,6 +11,12 @@ import Exanova from "./Assets/Exanova Results.png";
 import PExanova from "./Assets/exanova.png";
 import oblive from "./Assets/oblive.png";
 import Boblive from "./Assets/oblive.jpg";
+import BirajaImg from "./Assets/birijarout.jpg";
+import AbhishekImg from "./Assets/abhishek.jpg";
+import BibhuImg from "./Assets/bibhubahalia.jpg";
+import AyushImg from "./Assets/ayushpattnaik.jpg";
+import SachinImg from "./Assets/sachinkumar.png";
+import SanskarImg from "./Assets/sanskarpani.jpg";
 // Speaker section background refinement
 
 const Home = () => {
@@ -82,23 +88,23 @@ const Home = () => {
     {
       name: "Sachin Kumar",
       role: "Assistant Manager at JSW Group",
-      link:" https://media.licdn.com/dms/image/v2/D5603AQGgyZJqN2S0pA/profile-displayphoto-scale_200_200/B56Z4yGImiIEAg-/0/1778956930080?e=2147483647&v=beta&t=xeA5G-7r0MsMA-LIcQmuzjNh2jl7xqQFr2lj3S3fKaM",
+      link: "https://www.linkedin.com/in/sachin-kumar-0637081a7/",
       review: "As the Ex-Coordinator of IEC was an incredible journey that honed my event management and leadership skills. This role not only strengthened my organizational and decision-making abilities but also taught me the value of teamwork, adaptability, and leading with vision. Summing up it has been an 'OUT OF THE BOX' Journey",
-      avatar: "https://media.licdn.com/dms/image/v2/D4D03AQHA4KH4x66-AA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1681490671010?e=1762992000&v=beta&t=DSxxDh2u0qKU-dcK1JCvDm4pAN8oPwSPRF32F_zobog"
+      avatar: SachinImg
     },
     {
       name: "Ayush Pattnaik",
       role: "Software Engineer at Comviva",
-      link: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1732265064518?e=2147483647&v=beta&t=qI0e-vW8_0aOhfa0lhNcKFnQfW2-1YmbaxgdJ_VR9Cw",
+      link: "https://www.linkedin.com/in/ayupattnaik19/",
       review: "IEC gave me the platform to explore, learn, and grow beyond the classroom. The guidance, opportunities, and exposure I received here have truly shaped my journey and boosted my confidence. And the best part — I found a cool team for life.",
-      avatar: "https://media.licdn.com/dms/image/v2/D5603AQH-Y_iMg-AHUg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1732265064518?e=1762992000&v=beta&t=GmMU9zHQDJYKQRfm57scRvOLC-8V1oYuYq5kVFW73ec"
+      avatar: AyushImg
     },
     {
       name: "Sanskar Pani",
       role: "Founder and CEO at SCALE",
-      link: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_200_200/B4EZU4ekvhGgAg-/0/1740409294803?e=2147483647&v=beta&t=iQvTgQZwauemDFRrox8aZJaW54Ez2dc0tHXTiSt6WEs",
+      link: "https://www.linkedin.com/in/sanskarpani/",
       review: "The Startup Awareness and Mentorship Program at IEC has been a true game-changer for me. Most importantly, it connected me with a passionate and like-minded team that feels like family for life.",
-      avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEXO6HuwO2RJw/profile-displayphoto-shrink_400_400/B4EZU4ekvhGgAo-/0/1740409294803?e=1762992000&v=beta&t=blc7vvdLcVbFPwcJLi4BiX4pNzlzva54zzITuT1Nyho"
+      avatar: SanskarImg
     }
   ];
 
@@ -200,17 +206,17 @@ const Home = () => {
               name: "Biraja Prasad Rout",
               role: "Founder, Biggies Burger",
               link: "https://www.linkedin.com/in/biraja-rout/",
-              img: "https://media.licdn.com/dms/image/v2/D5603AQGrHRyevP3vKA/profile-displayphoto-shrink_800_800/B56ZVwzixiGsAg-/0/1741354316409?e=1762992000&v=beta&t=1qA77B3fXTIQhE9tiLRtbMcBzwxrVO-Nq6tb0LsOM7s"
+              img: BirajaImg
             }, {
               name: "Dr. Abhishek Gautam",
               role: "Founder, Ambula",
               link: "https://www.linkedin.com/in/abhishekkumargautam/",
-              img: "https://media.licdn.com/dms/image/v2/D5603AQHWw1uKJ4llfA/profile-displayphoto-scale_400_400/B56ZhCT_0GH0Ag-/0/1753459197026?e=1762992000&v=beta&t=eO2WmfPjRWH6WojoVeCX2vzfw29SHrkS3zSg_rK8cJw"
+              img: AbhishekImg
             }, {
               name: "Mr.Bibhu Bahalia",
               role: "Co-Founder, Assava",
               link: "https://www.linkedin.com/in/bibhu-bahalia-a9807ba0/",
-              img: "https://media.licdn.com/dms/image/v2/C5603AQGoXkOXqrA_OQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1588930901737?e=1762992000&v=beta&t=J2oY0xD7qqNaNa92d-ZFogLiO1eeMrHmwSiih23bnXs"
+              img: BibhuImg
             }].map((sp, i) => (
               <a key={i} href={sp.link} target="_blank" rel="noopener noreferrer" className="block min-w-[260px] max-w-xs mx-auto">
                 <div className="group bg-black rounded-3xl shadow-xl p-8 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-2xl relative border border-blue-400/30 h-[260px] xs:h-[260px] sm:h-[260px] md:h-[260px] lg:h-[260px]">
