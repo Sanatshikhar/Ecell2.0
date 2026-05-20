@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "./logo.png";
 import Footer from "./footer.js";
 
 import { TypewriterEffectSmooth } from "./animation/homeani.tsx";
