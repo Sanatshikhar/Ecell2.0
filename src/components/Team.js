@@ -4,19 +4,19 @@ import Footer from "./footer.js";
 import Card3D from "./Card3D";
 
 //Team 2025
-import Kiran from "./Assets/Team Image/Kiran.jpg";
-import PD from "./Assets/Team Image/PD2.jpg";
-import NS from "./Assets/Team Image/NS.jpg";
-import Sss from "./Assets/Team Image/Sanat.jpg";
-import Sn from "./Assets/Team Image/SN.jpg";
-import S from "./Assets/Team Image/S.jpeg";
-import AP from "./Assets/Team Image/AB.jpg";
-import TD from "./Assets/Team Image/TD.jpg";
-import AS from "./Assets/Team Image/AS.jpg";
-import KK from "./Assets/Team Image/KK.jpg";
-import SK from "./Assets/Team Image/SK.jpg";
-import SM from "./Assets/Team Image/SM.jpg";
-import Ms from "./Assets/Team Image/Ms.jpg";
+// import Kiran from "./Assets/Team Image/Kiran.jpg";
+// import PD from "./Assets/Team Image/PD2.jpg";
+// import NS from "./Assets/Team Image/NS.jpg";
+// import Sss from "./Assets/Team Image/Sanat.jpg";
+// import Sn from "./Assets/Team Image/SN.jpg";
+// import S from "./Assets/Team Image/S.jpeg";
+// import AP from "./Assets/Team Image/AB.jpg";
+// import TD from "./Assets/Team Image/TD.jpg";
+// import AS from "./Assets/Team Image/AS.jpg";
+// import KK from "./Assets/Team Image/KK.jpg";
+// import SK from "./Assets/Team Image/SK.jpg";
+// import SM from "./Assets/Team Image/SM.jpg";
+// import Ms from "./Assets/Team Image/Ms.jpg";
 
 //Team 2026
 import Sanat from "./Assets/Team 2026/Sanat.jpg";
