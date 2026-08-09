@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Footer from "./footer.js";
 import Card3D from "./Card3D";
+
+//Team 2025
 import Kiran from "./Assets/Team Image/Kiran.jpg";
 import PD from "./Assets/Team Image/PD2.jpg";
 import NS from "./Assets/Team Image/NS.jpg";
@@ -15,20 +17,45 @@ import KK from "./Assets/Team Image/KK.jpg";
 import SK from "./Assets/Team Image/SK.jpg";
 import SM from "./Assets/Team Image/SM.jpg";
 import Ms from "./Assets/Team Image/Ms.jpg";
+
+//Team 2026
+import Sanat from "./Assets/Team 2026/Sanat.jpg";
+import Bibhu from "./Assets/Team 2026/Bibhu.jpeg";
+import Eshan from "./Assets/Team 2026/Eshan.jpeg";
+import Abhinav from "./Assets/Team 2026/Abhinav.png";
+import Chinmayee from "./Assets/Team 2026/Chinmayee.jpeg";
+import Anurag from "./Assets/Team 2026/Anurag.jpg";
+import Sujay from "./Assets/Team 2026/Sujay.jpeg";
+import Rohit from "./Assets/Team 2026/Rohit.png";
+import Saloni from "./Assets/Team 2026/Saloni.jpg";
+import Miraa from "./Assets/Team 2026/Miraa.png";
+import Digant from "./Assets/Team 2026/Digant.png";
+import Varshit from "./Assets/Team 2026/Varshit.jpg";
+import Subham from "./Assets/Team 2026/Subham.jpeg";
+import Subhakanta from "./Assets/Team 2026/Subhakanta.jpeg";
+import Tanim from "./Assets/Team 2026/Tanim.jpeg";
+import Sadiya from "./Assets/Team 2026/Sadiya.jpg";
+import Shweta from "./Assets/Team 2026/Shweta.jpg";
+
+
 const agents = [
-    { name: "Kiran Panigrahi", role: "President", link: "https://www.linkedin.com/in/kiran-panigrahi-996223202/", image: Kiran },
-    { name: "Pratikshya Dash", role: "Vice-President", link: "https://www.linkedin.com/in/pratikshya-dash/", image: PD },
-    { name: "Abhay Prakash", role: "Advisor", link: "https://www.linkedin.com/in/abhay-prakash-ab143a262/", image: AP },
-    { name: "Mimansa Satpathy", role: "Treasurer", link: "https://www.linkedin.com/in/mimansa-satpathy/", image: Ms },
-    { name: "Tiyash Das Gupta", role: "Manager", link: "https://www.linkedin.com/in/tiyash13/++", image: TD },
-    { name: "Sanat Sikhar Sinha", role: "Technical Team", link: "https://www.linkedin.com/in/sanatsinhaa/", image: Sss },
-    { name: "Arnab Sahoo", role: "Design Team", link: "https://www.linkedin.com/in/arnab-sahoo-uiux/", image: AS },
-    { name: "Nobhonil Sarkar", role: "Media Team", link: "https://www.linkedin.com/in/nobhonil-sarkar/", image: NS },
-    { name: "Samarth Kumar", role: "Event-Management Team", link: "https://www.linkedin.com/in/samarth-kumar-here/", image: SK },
-    { name: "Stuti Mishra", role: "Content Team", link: "https://www.linkedin.com/in/stuti86/", image: SM },
-    { name: "Kumari Shubhangini", role: "Public-Relations Team", link: "https://www.linkedin.com/in/kumari-shubhangini/", image: S },
-    { name: "Ketan Kumar", role: "Operations Team", link: "https://www.linkedin.com/in/ketan-kumar120203/", image: KK },
-    { name: "Somyashree Nayak", role: "Marketing & Sponsorships Team", link: "https://www.linkedin.com/in/somyashree-nayak-3a974b278/", image: Sn },
+    { name: "Sanat Sikhar Sinha", role: "President", link: "https://www.linkedin.com/in/sanatsinhaa/", image: Sanat },
+    { name: "Kumar Bibhudatta", role: "Vice-President", link: "https://www.linkedin.com/in/kumar-bibhudatta-22ba85308/", image: Bibhu },
+    { name: "Eshab Mohanty", role: "Manager", link: "https://www.linkedin.com/in/eshan-mohanty-18b369366/", image: Eshan },
+    { name: "Abhinav Singh", role: "Treasurer", link: "https://www.linkedin.com/in/abhinav-singh2609/", image: Abhinav },
+    { name: "Sujay Jagat", role: "Technical Lead", link: "https://www.linkedin.com/in/sujay-jagat-7ab37b32a/", image: Sujay },
+    { name: "Rohit Kumar", role: "Technical Co-Lead", link: "https://www.linkedin.com/in/rohit-kumar-238b26316/", image: Rohit },
+    { name: "Digant Priyadarshi", role: "Design Lead", link: "https://www.linkedin.com/in/digant-priyadarshi/", image: Digant },
+    { name: "Sai Varshit", role: "Design Co-Lead", link: "https://www.linkedin.com/in/sai-varshit-km-6231942b5/", image: Varshit },
+    { name: "Chinmayee Patnaik", role: "Media Lead", link: "https://www.linkedin.com/in/chinmayee-patnaik-5581b4327/", image: Chinmayee },
+    { name: "Anurag Singh", role: "Media Co-Lead", link: "https://www.linkedin.com/in/anuragsingh2102", image: Anurag },
+    { name: "Subham Panda", role: "Event-Management Lead", link: "https://www.linkedin.com/in/subham-panda-764a69293/", image: Subham },
+    { name: "Subhakanta Das", role: "Event-Management Co-Lead", link: "https://www.linkedin.com/in/subhakanta-das-53b989329/", image: Subhakanta },
+    { name: "Saloni Kumari", role: "Content Lead", link: "https://www.linkedin.com/in/saloni2005/", image: Saloni },
+    { name: "Miraa Nayak", role: "Content Co-Lead", link: "https://www.linkedin.com/in/mira-rani-nayak-973970309/", image: Miraa },
+    { name: "Shaikh Minhazuddin ", role: "Public-Relations Lead", link: "https://www.linkedin.com/in/shaikh-minhazuddin-b1b904348/", image: Tanim },
+    { name: "Sadiya Ahmed", role: "Public-Relations Co-Lead", link: "https://www.linkedin.com/in/sadiya-ahmed-09232a277/", image: Sadiya },
+    {name: "ShwetaSingh", role: "Campus Representative", link: "https://www.linkedin.com/in/shweta-singh-527363352/", image: Shweta }
 ];
 
 
