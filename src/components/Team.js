@@ -41,7 +41,7 @@ import Shweta from "./Assets/Team 2026/Shweta.jpg";
 const agents = [
     { name: "Sanat Sikhar Sinha", role: "President", link: "https://www.linkedin.com/in/sanatsinhaa/", image: Sanat },
     { name: "Kumar Bibhudatta", role: "Vice-President", link: "https://www.linkedin.com/in/kumar-bibhudatta-22ba85308/", image: Bibhu },
-    { name: "Eshab Mohanty", role: "Manager", link: "https://www.linkedin.com/in/eshan-mohanty-18b369366/", image: Eshan },
+    { name: "Eshan Mohanty", role: "Manager", link: "https://www.linkedin.com/in/eshan-mohanty-18b369366/", image: Eshan },
     { name: "Abhinav Singh", role: "Treasurer", link: "https://www.linkedin.com/in/abhinav-singh2609/", image: Abhinav },
     { name: "Sujay Jagat", role: "Technical Lead", link: "https://www.linkedin.com/in/sujay-jagat-7ab37b32a/", image: Sujay },
     { name: "Rohit Kumar", role: "Technical Co-Lead", link: "https://www.linkedin.com/in/rohit-kumar-238b26316/", image: Rohit },
