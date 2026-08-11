@@ -145,7 +145,7 @@ function Contact() {
                                                 </div>
                                                 <div>
                                                     <h3 className="text-white font-semibold mb-1">Email</h3>
-                                                    <a href="mailto:shikharsanat@gmail.com" className="text-gray-400 hover:text-blue-400 transition">shikharsanat@gmail.com</a>
+                                                    <a href="mailto:iec.soau@gmail.com" className="text-gray-400 hover:text-blue-400 transition">iec.soau@gmail.com</a>
                                                 </div>
                                             </div>
 
@@ -158,8 +158,11 @@ function Contact() {
                                                 </div>
                                                 <div>
                                                     <h3 className="text-white font-semibold mb-1">Phone</h3>
-                                                    <a href="tel:+918917616478" className="text-gray-400 hover:text-purple-400 transition">+91 7091318966</a>
-                                                    <p className="text-gray-500 text-sm mt-1">Tech-Team of IEC</p>
+                                                    <div className="space-y-1">
+                                                        <a href="tel:+917091318966" className="block text-gray-400 hover:text-purple-400 transition">+91 7091318966</a>
+                                                        <a href="tel:+919815953245" className="block text-gray-400 hover:text-purple-400 transition">+91 9815953245</a>
+                                                    </div>
+                                                    <p className="text-gray-500 text-sm mt-1">Coordinators of IEC</p>
                                                 </div>
                                             </div>
 
