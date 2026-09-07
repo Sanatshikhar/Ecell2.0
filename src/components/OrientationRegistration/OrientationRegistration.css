@@ -1,0 +1,109 @@
+/* ===== Orientation Registration Portal Scoped Styles ===== */
+
+.orientation-page-wrapper {
+  background-color: #6b0ea9;
+  background-image: 
+    linear-gradient(135deg, rgba(131, 12, 184, 0.82) 0%, rgba(55, 0, 102, 0.92) 100%),
+    url('./assets/bg-pattern.png');
+  background-repeat: repeat;
+  background-size: auto, 360px auto;
+  background-position: top left;
+  background-attachment: fixed;
+  color: #2d3142;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.orientation-page-wrapper ::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: inherit;
+}
+
+/* ===== Custom Scrollbar ===== */
+.orientation-page-wrapper ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.orientation-page-wrapper ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.orientation-page-wrapper ::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.25);
+  border-radius: 10px;
+}
+
+.orientation-page-wrapper ::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.4);
+}
+
+/* ===== Dropdown scrollbar ===== */
+.dropdown-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 10px;
+}
+
+/* ===== Input focus transition ===== */
+.orientation-input-field {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.orientation-input-field:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+}
+
+/* ===== Team card ===== */
+.team-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+}
+
+.team-card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ===== Submit button ===== */
+.btn-submit {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-submit:hover:not(:disabled) {
+  box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ===== Dropdown trigger ===== */
+.select-trigger {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.select-trigger:hover {
+  border-color: #c7d2fe;
+  background-color: #fff;
+}
+
+/* ===== GSAP initial hidden states ===== */
+.gsap-hidden {
+  opacity: 0;
+}

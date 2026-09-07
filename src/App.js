@@ -27,6 +27,7 @@ import ScratchLabsParticipantDashboard from "./components/ScratchLabsParticipant
 import AITribunalRegistration from "./components/AITribunalRegistration";
 import ScratchLabsMarketingLinksForm from "./components/ScratchLabsMarketingLinksForm";
 import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
+import OrientationRegistration from "./components/OrientationRegistration/OrientationRegistration";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -60,6 +61,9 @@ function AppContent() {
     '/terms-conditions',
     '/shipping',
     '/privacy',
+    '/orientation',
+    '/orientation-registration',
+    '/orientationregd',
   ];
 
   const showQueryBar = hideHeaderPaths.includes(location.pathname);
@@ -78,6 +82,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
+        <Route path="/register" element={<OrientationRegistration />} />
         <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
         <Route path="/scratchlabs/participant-portal" element={<ScratchLabsParticipantDashboard />} />
         <Route path="/scratchlabs/marketing-links" element={<ScratchLabsMarketingLinksForm />} />
@@ -87,6 +92,7 @@ function AppContent() {
         <Route path="/verify" element={auth ? <Verify /> : <Login onLogin={() => setAuth(true)} />} />
         <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/scratchlabs/audience-poll" element={<AudiencePollPage />} />
+
         <Route
           path="/scratchlabs/audience-poll/results"
           element={auth && resultsRouteUnlocked ? <AudiencePollResultsPage /> : <Login onLogin={() => {
