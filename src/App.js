@@ -61,9 +61,7 @@ function AppContent() {
     '/terms-conditions',
     '/shipping',
     '/privacy',
-    '/orientation',
-    '/orientation-registration',
-    '/orientationregd',
+    '/register',
   ];
 
   const showQueryBar = hideHeaderPaths.includes(location.pathname);
