@@ -375,18 +375,19 @@ export default function Mascot({
             strokeWidth="2.5"
           />
 
-          {/* Chest E-Cell Emblem */}
-          <circle cx="100" cy="162" r="16" fill="url(#chestGlow)" filter="url(#glowEffect)" />
+          {/* Chest IEC Emblem */}
+          <circle cx="100" cy="162" r="16.5" fill="url(#chestGlow)" filter="url(#glowEffect)" />
           <text
             x="100"
-            y="167"
-            fontSize="13"
+            y="166.5"
+            fontSize="11"
             fontWeight="bold"
+            letterSpacing="-0.3px"
             fill="#581c87"
             textAnchor="middle"
             fontFamily="sans-serif"
           >
-            EC
+            IEC
           </text>
 
           {/* Arms */}
