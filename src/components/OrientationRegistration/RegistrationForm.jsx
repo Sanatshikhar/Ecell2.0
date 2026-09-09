@@ -612,8 +612,8 @@ export default function RegistrationForm() {
               </div>
 
               {/* Branch, Section, Year */}
-              <div ref={(el) => addFieldRef(el, 5)} className="space-y-3.5 relative z-20">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div ref={(el) => addFieldRef(el, 5)} className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-20">
+                <div className="order-1 sm:order-1 relative z-30">
                   <CustomSelect
                     label="Branch"
                     name="branch"
@@ -635,55 +635,11 @@ export default function RegistrationForm() {
                     error={errors.branch}
                     icon={Building2}
                   />
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                      Section <span className="text-rose-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="section"
-                      value={formData.section}
-                      onChange={handleChange}
-                      onFocus={() => {
-                        setActiveField("section");
-                        if (errors.section) setLastSubmittedError(errors.section);
-                      }}
-                      onBlur={() => handleBlur("section")}
-                      placeholder="Enter section"
-                      className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
-                        errors.section ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
-                      }`}
-                    />
-                    {errors.section && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.section}</p>}
-                  </div>
-
-                  <CustomSelect
-                    label="Year"
-                    name="year"
-                    value={formData.year}
-                    options={YEARS}
-                    placeholder="Select Year"
-                    onChange={(e) => {
-                      handleChange(e);
-                      if (e.target.value) {
-                        setErrors((prev) => ({ ...prev, year: "" }));
-                        if (lastSubmittedError === errors.year) setLastSubmittedError(null);
-                      }
-                    }}
-                    onFocus={() => {
-                      setActiveField("year");
-                      if (errors.year) setLastSubmittedError(errors.year);
-                    }}
-                    onBlur={() => handleBlur("year")}
-                    error={errors.year}
-                    icon={GraduationCap}
-                  />
                 </div>
 
-                {/* Conditional input when Other branch is selected */}
+                {/* In phone view, comes just under branch selector (order-2), on desktop spans row 2 (sm:order-4 sm:col-span-3) */}
                 {formData.branch === "Other" && (
-                  <div className="animate-field-in">
+                  <div className="order-2 sm:order-4 sm:col-span-3 animate-field-in relative z-10">
                     <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-indigo-500" /> Specify Branch Name <span className="text-rose-400">*</span>
                     </label>
@@ -707,6 +663,52 @@ export default function RegistrationForm() {
                     )}
                   </div>
                 )}
+
+                <div className="order-3 sm:order-2 relative z-10">
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Section <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChange}
+                    onFocus={() => {
+                      setActiveField("section");
+                      if (errors.section) setLastSubmittedError(errors.section);
+                    }}
+                    onBlur={() => handleBlur("section")}
+                    placeholder="Enter section"
+                    className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
+                      errors.section ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
+                    }`}
+                  />
+                  {errors.section && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.section}</p>}
+                </div>
+
+                <div className="order-4 sm:order-3 relative z-20">
+                  <CustomSelect
+                    label="Year"
+                    name="year"
+                    value={formData.year}
+                    options={YEARS}
+                    placeholder="Select Year"
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, year: "" }));
+                        if (lastSubmittedError === errors.year) setLastSubmittedError(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      setActiveField("year");
+                      if (errors.year) setLastSubmittedError(errors.year);
+                    }}
+                    onBlur={() => handleBlur("year")}
+                    error={errors.year}
+                    icon={GraduationCap}
+                  />
+                </div>
               </div>
 
               {/* Team Selection */}
