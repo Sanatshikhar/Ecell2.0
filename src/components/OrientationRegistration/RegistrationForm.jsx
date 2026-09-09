@@ -92,7 +92,7 @@ export default function RegistrationForm() {
   const [lastSubmittedError, setLastSubmittedError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
-  const [keyboardOffset, setKeyboardOffset] = useState(12);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   // Refs for GSAP animations
   const containerRef = useRef(null);
@@ -191,25 +191,103 @@ export default function RegistrationForm() {
     return () => ctx.revert();
   }, []);
 
-  // Detect virtual keyboard via VisualViewport API
+  // Genuinely track mobile virtual keyboard height via VisualViewport
+  // Ensures mascot moves up ONLY when virtual keyboard actually opens on a phone,
+  // resting right above the keyboard, with zero fake/hardcoded bluffing on field focus.
   useEffect(() => {
     const handleViewportChange = () => {
+      // 1. Check if an editable input/textarea is actually focused
+      const activeEl = document.activeElement;
+      const isInputActive =
+        activeEl &&
+        (["INPUT", "TEXTAREA"].includes(activeEl.tagName) || Boolean(activeEl.isContentEditable));
+
+      // If no input is focused, the virtual keyboard cannot be open
+      if (!isInputActive) {
+        setKeyboardOffset(0);
+        return;
+      }
+
+      let offset = 0;
+
+      // 2. Measure layout vs visual viewport overlap (standard across iOS Safari & Android Chrome)
       if (window.visualViewport) {
         const vv = window.visualViewport;
-        const overlap = window.innerHeight - vv.height - vv.offsetTop;
-        setKeyboardOffset(overlap > 80 ? overlap + 12 : 12);
+        const layoutHeight = window.innerHeight;
+        const visualBottom = vv.offsetTop + vv.height;
+        const overlap = layoutHeight - visualBottom;
+
+        // Mobile keyboards are always > 70px. Address bar toggles are < 60px.
+        if (overlap > 70) {
+          offset = overlap;
+        }
+      } else if (
+        navigator.virtualKeyboard?.overlaysContent &&
+        navigator.virtualKeyboard.boundingRect?.height > 70
+      ) {
+        offset = navigator.virtualKeyboard.boundingRect.height;
       }
+
+      // If on desktop or no virtual keyboard is open, offset will be 0
+      setKeyboardOffset(offset > 0 ? Math.round(offset) : 0);
     };
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", handleViewportChange);
       window.visualViewport.addEventListener("scroll", handleViewportChange);
     }
+    window.addEventListener("resize", handleViewportChange);
+
+    if (navigator.virtualKeyboard) {
+      navigator.virtualKeyboard.addEventListener("geometrychange", handleViewportChange);
+    }
+
+    // When an input is focused, track during the slide-up animation
+    const handleFocusIn = (e) => {
+      const target = e.target;
+      const isInput =
+        target &&
+        (["INPUT", "TEXTAREA"].includes(target.tagName) || Boolean(target.isContentEditable));
+
+      if (isInput) {
+        handleViewportChange();
+        setTimeout(handleViewportChange, 100);
+        setTimeout(handleViewportChange, 250);
+        setTimeout(handleViewportChange, 400);
+        setTimeout(handleViewportChange, 600);
+      }
+    };
+
+    // When focus leaves, dismiss if not moving to another input
+    const handleFocusOut = () => {
+      setTimeout(() => {
+        const activeEl = document.activeElement;
+        const isInputActive =
+          activeEl &&
+          (["INPUT", "TEXTAREA"].includes(activeEl.tagName) || Boolean(activeEl.isContentEditable));
+
+        if (!isInputActive) {
+          setKeyboardOffset(0);
+        } else {
+          handleViewportChange();
+        }
+      }, 60);
+    };
+
+    window.addEventListener("focusin", handleFocusIn);
+    window.addEventListener("focusout", handleFocusOut);
+
     return () => {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener("resize", handleViewportChange);
         window.visualViewport.removeEventListener("scroll", handleViewportChange);
       }
+      window.removeEventListener("resize", handleViewportChange);
+      if (navigator.virtualKeyboard) {
+        navigator.virtualKeyboard.removeEventListener("geometrychange", handleViewportChange);
+      }
+      window.removeEventListener("focusin", handleFocusIn);
+      window.removeEventListener("focusout", handleFocusOut);
     };
   }, []);
 
@@ -431,7 +509,9 @@ export default function RegistrationForm() {
     }
   };
 
-  const effectiveBottomPx = keyboardOffset > 12 ? keyboardOffset : activeField && activeField !== "team" ? 260 : 12;
+  const effectiveBottomStyle = keyboardOffset > 0
+    ? `${keyboardOffset + 14}px`
+    : "calc(14px + env(safe-area-inset-bottom, 0px))";
 
   const addFieldRef = (el, index) => {
     if (el) formFieldsRef.current[index] = el;
@@ -443,7 +523,7 @@ export default function RegistrationForm() {
       {/* MOBILE FLOATING MASCOT */}
       <div
         className="lg:hidden fixed right-3 z-50 flex flex-col items-end pointer-events-auto transition-all duration-300 ease-out"
-        style={{ bottom: `${effectiveBottomPx}px` }}
+        style={{ bottom: effectiveBottomStyle }}
       >
         <Mascot
           activeField={activeField}
