@@ -9,6 +9,8 @@ lerna-debug.log*
 
 # Dependencies and build directories
 node_modules/
+build/
+dist/
 
 dist-ssr/
 android/
