@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Footer from "./footer.js";
 import Card3D from "./Card3D";
-import Sss from "./Assets/Team Image/Sanat.jpg";
+import Sss from "./Assets/Team 2026/Sanat.jpg";
 
 const agents = [
   { name: "Sanat Sikhar Sinha", role: "Technical Team", link: "https://in.linkedin.com/in/sanatsinhaa", image: Sss },
