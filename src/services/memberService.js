@@ -82,8 +82,8 @@ export function formatDriveImageUrl(url) {
     }
 
     if (fileId) {
-      // High-resolution image proxy that reliably renders in browser
-      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+      // Direct high-resolution image proxy via Google user content (avoids ECONNRESET)
+      return `https://lh3.googleusercontent.com/d/${fileId}`;
     }
   }
 

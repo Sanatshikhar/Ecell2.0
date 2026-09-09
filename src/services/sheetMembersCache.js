@@ -3,8 +3,53 @@ export const INITIAL_MEMBERS = [
   {
     "id": "101",
     "name": "Sanat Sikhar Sinha",
+    "designation": "President",
     "team": "Secretariat",
-    "designation": "Member",
+    "email": "",
+    "phone": "",
+    "linkedin": "",
+    "instagram": "",
+    "branch": "—",
+    "year": "",
+    "regNo": "—",
+    "dob": "",
+    "photo": ""
+  },
+  {
+    "id": "102",
+    "name": "Kumar Bibhudatta",
+    "designation": "Vice President",
+    "team": "Secretariat",
+    "email": "",
+    "phone": "",
+    "linkedin": "",
+    "instagram": "",
+    "branch": "—",
+    "year": "",
+    "regNo": "—",
+    "dob": "",
+    "photo": ""
+  },
+  {
+    "id": "103",
+    "name": "Eshan Mohanty",
+    "designation": "Manager",
+    "team": "Secretariat",
+    "email": "",
+    "phone": "",
+    "linkedin": "",
+    "instagram": "",
+    "branch": "—",
+    "year": "",
+    "regNo": "—",
+    "dob": "",
+    "photo": ""
+  },
+  {
+    "id": "104",
+    "name": "Abhinav Singh",
+    "designation": "Treasurer",
+    "team": "Secretariat",
     "email": "",
     "phone": "",
     "linkedin": "",
@@ -18,8 +63,8 @@ export const INITIAL_MEMBERS = [
   {
     "id": "105",
     "name": "Subham Panda",
-    "team": "Event management",
     "designation": "Lead",
+    "team": "Event Management Team",
     "email": "subhampanda1000@gmail.com",
     "phone": "8280651536",
     "linkedin": "https://www.linkedin.com/in/subham-panda-764a69293?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -28,13 +73,13 @@ export const INITIAL_MEMBERS = [
     "year": "4th year",
     "regNo": "2341016100",
     "dob": "10/10/2004",
-    "photo": "https://drive.google.com/thumbnail?id=1e0lZ3PazWyGfIG3ZjjvPPwLoPzZLNvtA&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1e0lZ3PazWyGfIG3ZjjvPPwLoPzZLNvtA"
   },
   {
     "id": "106",
     "name": "Parminder Singh",
-    "team": "Event management",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Event Management Team",
     "email": "singh.sanjam18@gmail.com",
     "phone": "6203023719",
     "linkedin": "https://www.linkedin.com/in/parminder-singh-a22710268?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -43,13 +88,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E119E11",
     "dob": "7/20/2026",
-    "photo": "https://drive.google.com/thumbnail?id=1rwA7IFV-xGN_HQL1OuWtWNAEZ1fpbRSt&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1rwA7IFV-xGN_HQL1OuWtWNAEZ1fpbRSt"
   },
   {
     "id": "107",
     "name": "Saranya Dash",
-    "team": "Content, Design",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Content, Design Team",
     "email": "dashsaranya.soa@gmail.com",
     "phone": "9124648155",
     "linkedin": "https://www.linkedin.com/in/saranya-dash-aa491a375?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -58,13 +103,13 @@ export const INITIAL_MEMBERS = [
     "year": "2nd year",
     "regNo": "25E104B47",
     "dob": "8/26/2007",
-    "photo": "https://drive.google.com/thumbnail?id=1yFnax_1t8ozqEJVSM2cWifWI_37F9gGL&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1yFnax_1t8ozqEJVSM2cWifWI_37F9gGL"
   },
   {
     "id": "108",
     "name": "Neelesh Kumar Behera",
-    "team": "Media",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Media Team",
     "email": "neeleshbehera81@gmail.com",
     "phone": "8984555935",
     "linkedin": "https://www.linkedin.com/in/neelesh-kumar-behera-2183433b3?utm_source=share_via&utm_content=profile&utm_medium=member_ios",
@@ -73,13 +118,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E102A82",
     "dob": "8/8/2006",
-    "photo": "https://drive.google.com/thumbnail?id=1nG_2XYFI0T4cs2MpRXSgqoLlQbxhOqSu&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1nG_2XYFI0T4cs2MpRXSgqoLlQbxhOqSu"
   },
   {
     "id": "109",
     "name": "Rohit Mukhi",
-    "team": "Content",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Content Team",
     "email": "rohitmukhi52@gmail.com",
     "phone": "8580371372",
     "linkedin": "https://www.linkedin.com/in/rohit-mukhi-009a14263?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -88,13 +133,13 @@ export const INITIAL_MEMBERS = [
     "year": "4th year",
     "regNo": "2341013419",
     "dob": "6/30/2003",
-    "photo": "https://drive.google.com/thumbnail?id=1ZX_DLTMVpIBIATmwhMRDXeWEDVp8nXHX&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1ZX_DLTMVpIBIATmwhMRDXeWEDVp8nXHX"
   },
   {
     "id": "110",
     "name": "Kalyan Jyoti Mishra",
-    "team": "Event management",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Event Management Team",
     "email": "kalyanjyotimishra@gmail.com",
     "phone": "7682953323",
     "linkedin": "https://www.linkedin.com/in/kalyan-jyoti-mishra",
@@ -103,13 +148,13 @@ export const INITIAL_MEMBERS = [
     "year": "2nd year",
     "regNo": "25E113B78",
     "dob": "7/22/2007",
-    "photo": "https://drive.google.com/thumbnail?id=1HQ_eLIrAmMmc9D9h_gKi1LuyPAZagYJT&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1HQ_eLIrAmMmc9D9h_gKi1LuyPAZagYJT"
   },
   {
     "id": "111",
     "name": "Spandan Pattanaik",
-    "team": "Public relation",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Public Relation Team",
     "email": "spandanpattanaik2007@gmail.com",
     "phone": "7978667994",
     "linkedin": "https://www.linkedin.com/in/spandan-pattanaik-032b201b4?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -118,13 +163,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E116C39",
     "dob": "2/5/2007",
-    "photo": "https://drive.google.com/thumbnail?id=1V4Qlsh5UVPJtDefIdj2vqF_7dNwzR_rh&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1V4Qlsh5UVPJtDefIdj2vqF_7dNwzR_rh"
   },
   {
     "id": "112",
     "name": "Utkarsh Sinha",
-    "team": "Technical",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Technical Team",
     "email": "sinhau65@gmail.com",
     "phone": "9142195378",
     "linkedin": "www.linkedin.com/in/utkarshhhsinha",
@@ -133,13 +178,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E119E33",
     "dob": "6/5/2005",
-    "photo": "https://drive.google.com/thumbnail?id=1EYmqJMbVLcKnqOejLGalxbA5i9AUrYA2&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1EYmqJMbVLcKnqOejLGalxbA5i9AUrYA2"
   },
   {
     "id": "113",
     "name": "Rajeev Pramanik",
-    "team": "Technical",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Technical Team",
     "email": "imrajeev20@gmail.com",
     "phone": "8789850340",
     "linkedin": "https://www.linkedin.com/in/rajeev-pramanik-248105331?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -148,13 +193,13 @@ export const INITIAL_MEMBERS = [
     "year": "2nd year",
     "regNo": "25E116D72",
     "dob": "8/20/2004",
-    "photo": "https://drive.google.com/thumbnail?id=1vOCvaX9JRKrcn6TRaVa8_mkU8AynFaOu&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1vOCvaX9JRKrcn6TRaVa8_mkU8AynFaOu"
   },
   {
     "id": "114",
     "name": "Sujay Jagat",
-    "team": "Technical",
     "designation": "Lead",
+    "team": "Technical Team",
     "email": "sjagat222@gmail.com",
     "phone": "7004577714",
     "linkedin": "https://www.linkedin.com/in/sujay-jagat-7ab37b32a?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -163,13 +208,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E110A82",
     "dob": "11/24/2005",
-    "photo": "https://drive.google.com/thumbnail?id=1pAXkPS5RkZqRDJ2aYk5KLIANCx5Mot-J&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1pAXkPS5RkZqRDJ2aYk5KLIANCx5Mot-J"
   },
   {
     "id": "115",
     "name": "D.Amarnath Patro",
-    "team": "Public relation",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Public Relation Team",
     "email": "amarpatro25@gmail.com",
     "phone": "9861422119",
     "linkedin": "https://www.linkedin.com/in/amarnathpatro/",
@@ -178,28 +223,28 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E116C27",
     "dob": "8/31/2006",
-    "photo": "https://drive.google.com/thumbnail?id=15iZ5z3tBMvwaAtpjOoQiSchriAc6l22i&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/15iZ5z3tBMvwaAtpjOoQiSchriAc6l22i"
   },
   {
     "id": "116",
     "name": "Rohit Kumar",
-    "team": "Technical",
     "designation": "Co-Lead",
+    "team": "Technical Team",
     "email": "rohit983527@gmail.com",
     "phone": "9835279029",
     "linkedin": "https://www.linkedin.com/in/rohit-kumar-238b26316/",
     "instagram": "https://www.instagram.com/_rohit__kumar_98/",
-    "branch": "C.S.E (Core)",
+    "branch": "CSE (Core)",
     "year": "3rd year",
     "regNo": "24E111B55",
     "dob": "3/18/2006",
-    "photo": "https://drive.google.com/thumbnail?id=1zx-4F844SyChJ3u-gm84s1gi6oLjVSuy&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1zx-4F844SyChJ3u-gm84s1gi6oLjVSuy"
   },
   {
     "id": "117",
     "name": "Ayush Kumar Singh",
-    "team": "Public relation",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Public Relation Team",
     "email": "s14ayush@gmail.com",
     "phone": "9508904992",
     "linkedin": "https://www.linkedin.com/in/theayush17",
@@ -208,13 +253,13 @@ export const INITIAL_MEMBERS = [
     "year": "4th year",
     "regNo": "2341019478",
     "dob": "2/17/2005",
-    "photo": "https://drive.google.com/thumbnail?id=1oAPmCI7TPsBmv4QkLLEAXOcoN-o5xb8h&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1oAPmCI7TPsBmv4QkLLEAXOcoN-o5xb8h"
   },
   {
     "id": "118",
     "name": "Rishit Swain",
-    "team": "Public relation",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Public Relation Team",
     "email": "rajashreeswain471@gmail.com",
     "phone": "7735776647",
     "linkedin": "https://www.linkedin.com/in/rishit-swain-252768376?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -223,13 +268,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E119F02",
     "dob": "9/1/2006",
-    "photo": "https://drive.google.com/thumbnail?id=1asVVTc3YREIDdIW5tJBlv1YNMaGAIaNy&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1asVVTc3YREIDdIW5tJBlv1YNMaGAIaNy"
   },
   {
     "id": "119",
     "name": "Shruti Mohanty",
-    "team": "Event management",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Event Management Team",
     "email": "shrutimohanty911@gmail.com",
     "phone": "7848094794",
     "linkedin": "https://www.linkedin.com/in/shruti-mohanty-44418b3a3?utm_source=share_via&utm_content=profile&utm_medium=member_android",
@@ -238,13 +283,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E113B87",
     "dob": "8/6/2006",
-    "photo": "https://drive.google.com/thumbnail?id=1bfVHk4mGquvKMGqeXgn1P3b5cxbuI4uF&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1bfVHk4mGquvKMGqeXgn1P3b5cxbuI4uF"
   },
   {
     "id": "120",
     "name": "Sunetra Pandey",
-    "team": "Technical",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Technical Team",
     "email": "pandeysunetra7@gmail.com",
     "phone": "24E116B00",
     "linkedin": "https://www.linkedin.com/in/sunetra-pandey-500278323/",
@@ -253,13 +298,13 @@ export const INITIAL_MEMBERS = [
     "year": "3rd year",
     "regNo": "24E116B00",
     "dob": "2/3/2006",
-    "photo": "https://drive.google.com/thumbnail?id=16JyZeP38fbIXoKFyOJelC2lHYVbmda-F&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/16JyZeP38fbIXoKFyOJelC2lHYVbmda-F"
   },
   {
     "id": "121",
     "name": "Shubham Modi",
-    "team": "Technical",
-    "designation": "Core",
+    "designation": "Core member",
+    "team": "Technical Team",
     "email": "shubhammodi2003@gmail.com",
     "phone": "9102266990",
     "linkedin": "www.linkedin.com/in/shubham-modi-203141253",
@@ -268,6 +313,21 @@ export const INITIAL_MEMBERS = [
     "year": "4th year",
     "regNo": "2341013225",
     "dob": "9/27/2003",
-    "photo": "https://drive.google.com/thumbnail?id=1GRHaOdcZapgqe6BW6XZPcehOWUXdYqGf&sz=w1000"
+    "photo": "https://lh3.googleusercontent.com/d/1GRHaOdcZapgqe6BW6XZPcehOWUXdYqGf"
+  },
+  {
+    "id": "122",
+    "name": "Apurba Mohapatra",
+    "designation": "Core member",
+    "team": "Public Relation Team",
+    "email": "apurbamohapatra0@gmail.com",
+    "phone": "8144188834",
+    "linkedin": "https://www.linkedin.com/in/apurba-mohapatra-0940b83a0/",
+    "instagram": "https://www.instagram.com/whimsygal__/",
+    "branch": "CSE-DS",
+    "year": "2nd year",
+    "regNo": "25E113D22",
+    "dob": "4/29/2007",
+    "photo": "https://lh3.googleusercontent.com/d/1y0IDAAWNXu1mYmCOJtwrTlqMnFWGKDHm"
   }
 ];

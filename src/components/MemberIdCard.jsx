@@ -19,19 +19,19 @@ import {
   ShieldCheck,
   Award,
 } from "lucide-react";
-import RohitPhoto from "./Assets/Team 2026/Rohit.png";
-import SubhamPhoto from "./Assets/Team 2026/Subham.jpeg";
-import SujayPhoto from "./Assets/Team 2026/Sujay.jpeg";
 import SanatPhoto from "./Assets/Team 2026/Sanat.jpg";
+import BibhuPhoto from "./Assets/Team 2026/Bibhu.jpeg";
+import EshanPhoto from "./Assets/Team 2026/Eshan.jpeg";
+import AbhinavPhoto from "./Assets/Team 2026/Abhinav.png";
 
 function getLocalPhoto(member) {
   if (!member) return null;
-  const name = (member.name || "").toLowerCase();
-  const id = String(member.id || "");
-  if (name.includes("rohit") || id === "116" || id === "102") return RohitPhoto;
-  if (name.includes("subham") || id === "105") return SubhamPhoto;
-  if (name.includes("sujay") || id === "114" || id === "103") return SujayPhoto;
-  if (name.includes("sanat") || id === "101") return SanatPhoto;
+  const id = String(member.id || "").trim();
+  // Only Secretariat members (101-104) who do not have form uploads
+  if (id === "101") return SanatPhoto;
+  if (id === "102") return BibhuPhoto;
+  if (id === "103") return EshanPhoto;
+  if (id === "104") return AbhinavPhoto;
   return null;
 }
 
@@ -203,22 +203,22 @@ export default function MemberIdCard() {
                         className="side-photo-img"
                         referrerPolicy="no-referrer"
                         onError={(e) => {
+                          // Try alternative Google thumbnail if lh3 fails
+                          if (member.photo && !e.target.dataset.triedFallback) {
+                            e.target.dataset.triedFallback = "true";
+                            const match =
+                              member.photo.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
+                              member.photo.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                            if (match && match[1]) {
+                              e.target.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+                              return;
+                            }
+                          }
                           const local = getLocalPhoto(member);
                           if (local && !e.target.dataset.triedLocal) {
                             e.target.dataset.triedLocal = "true";
                             e.target.src = local;
                             return;
-                          }
-                          // Try Google user content proxy if thumbnail fails
-                          if (member.photo && !e.target.dataset.triedFallback) {
-                            e.target.dataset.triedFallback = "true";
-                            const match =
-                              member.photo.match(/id=([a-zA-Z0-9_-]+)/) ||
-                              member.photo.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                            if (match && match[1]) {
-                              e.target.src = `https://lh3.googleusercontent.com/d/${match[1]}`;
-                              return;
-                            }
                           }
                           e.target.style.display = "none";
                           if (e.target.nextSibling) {
