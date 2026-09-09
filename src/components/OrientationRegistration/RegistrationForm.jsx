@@ -17,7 +17,10 @@ import {
   ArrowRight,
   User,
   Building2,
-  GraduationCap
+  GraduationCap,
+  Phone,
+  Mail,
+  Hash
 } from "lucide-react";
 
 import bannerImg from "./assets/banner.png";
@@ -56,12 +59,29 @@ const BRANCHES = [
 
 const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
+const normalizePhone = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+
+  // Accept +91/91 or 0 prefixed Indian numbers and normalize to 10 digits
+  let normalized = digits;
+  if (normalized.length === 12 && normalized.startsWith("91")) {
+    normalized = normalized.slice(2);
+  } else if (normalized.length === 11 && normalized.startsWith("0")) {
+    normalized = normalized.slice(1);
+  }
+
+  return normalized;
+};
+
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
     name: "",
     registration_number: "",
     email: "",
+    phone: "",
     branch: "",
+    other_branch: "",
     section: "",
     year: "",
     team: []
@@ -69,6 +89,7 @@ export default function RegistrationForm() {
 
   const [activeField, setActiveField] = useState(null);
   const [errors, setErrors] = useState({});
+  const [lastSubmittedError, setLastSubmittedError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
   const [keyboardOffset, setKeyboardOffset] = useState(12);
@@ -192,61 +213,219 @@ export default function RegistrationForm() {
     };
   }, []);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Full name is required.";
-    if (!formData.registration_number.trim()) newErrors.registration_number = "Registration number is required.";
-    if (!formData.email.trim()) {
-      newErrors.email = "Email address is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = "Please enter a valid email address.";
+  const validateField = (name, value, allData = formData) => {
+    let error = "";
+    switch (name) {
+      case "name":
+        if (!value.trim()) {
+          error = "Please enter your full name.";
+        } else if (value.trim().length < 2) {
+          error = "Name must be at least 2 characters.";
+        }
+        break;
+      case "registration_number":
+        if (!value.trim()) {
+          error = "Please enter your registration number.";
+        } else if (value.trim().length < 5) {
+          error = "Please enter a valid college registration number.";
+        }
+        break;
+      case "email":
+        if (!value.trim()) {
+          error = "Email address is required.";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+          error = "Please enter a valid email address (e.g. student@soa.ac.in).";
+        }
+        break;
+      case "phone": {
+        const trimmed = value.trim();
+        const normalized = normalizePhone(trimmed);
+        if (!trimmed) {
+          error = "Phone number is required.";
+        } else if (!/^[\d\s+\-()]+$/.test(trimmed)) {
+          error = "Phone number contains invalid characters.";
+        } else if (!/^[6-9]\d{9}$/.test(normalized)) {
+          error = "Please enter a valid 10-digit Indian phone number.";
+        }
+        break;
+      }
+      case "branch":
+        if (!value) {
+          error = "Please select your branch from the list.";
+        }
+        break;
+      case "other_branch":
+        if (allData.branch === "Other" && !value.trim()) {
+          error = "Please specify your branch or course name.";
+        }
+        break;
+      case "section":
+        if (!value.trim()) {
+          error = "Please enter your section (e.g. A, B, or CSE-1).";
+        }
+        break;
+      case "year":
+        if (!value) {
+          error = "Please select your academic year.";
+        }
+        break;
+      case "team":
+        if (!value || value.length === 0) {
+          error = "Please select at least one team to join.";
+        }
+        break;
+      default:
+        break;
     }
-    if (!formData.branch) newErrors.branch = "Please select your branch.";
-    if (!formData.section.trim()) newErrors.section = "Section is required.";
-    if (!formData.year) newErrors.year = "Please select your academic year.";
-    if (!formData.team?.length) newErrors.team = "Please select at least one team.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return error;
+  };
+
+  const handleBlur = (fieldName) => {
+    setActiveField(null);
+    const val = fieldName === "team" ? formData.team : formData[fieldName] || "";
+    if (val || errors[fieldName]) {
+      const error = validateField(fieldName, val);
+      setErrors((prev) => ({ ...prev, [fieldName]: error }));
+      if (error) {
+        setLastSubmittedError(error);
+      } else if (lastSubmittedError === errors[fieldName]) {
+        setLastSubmittedError(null);
+      }
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === "branch" && value !== "Other") {
+        next.other_branch = "";
+      }
+      return next;
+    });
+
+    if (errors[name]) {
+      const updatedError = validateField(name, value, { ...formData, [name]: value });
+      setErrors((prev) => ({ ...prev, [name]: updatedError }));
+      if (!updatedError && (lastSubmittedError === errors[name] || lastSubmittedError === updatedError)) {
+        setLastSubmittedError(null);
+      }
+    }
   };
 
   const handleToggleTeam = (teamId) => {
     setFormData((prev) => {
       const exists = prev.team.includes(teamId);
-      return { ...prev, team: exists ? prev.team.filter((t) => t !== teamId) : [...prev.team, teamId] };
+      const newTeam = exists ? prev.team.filter((t) => t !== teamId) : [...prev.team, teamId];
+      if (errors.team && newTeam.length > 0) {
+        setErrors((errs) => ({ ...errs, team: "" }));
+        if (lastSubmittedError === errors.team) {
+          setLastSubmittedError(null);
+        }
+      }
+      return { ...prev, team: newTeam };
     });
     setActiveField("team");
-    if (errors.team) setErrors((prev) => ({ ...prev, team: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage(null);
-    if (!validateForm()) return;
 
+    const fieldsToValidate = [
+      "name",
+      "registration_number",
+      "email",
+      "phone",
+      "branch",
+      ...(formData.branch === "Other" ? ["other_branch"] : []),
+      "section",
+      "year",
+      "team"
+    ];
+
+    const newErrors = {};
+    for (const f of fieldsToValidate) {
+      const val = f === "team" ? formData.team : formData[f] || "";
+      const err = validateField(f, val);
+      if (err) newErrors[f] = err;
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = fieldsToValidate.find((f) => newErrors[f]);
+      const firstErrorMessage = newErrors[firstErrorField];
+      setLastSubmittedError(firstErrorMessage);
+      setActiveField(firstErrorField);
+
+      // Focus on the first field with an error
+      const inputEl = document.querySelector(`[name="${firstErrorField}"]`);
+      if (inputEl) {
+        inputEl.focus();
+      }
+      return;
+    }
+
+    setLastSubmittedError(null);
     setIsSubmitting(true);
+    const normalizedPhone = normalizePhone(formData.phone.trim());
+    const finalBranch = formData.branch === "Other"
+      ? formData.other_branch.trim()
+      : formData.branch;
+
+    const payload = {
+      name: formData.name.trim(),
+      registration_number: formData.registration_number.trim(),
+      email: formData.email.trim(),
+      phone: normalizedPhone,
+      branch: finalBranch,
+      section: formData.section.trim(),
+      year: formData.year,
+      team: formData.team.join(", ")
+    };
+
     try {
-      await pb.collection("registrations").create({
-        name: formData.name.trim(),
-        registration_number: formData.registration_number.trim(),
-        email: formData.email.trim(),
-        branch: formData.branch,
-        section: formData.section.trim(),
-        year: formData.year,
-        team: formData.team.join(", ")
-      });
+      try {
+        await pb.collection("registrations").create(payload);
+      } catch (err) {
+        // Fallback for PB schema variances (e.g. if PB doesn't yet have 'phone' field or custom branch option)
+        const phoneError = err?.data?.data?.phone || err?.response?.data?.phone;
+        const branchError = err?.data?.data?.branch || err?.response?.data?.branch;
+
+        if (phoneError || branchError) {
+          const fallbackPayload = {
+            ...payload,
+            ...(phoneError ? { phone: undefined } : {}),
+            ...(branchError && formData.branch === "Other" ? { branch: "Other" } : {})
+          };
+          if (phoneError) {
+            fallbackPayload.section = `${formData.section.trim()} | Ph: ${normalizedPhone}`;
+          }
+          await pb.collection("registrations").create(fallbackPayload);
+        } else {
+          throw err;
+        }
+      }
 
       setStatusMessage({ type: "success", title: "Registration Successful!", text: "Welcome to E-Cell." });
-      setFormData({ name: "", registration_number: "", email: "", branch: "", section: "", year: "", team: [] });
+      setFormData({
+        name: "",
+        registration_number: "",
+        email: "",
+        phone: "",
+        branch: "",
+        other_branch: "",
+        section: "",
+        year: "",
+        team: []
+      });
       setErrors({});
+      setLastSubmittedError(null);
     } catch (err) {
       console.error("PocketBase registration error:", err);
       setStatusMessage({ type: "error", title: "Registration failed.", text: err?.message || "Could not save registration." });
+      setLastSubmittedError(err?.message || "Could not save registration.");
     } finally {
       setIsSubmitting(false);
     }
@@ -266,7 +445,14 @@ export default function RegistrationForm() {
         className="lg:hidden fixed right-3 z-50 flex flex-col items-end pointer-events-auto transition-all duration-300 ease-out"
         style={{ bottom: `${effectiveBottomPx}px` }}
       >
-        <Mascot activeField={activeField} statusState={statusMessage} selectedTeams={formData.team} isFloating={true} />
+        <Mascot
+          activeField={activeField}
+          statusState={statusMessage}
+          selectedTeams={formData.team}
+          errors={errors}
+          lastSubmittedError={lastSubmittedError}
+          isFloating={true}
+        />
       </div>
 
       {/* Top Hero Banner */}
@@ -330,39 +516,44 @@ export default function RegistrationForm() {
             {/* Form */}
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
-              {/* Full Name */}
-              <div ref={(el) => addFieldRef(el, 3)}>
-                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-indigo-500" /> Full Name <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  onFocus={() => setActiveField("name")}
-                  onBlur={() => setActiveField(null)}
-                  placeholder="Enter full name"
-                  className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
-                    errors.name ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
-                  }`}
-                />
-                {errors.name && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.name}</p>}
-              </div>
-
-              {/* Reg Number & Email */}
-              <div ref={(el) => addFieldRef(el, 4)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Full Name & Registration Number */}
+              <div ref={(el) => addFieldRef(el, 3)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Registration Number <span className="text-rose-400">*</span>
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-indigo-500" /> Full Name <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onFocus={() => {
+                      setActiveField("name");
+                      if (errors.name) setLastSubmittedError(errors.name);
+                    }}
+                    onBlur={() => handleBlur("name")}
+                    placeholder="Enter full name"
+                    className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
+                      errors.name ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
+                    }`}
+                  />
+                  {errors.name && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.name}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <Hash className="w-3.5 h-3.5 text-indigo-500" /> Registration Number <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     name="registration_number"
                     value={formData.registration_number}
                     onChange={handleChange}
-                    onFocus={() => setActiveField("registration_number")}
-                    onBlur={() => setActiveField(null)}
+                    onFocus={() => {
+                      setActiveField("registration_number");
+                      if (errors.registration_number) setLastSubmittedError(errors.registration_number);
+                    }}
+                    onBlur={() => handleBlur("registration_number")}
                     placeholder="Enter registration number"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.registration_number ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
@@ -370,18 +561,24 @@ export default function RegistrationForm() {
                   />
                   {errors.registration_number && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.registration_number}</p>}
                 </div>
+              </div>
 
+              {/* Email Address & Phone Number */}
+              <div ref={(el) => addFieldRef(el, 4)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Email Address <span className="text-rose-400">*</span>
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-indigo-500" /> Email Address <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    onFocus={() => setActiveField("email")}
-                    onBlur={() => setActiveField(null)}
+                    onFocus={() => {
+                      setActiveField("email");
+                      if (errors.email) setLastSubmittedError(errors.email);
+                    }}
+                    onBlur={() => handleBlur("email")}
                     placeholder="Enter email address"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.email ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
@@ -389,54 +586,127 @@ export default function RegistrationForm() {
                   />
                   {errors.email && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.email}</p>}
                 </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-indigo-500" /> Phone Number <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    onFocus={() => {
+                      setActiveField("phone");
+                      if (errors.phone) setLastSubmittedError(errors.phone);
+                    }}
+                    onBlur={() => handleBlur("phone")}
+                    placeholder="Enter 10-digit phone number"
+                    maxLength={15}
+                    className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
+                      errors.phone ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
+                    }`}
+                  />
+                  {errors.phone && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.phone}</p>}
+                </div>
               </div>
 
               {/* Branch, Section, Year */}
-              <div ref={(el) => addFieldRef(el, 5)} className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-20">
-                <CustomSelect
-                  label="Branch"
-                  name="branch"
-                  value={formData.branch}
-                  options={BRANCHES}
-                  placeholder="Select Branch"
-                  onChange={handleChange}
-                  onFocus={() => setActiveField("branch")}
-                  onBlur={() => setActiveField(null)}
-                  error={errors.branch}
-                  icon={Building2}
-                />
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Section <span className="text-rose-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="section"
-                    value={formData.section}
-                    onChange={handleChange}
-                    onFocus={() => setActiveField("section")}
-                    onBlur={() => setActiveField(null)}
-                    placeholder="Enter section"
-                    className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
-                      errors.section ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
-                    }`}
+              <div ref={(el) => addFieldRef(el, 5)} className="space-y-3.5 relative z-20">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <CustomSelect
+                    label="Branch"
+                    name="branch"
+                    value={formData.branch}
+                    options={BRANCHES}
+                    placeholder="Select Branch"
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, branch: "" }));
+                        if (lastSubmittedError === errors.branch) setLastSubmittedError(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      setActiveField("branch");
+                      if (errors.branch) setLastSubmittedError(errors.branch);
+                    }}
+                    onBlur={() => handleBlur("branch")}
+                    error={errors.branch}
+                    icon={Building2}
                   />
-                  {errors.section && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.section}</p>}
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                      Section <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="section"
+                      value={formData.section}
+                      onChange={handleChange}
+                      onFocus={() => {
+                        setActiveField("section");
+                        if (errors.section) setLastSubmittedError(errors.section);
+                      }}
+                      onBlur={() => handleBlur("section")}
+                      placeholder="Enter section"
+                      className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
+                        errors.section ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.section && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.section}</p>}
+                  </div>
+
+                  <CustomSelect
+                    label="Year"
+                    name="year"
+                    value={formData.year}
+                    options={YEARS}
+                    placeholder="Select Year"
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, year: "" }));
+                        if (lastSubmittedError === errors.year) setLastSubmittedError(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      setActiveField("year");
+                      if (errors.year) setLastSubmittedError(errors.year);
+                    }}
+                    onBlur={() => handleBlur("year")}
+                    error={errors.year}
+                    icon={GraduationCap}
+                  />
                 </div>
 
-                <CustomSelect
-                  label="Year"
-                  name="year"
-                  value={formData.year}
-                  options={YEARS}
-                  placeholder="Select Year"
-                  onChange={handleChange}
-                  onFocus={() => setActiveField("year")}
-                  onBlur={() => setActiveField(null)}
-                  error={errors.year}
-                  icon={GraduationCap}
-                />
+                {/* Conditional input when Other branch is selected */}
+                {formData.branch === "Other" && (
+                  <div className="animate-field-in">
+                    <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-indigo-500" /> Specify Branch Name <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="other_branch"
+                      value={formData.other_branch}
+                      onChange={handleChange}
+                      onFocus={() => {
+                        setActiveField("other_branch");
+                        if (errors.other_branch) setLastSubmittedError(errors.other_branch);
+                      }}
+                      onBlur={() => handleBlur("other_branch")}
+                      placeholder="Enter your branch name (e.g. Biotechnology, MCA, BBA...)"
+                      className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
+                        errors.other_branch ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.other_branch && (
+                      <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.other_branch}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Team Selection */}
@@ -526,7 +796,14 @@ export default function RegistrationForm() {
 
           {/* Mascot */}
           <div className="relative z-10 w-full flex items-center justify-center my-auto">
-            <Mascot activeField={activeField} statusState={statusMessage} selectedTeams={formData.team} isFloating={false} />
+            <Mascot
+              activeField={activeField}
+              statusState={statusMessage}
+              selectedTeams={formData.team}
+              errors={errors}
+              lastSubmittedError={lastSubmittedError}
+              isFloating={false}
+            />
           </div>
         </div>
       </div>

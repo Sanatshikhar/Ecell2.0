@@ -109,7 +109,7 @@ function AppContent() {
           <span>For any queries or question contact </span>
           <span className="global-query-team-contact">
             <span className="global-query-label">@IEC Technical Team :</span>
-            <a href="tel:+917091318966" className="global-query-phone">+91 70913 18966</a>
+            <a href="tel:+917004577714" className="global-query-phone">+91 70045 77714</a>
           </span>
         </div>
       )}
