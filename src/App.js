@@ -28,6 +28,7 @@ import AITribunalRegistration from "./components/AITribunalRegistration";
 import ScratchLabsMarketingLinksForm from "./components/ScratchLabsMarketingLinksForm";
 import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlider";
 import OrientationRegistration from "./components/OrientationRegistration/OrientationRegistration";
+import MemberIdCard from "./components/MemberIdCard";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -64,16 +65,22 @@ function AppContent() {
     '/register',
   ];
 
+  const shouldHideHeader =
+    hideHeaderPaths.includes(location.pathname) ||
+    location.pathname.startsWith('/member');
+
   const showQueryBar = hideHeaderPaths.includes(location.pathname);
 
   return (
     <>
-      {!hideHeaderPaths.includes(location.pathname) && <Header />}
+      {!shouldHideHeader && <Header />}
       <Routes>
         <Route path="/audience-poll" element={<Navigate to="/scratchlabs/audience-poll" replace />} />
         <Route path="/workshop" element={<RegistrationSlider />} />
         <Route path="/TechTeam" element={<TechTeam />} />
         <Route path="/Members" element={<Members />} />
+        <Route path="/member/:id" element={<MemberIdCard />} />
+        <Route path="/members/:id" element={<MemberIdCard />} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         {/* <Route path="/gallery" element={<Gallery />} /> */}
