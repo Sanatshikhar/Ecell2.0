@@ -88,8 +88,8 @@ PAYLOAD=$(cat <<EOF
     { "name": "mailSent", "type": "bool", "required": false }
   ],
   "indexes": [
-    "CREATE UNIQUE INDEX idx_${COLLECTION_NAME}_email ON ${COLLECTION_NAME} (email)",
-    "CREATE UNIQUE INDEX idx_${COLLECTION_NAME}_reg ON ${COLLECTION_NAME} (registration_number)"
+    "CREATE UNIQUE INDEX idx_${COLLECTION_NAME}_email ON ${COLLECTION_NAME} (email COLLATE NOCASE)",
+    "CREATE UNIQUE INDEX idx_${COLLECTION_NAME}_reg ON ${COLLECTION_NAME} (registration_number COLLATE NOCASE)"
   ]
 }
 EOF

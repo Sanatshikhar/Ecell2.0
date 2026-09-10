@@ -422,29 +422,46 @@ export default function RegistrationForm() {
   const validateField = (name, value, allData = formData) => {
     let error = "";
     switch (name) {
-      case "name":
-        if (!value.trim()) {
+      case "name": {
+        const trimmed = String(value || "").trim();
+        if (!trimmed) {
           error = "Please enter your full name.";
-        } else if (value.trim().length < 2) {
+        } else if (trimmed.length < 2) {
           error = "Name must be at least 2 characters.";
+        } else if (trimmed.length > 70) {
+          error = "Name cannot exceed 70 characters.";
+        } else if (!/^[a-zA-Z\s.'-]+$/.test(trimmed)) {
+          error = "Please enter a valid name (letters and spaces only).";
         }
         break;
-      case "registration_number":
-        if (!value.trim()) {
+      }
+      case "registration_number": {
+        const trimmed = String(value || "").trim().toUpperCase();
+        const digitsCount = trimmed.replace(/\D/g, "").length;
+        if (!trimmed) {
           error = "Please enter your registration number.";
-        } else if (value.trim().length < 5) {
+        } else if (!/^[A-Z0-9]+$/.test(trimmed)) {
+          error = "Registration number can only contain letters and numbers.";
+        } else if (trimmed.length < 6 || trimmed.length > 15) {
+          error = "Registration number must be between 6 and 15 characters.";
+        } else if (digitsCount < 3) {
           error = "Please enter a valid college registration number.";
         }
         break;
-      case "email":
-        if (!value.trim()) {
+      }
+      case "email": {
+        const trimmed = String(value || "").trim().toLowerCase();
+        if (!trimmed) {
           error = "Email address is required.";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
-          error = "Please enter a valid email address (e.g. student@soa.ac.in).";
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) {
+          error = "Please enter a valid email address.";
+        } else if (trimmed.length > 100) {
+          error = "Email address cannot exceed 100 characters.";
         }
         break;
+      }
       case "phone": {
-        const trimmed = value.trim();
+        const trimmed = String(value || "").trim();
         const normalized = normalizePhone(trimmed);
         if (!trimmed) {
           error = "Phone number is required.";
@@ -458,21 +475,38 @@ export default function RegistrationForm() {
       case "branch":
         if (!value) {
           error = "Please select your branch from the list.";
+        } else if (!BRANCHES.includes(value)) {
+          error = "Please select a valid branch.";
         }
         break;
       case "other_branch":
-        if (allData.branch === "Other" && !value.trim()) {
-          error = "Please specify your branch or course name.";
+        if (allData.branch === "Other") {
+          const trimmed = String(value || "").trim();
+          if (!trimmed) {
+            error = "Please specify your branch or course name.";
+          } else if (trimmed.length < 2) {
+            error = "Branch name must be at least 2 characters.";
+          } else if (trimmed.length > 60) {
+            error = "Branch name cannot exceed 60 characters.";
+          }
         }
         break;
-      case "section":
-        if (!value.trim()) {
-          error = "Please enter your section (e.g. A, B, or CSE-1).";
+      case "section": {
+        const trimmed = String(value || "").trim();
+        if (!trimmed) {
+          error = "Please enter your section.";
+        } else if (!/^[a-zA-Z0-9\s-]+$/.test(trimmed)) {
+          error = "Section contains invalid characters.";
+        } else if (trimmed.length > 10) {
+          error = "Section cannot exceed 10 characters.";
         }
         break;
+      }
       case "year":
         if (!value) {
           error = "Please select your academic year.";
+        } else if (!YEARS.includes(value)) {
+          error = "Please select a valid academic year.";
         }
         break;
       case "idProof":
@@ -480,6 +514,18 @@ export default function RegistrationForm() {
           error = "Please upload your College ID or Admission document.";
         } else if (value.size > 5 * 1024 * 1024) {
           error = "File size must be under 5MB.";
+        } else {
+          const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/jpg",
+            "application/pdf"
+          ];
+          const isAllowed = allowedTypes.includes(value.type) || Boolean(value.name?.match(/\.(jpg|jpeg|png|webp|pdf)$/i));
+          if (!isAllowed) {
+            error = "Please upload an image (JPG, PNG, WEBP) or PDF file.";
+          }
         }
         break;
       case "team":
@@ -576,7 +622,14 @@ export default function RegistrationForm() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (name === "registration_number") {
+      value = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    } else if (name === "section") {
+      value = value.toUpperCase();
+    }
+
     setFormData((prev) => {
       const next = { ...prev, [name]: value };
       if (name === "branch" && value !== "Other") {
@@ -584,6 +637,17 @@ export default function RegistrationForm() {
       }
       return next;
     });
+
+    if (name === "branch" && value !== "Other") {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.other_branch;
+        return next;
+      });
+      if (lastSubmittedError && errors.other_branch === lastSubmittedError) {
+        setLastSubmittedError(null);
+      }
+    }
 
     if (errors[name]) {
       const updatedError = validateField(name, value, { ...formData, [name]: value });
@@ -651,19 +715,23 @@ export default function RegistrationForm() {
 
     setLastSubmittedError(null);
     setIsSubmitting(true);
+    const normalizedName = formData.name.trim();
+    const normalizedRegNo = formData.registration_number.trim().toUpperCase();
+    const normalizedEmail = formData.email.trim().toLowerCase();
     const normalizedPhone = normalizePhone(formData.phone.trim());
+    const normalizedSection = formData.section.trim().toUpperCase();
     const finalBranch = formData.branch === "Other"
       ? formData.other_branch.trim()
       : formData.branch;
 
     // Build FormData to send both text fields and binary file to PocketBase
     const data = new FormData();
-    data.append("name", formData.name.trim());
-    data.append("registration_number", formData.registration_number.trim());
-    data.append("email", formData.email.trim());
+    data.append("name", normalizedName);
+    data.append("registration_number", normalizedRegNo);
+    data.append("email", normalizedEmail);
     data.append("phone", normalizedPhone);
     data.append("branch", finalBranch);
-    data.append("section", formData.section.trim());
+    data.append("section", normalizedSection);
     data.append("year", formData.year);
     data.append("team", formData.team.join(", "));
     if (formData.idProof) {
@@ -682,14 +750,14 @@ export default function RegistrationForm() {
 
         if (phoneError || branchError || idProofError) {
           const fallbackData = new FormData();
-          fallbackData.append("name", formData.name.trim());
-          fallbackData.append("registration_number", formData.registration_number.trim());
-          fallbackData.append("email", formData.email.trim());
+          fallbackData.append("name", normalizedName);
+          fallbackData.append("registration_number", normalizedRegNo);
+          fallbackData.append("email", normalizedEmail);
           if (!phoneError) {
             fallbackData.append("phone", normalizedPhone);
           }
           fallbackData.append("branch", branchError && formData.branch === "Other" ? "Other" : finalBranch);
-          fallbackData.append("section", phoneError ? `${formData.section.trim()} | Ph: ${normalizedPhone}` : formData.section.trim());
+          fallbackData.append("section", phoneError ? `${normalizedSection} | Ph: ${normalizedPhone}` : normalizedSection);
           fallbackData.append("year", formData.year);
           fallbackData.append("team", formData.team.join(", "));
           if (formData.idProof && !idProofError) {
@@ -701,15 +769,15 @@ export default function RegistrationForm() {
         }
       }
 
-      const firstName = formData.name.trim().split(" ")[0] || "Innovator";
+      const firstName = normalizedName.split(" ")[0] || "Innovator";
       const summary = {
         id: createdRecord?.id || ("SOA-" + Math.random().toString(36).substring(2, 8).toUpperCase()),
-        name: formData.name.trim(),
-        registration_number: formData.registration_number.trim(),
-        email: formData.email.trim(),
+        name: normalizedName,
+        registration_number: normalizedRegNo,
+        email: normalizedEmail,
         phone: normalizedPhone,
         branch: finalBranch,
-        section: formData.section.trim(),
+        section: normalizedSection,
         year: formData.year,
         team: [...formData.team],
         hasIdProof: Boolean(formData.idProof),
@@ -742,17 +810,53 @@ export default function RegistrationForm() {
       // Extract specific validation errors from PocketBase
       const fieldData = err?.data?.data || err?.response?.data;
       if (fieldData && typeof fieldData === "object") {
+        const backendErrors = {};
+        let firstFieldToFocus = null;
+
+        if (fieldData.registration_number) {
+          const msg = "This registration number is already registered.";
+          backendErrors.registration_number = msg;
+          userFriendlyMsg = msg;
+          if (!firstFieldToFocus) firstFieldToFocus = "registration_number";
+        }
         if (fieldData.email) {
-          userFriendlyMsg = "This email address is already registered.";
-        } else if (fieldData.registration_number) {
-          userFriendlyMsg = "This registration number is already registered.";
-        } else if (fieldData.idProof) {
-          userFriendlyMsg = fieldData.idProof?.message || "Error with uploaded ID file.";
-        } else if (fieldData.phone) {
-          userFriendlyMsg = fieldData.phone?.message || "Please enter a valid phone number.";
-        } else {
-          const firstKey = Object.keys(fieldData)[0];
-          userFriendlyMsg = fieldData[firstKey]?.message || `Validation error in ${firstKey}.`;
+          const msg = "This email address is already registered.";
+          backendErrors.email = msg;
+          if (!userFriendlyMsg || userFriendlyMsg === "Could not save registration. Please try again.") {
+            userFriendlyMsg = msg;
+          }
+          if (!firstFieldToFocus) firstFieldToFocus = "email";
+        }
+        if (fieldData.phone) {
+          const msg = fieldData.phone?.message || "Please enter a valid phone number.";
+          backendErrors.phone = msg;
+          if (!userFriendlyMsg || userFriendlyMsg === "Could not save registration. Please try again.") {
+            userFriendlyMsg = msg;
+          }
+          if (!firstFieldToFocus) firstFieldToFocus = "phone";
+        }
+        if (fieldData.idProof) {
+          const msg = fieldData.idProof?.message || "Error with uploaded ID file.";
+          backendErrors.idProof = msg;
+          if (!userFriendlyMsg || userFriendlyMsg === "Could not save registration. Please try again.") {
+            userFriendlyMsg = msg;
+          }
+          if (!firstFieldToFocus) firstFieldToFocus = "idProof";
+        }
+
+        // Map any remaining field errors
+        for (const key of Object.keys(fieldData)) {
+          if (!backendErrors[key]) {
+            backendErrors[key] = fieldData[key]?.message || `Validation error in ${key}.`;
+            if (!firstFieldToFocus) firstFieldToFocus = key;
+          }
+        }
+
+        setErrors((prev) => ({ ...prev, ...backendErrors }));
+        if (firstFieldToFocus) {
+          setActiveField(firstFieldToFocus);
+          const el = document.querySelector(`[name="${firstFieldToFocus}"]`);
+          if (el) el.focus();
         }
       } else if (err?.status === 404) {
         userFriendlyMsg = `Collection '${COLLECTION_NAME}' not found in database. Please verify PocketBase setup.`;
@@ -1059,6 +1163,8 @@ export default function RegistrationForm() {
                     }}
                     onBlur={() => handleBlur("name")}
                     placeholder="Enter full name"
+                    maxLength={70}
+                    autoComplete="name"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.name ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                     }`}
@@ -1081,6 +1187,9 @@ export default function RegistrationForm() {
                     }}
                     onBlur={() => handleBlur("registration_number")}
                     placeholder="Enter registration number"
+                    maxLength={20}
+                    autoComplete="off"
+                    spellCheck="false"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.registration_number ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                     }`}
@@ -1106,6 +1215,8 @@ export default function RegistrationForm() {
                     }}
                     onBlur={() => handleBlur("email")}
                     placeholder="Enter email address"
+                    maxLength={100}
+                    autoComplete="email"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.email ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                     }`}
@@ -1129,6 +1240,7 @@ export default function RegistrationForm() {
                     onBlur={() => handleBlur("phone")}
                     placeholder="Enter 10-digit phone number"
                     maxLength={15}
+                    autoComplete="tel"
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.phone ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                     }`}
@@ -1179,7 +1291,8 @@ export default function RegistrationForm() {
                         if (errors.other_branch) setLastSubmittedError(errors.other_branch);
                       }}
                       onBlur={() => handleBlur("other_branch")}
-                      placeholder="Enter your branch name (e.g. Biotechnology, MCA, BBA...)"
+                      placeholder="Enter your branch or course name"
+                      maxLength={60}
                       className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                         errors.other_branch ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                       }`}
@@ -1205,6 +1318,7 @@ export default function RegistrationForm() {
                     }}
                     onBlur={() => handleBlur("section")}
                     placeholder="Enter section"
+                    maxLength={10}
                     className={`w-full py-2.5 px-3.5 rounded-xl border text-base sm:text-sm text-slate-800 bg-slate-50/80 focus:outline-none orientation-input-field ${
                       errors.section ? "border-rose-300 bg-rose-50/40" : "border-slate-200"
                     }`}

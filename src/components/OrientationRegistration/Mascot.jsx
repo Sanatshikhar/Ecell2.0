@@ -66,7 +66,7 @@ export default function Mascot({
         };
       case "registration_number":
         return {
-          text: "Enter your 10-digit ITER / SOA college registration number.",
+          text: "Enter your college registration number.",
           isError: false,
           isSuccess: false
         };
@@ -90,13 +90,13 @@ export default function Mascot({
         };
       case "other_branch":
         return {
-          text: "Type in your exact branch or course name (e.g. Biotechnology, MCA).",
+          text: "Type in your exact branch or course name.",
           isError: false,
           isSuccess: false
         };
       case "section":
         return {
-          text: "Enter your current section (e.g., A, B, or CSE-1).",
+          text: "Enter your section.",
           isError: false,
           isSuccess: false
         };
