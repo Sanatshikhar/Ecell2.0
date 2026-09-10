@@ -60,6 +60,19 @@ export const MOCK_MEMBERS = [
 ];
 
 /**
+ * Helper to extract Google Drive file ID from various link formats
+ */
+export function extractDriveFileId(url) {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  const dMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (dMatch && dMatch[1]) return dMatch[1];
+  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1]) return idMatch[1];
+  return null;
+}
+
+/**
  * Transform Google Drive file view/open URLs into direct high-resolution image links
  */
 export function formatDriveImageUrl(url) {
@@ -67,23 +80,15 @@ export function formatDriveImageUrl(url) {
   const trimmed = url.trim();
 
   // Check if it's a Google Drive link
-  if (trimmed.includes("drive.google.com") || trimmed.includes("docs.google.com")) {
-    let fileId = "";
-    // Format: /file/d/FILE_ID/view or /file/d/FILE_ID
-    const dMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (dMatch && dMatch[1]) {
-      fileId = dMatch[1];
-    } else {
-      // Format: ?id=FILE_ID or &id=FILE_ID
-      const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (idMatch && idMatch[1]) {
-        fileId = idMatch[1];
-      }
-    }
-
+  if (
+    trimmed.includes("drive.google.com") ||
+    trimmed.includes("docs.google.com") ||
+    trimmed.includes("googleusercontent.com")
+  ) {
+    const fileId = extractDriveFileId(trimmed);
     if (fileId) {
-      // Direct high-resolution image proxy via Google user content (avoids ECONNRESET)
-      return `https://lh3.googleusercontent.com/d/${fileId}`;
+      // Primary web-optimized thumbnail link (handles PNG, JPG, WEBP, and HEIC automatically)
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
     }
   }
 

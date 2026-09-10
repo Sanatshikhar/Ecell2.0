@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getMemberById } from "../services/memberService";
+import { getMemberById, extractDriveFileId } from "../services/memberService";
 import logoImg from "./logo.png";
 import "./MemberIdCard.css";
 import {
@@ -94,6 +94,7 @@ export default function MemberIdCard() {
   };
 
   const handleMouseMove = (e) => {
+    if (window.innerWidth < 860) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -202,24 +203,33 @@ export default function MemberIdCard() {
                         alt={member.name}
                         className="side-photo-img"
                         referrerPolicy="no-referrer"
+                        loading="eager"
                         onError={(e) => {
-                          // Try alternative Google thumbnail if lh3 fails
-                          if (member.photo && !e.target.dataset.triedFallback) {
-                            e.target.dataset.triedFallback = "true";
-                            const match =
-                              member.photo.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
-                              member.photo.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-                            if (match && match[1]) {
-                              e.target.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-                              return;
-                            }
+                          const fileId = extractDriveFileId(member.photo);
+                          const step = parseInt(e.target.dataset.fallbackStep || "0", 10);
+
+                          // Step 0: Tried primary thumbnail -> Try lh3 user content proxy
+                          if (fileId && step === 0) {
+                            e.target.dataset.fallbackStep = "1";
+                            e.target.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+                            return;
                           }
+                          // Step 1: Tried lh3 -> Try direct UC export view
+                          if (fileId && step === 1) {
+                            e.target.dataset.fallbackStep = "2";
+                            e.target.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                            return;
+                          }
+
+                          // Next fallback: Local Secretariat Photo if applicable
                           const local = getLocalPhoto(member);
                           if (local && !e.target.dataset.triedLocal) {
                             e.target.dataset.triedLocal = "true";
                             e.target.src = local;
                             return;
                           }
+
+                          // Final fallback: Show initials
                           e.target.style.display = "none";
                           if (e.target.nextSibling) {
                             e.target.nextSibling.style.display = "flex";
