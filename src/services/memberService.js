@@ -11,11 +11,11 @@ import { INITIAL_MEMBERS } from "./sheetMembersCache";
  */
 const DEFAULT_SHEET_URL =
   process.env.REACT_APP_MEMBER_SHEET_URL ||
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vScluPPErnpZoSe50wdGfWAHp6XzFa66-S_PqgU_US3FLvPl1fb6kHUjlfUZ61L-SX1C_hUpns2A8hn/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/1iXHQPG6KwqPTXYO0-R8s4DAfQ3m2TQca-iQ8OlwhCtw/edit?usp=sharing";
 
 let cachedMembers = null;
 let lastFetchTime = 0;
-const CACHE_DURATION_MS = 60 * 1000; // 1 minute
+const CACHE_DURATION_MS = 5 * 1000; // 5 seconds for instant updates
 
 /**
  * Default fallback / mock members used if sheet URL is not configured or for initial testing
@@ -87,12 +87,94 @@ export function formatDriveImageUrl(url) {
   ) {
     const fileId = extractDriveFileId(trimmed);
     if (fileId) {
-      // Primary web-optimized thumbnail link (handles PNG, JPG, WEBP, and HEIC automatically)
-      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+      // Direct CDN thumbnail that loads reliably across all browsers without redirect blocks
+      return `https://lh3.googleusercontent.com/d/${fileId}`;
     }
   }
 
   return trimmed;
+}
+
+/**
+ * Extract clean first name for the greeting (e.g. "Rohit", "Sanat")
+ */
+export function getFirstName(fullName) {
+  if (!fullName || typeof fullName !== "string") return "Member";
+  const cleaned = fullName.trim();
+  const parts = cleaned.split(/\s+/);
+  return parts[0] || "Member";
+}
+
+/**
+ * Normalize Instagram field from sheet into a clean link and handle
+ */
+export function normalizeInstagram(val) {
+  if (!val || typeof val !== "string") return { url: "", handle: "" };
+  const raw = val.trim();
+  if (["na", "none", "-", "n/a", "no"].includes(raw.toLowerCase())) {
+    return { url: "", handle: "" };
+  }
+
+  if (raw.includes("instagram.com")) {
+    let cleanUrl = raw;
+    if (!cleanUrl.startsWith("http")) cleanUrl = `https://${cleanUrl}`;
+    try {
+      const parsed = new URL(cleanUrl);
+      const pathname = parsed.pathname.replace(/^\/|\/$/g, "");
+      const username = pathname.split("/")[0] || "";
+      return {
+        url: cleanUrl,
+        handle: username ? `@${username}` : cleanUrl,
+      };
+    } catch {
+      return { url: cleanUrl, handle: cleanUrl };
+    }
+  }
+
+  const cleanHandle = raw.replace(/^@/, "").replace(/\/+$/, "").trim();
+  if (!cleanHandle) return { url: "", handle: "" };
+  return {
+    url: `https://www.instagram.com/${cleanHandle}/`,
+    handle: `@${cleanHandle}`,
+  };
+}
+
+/**
+ * Normalize LinkedIn URL
+ */
+export function normalizeLinkedIn(val) {
+  if (!val || typeof val !== "string") return "";
+  const raw = val.trim();
+  if (["na", "none", "-", "n/a", "no"].includes(raw.toLowerCase())) return "";
+  if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+  if (raw.startsWith("www.") || raw.includes("linkedin.com")) return `https://${raw}`;
+  return raw;
+}
+
+/**
+ * Normalize phone / WhatsApp number into display string and direct WhatsApp URL
+ */
+export function normalizePhone(val) {
+  if (!val || typeof val !== "string") return { display: "", waUrl: "" };
+  const raw = val.trim();
+  const digits = raw.replace(/[^0-9]/g, "");
+
+  if (digits.length === 10) {
+    return {
+      display: `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`,
+      waUrl: `https://wa.me/91${digits}`,
+    };
+  }
+  if (digits.length > 10) {
+    return {
+      display: raw.startsWith("+") ? raw : `+${digits}`,
+      waUrl: `https://wa.me/${digits}`,
+    };
+  }
+  return {
+    display: raw,
+    waUrl: digits ? `https://wa.me/${digits}` : "",
+  };
 }
 
 /**
@@ -167,7 +249,7 @@ function getCsvFetchUrl(sheetUrl) {
   const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
   if (match && match[1]) {
     const sheetId = match[1];
-    return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+    return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&t=${Date.now()}`;
   }
 
   return trimmed;
@@ -220,7 +302,7 @@ export async function getAllMembers() {
 
   try {
     const fetchUrl = getCsvFetchUrl(sheetUrl);
-    const response = await fetch(fetchUrl);
+    const response = await fetch(fetchUrl, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Failed to fetch sheet: HTTP ${response.status}`);
     }
@@ -275,18 +357,29 @@ export async function getAllMembers() {
       // If row has no name and no photo, skip empty rows
       if (!nameVal && (!photoIdx || !row[photoIdx])) continue;
 
+      const rawInstagram = instagramIdx !== -1 && row[instagramIdx] ? row[instagramIdx].trim() : "";
+      const rawLinkedin = linkedinIdx !== -1 && row[linkedinIdx] ? row[linkedinIdx].trim() : "";
+      const rawPhone = phoneIdx !== -1 && row[phoneIdx] ? row[phoneIdx].trim() : "";
+      const instaNorm = normalizeInstagram(rawInstagram);
+      const phoneNorm = normalizePhone(rawPhone);
+
       const member = {
         id: idVal,
         name: nameVal || `Member ${idVal}`,
+        firstName: getFirstName(nameVal),
         designation: desigIdx !== -1 && row[desigIdx] ? row[desigIdx].trim() : "Member",
         team: teamIdx !== -1 && row[teamIdx] ? row[teamIdx].trim() : "E-Cell",
         regNo: regNoIdx !== -1 && row[regNoIdx] ? row[regNoIdx].trim() : "—",
         branch: branchIdx !== -1 && row[branchIdx] ? row[branchIdx].trim() : "—",
         year: yearIdx !== -1 && row[yearIdx] ? row[yearIdx].trim() : "",
-        phone: phoneIdx !== -1 && row[phoneIdx] ? row[phoneIdx].trim() : "",
+        phone: rawPhone,
+        phoneDisplay: phoneNorm.display,
+        waUrl: phoneNorm.waUrl,
         email: emailIdx !== -1 && row[emailIdx] ? row[emailIdx].trim() : "",
-        linkedin: linkedinIdx !== -1 && row[linkedinIdx] ? row[linkedinIdx].trim() : "",
-        instagram: instagramIdx !== -1 && row[instagramIdx] ? row[instagramIdx].trim() : "",
+        linkedin: normalizeLinkedIn(rawLinkedin),
+        instagram: rawInstagram,
+        instagramUrl: instaNorm.url,
+        instagramHandle: instaNorm.handle,
         dob: dobIdx !== -1 && row[dobIdx] ? row[dobIdx].trim() : "",
         photo: photoIdx !== -1 && row[photoIdx] ? formatDriveImageUrl(row[photoIdx].trim()) : "",
       };
