@@ -20,7 +20,15 @@ import {
   GraduationCap,
   Phone,
   Mail,
-  Hash
+  Hash,
+  Upload,
+  X,
+  Sparkles,
+  RotateCcw,
+  Instagram,
+  PartyPopper,
+  ShieldCheck,
+  Home
 } from "lucide-react";
 
 import bannerImg from "./assets/banner.png";
@@ -28,9 +36,12 @@ import logoImg from "./assets/ecell-logo.jpg";
 import monogramImg from "./assets/ec-monogram.png";
 import bgPatternImg from "./assets/bg-pattern.png";
 
-// Allow orientation-specific PB URL if configured, otherwise fallback to project's configured PB
-const pb = process.env.REACT_APP_ORIENTATION_DB_URL
-  ? new PocketBase(process.env.REACT_APP_ORIENTATION_DB_URL)
+// Configurable collection name (defaults to "registrations")
+const COLLECTION_NAME = process.env.REACT_APP_ORIENTATION_COLLECTION || "registrations";
+
+// Allow orientation-specific PB URL if configured, otherwise fallback to project's configured PB (REACT_APP_DB_URL)
+const pb = (process.env.REACT_APP_ORIENTATION_DB_URL && process.env.REACT_APP_ORIENTATION_DB_URL.trim())
+  ? new PocketBase(process.env.REACT_APP_ORIENTATION_DB_URL.trim())
   : defaultPb;
 
 const TEAMS = [
@@ -74,6 +85,108 @@ const normalizePhone = (value) => {
   return normalized;
 };
 
+const formatFileSize = (bytes) => {
+  if (!bytes) return "0 B";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+};
+
+function ConfettiCanvas() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = (canvas.width = canvas.parentElement?.offsetWidth || window.innerWidth);
+    let height = (canvas.height = canvas.parentElement?.offsetHeight || 650);
+
+    const colors = ["#a855f7", "#6366f1", "#ec4899", "#10b981", "#f59e0b", "#3b82f6", "#06b6d4"];
+    const count = 75;
+    const pieces = Array.from({ length: count }).map(() => ({
+      x: width * (0.15 + Math.random() * 0.7),
+      y: height * 0.12 + Math.random() * 40,
+      vx: (Math.random() - 0.5) * 12,
+      vy: -Math.random() * 9 - 4,
+      size: Math.random() * 8 + 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rSpeed: (Math.random() - 0.5) * 9,
+      opacity: 1,
+      gravity: 0.22 + Math.random() * 0.14,
+      shape: Math.random() > 0.4 ? "rect" : "circle"
+    }));
+
+    let animId;
+    const startTime = Date.now();
+
+    const render = () => {
+      const elapsed = Date.now() - startTime;
+      ctx.clearRect(0, 0, width, height);
+
+      let alive = false;
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.vy += p.gravity;
+        p.y += p.vy;
+        p.vx *= 0.98;
+        p.rotation += p.rSpeed;
+
+        if (elapsed > 2000) {
+          p.opacity = Math.max(0, 1 - (elapsed - 2000) / 1500);
+        }
+
+        if (p.opacity > 0 && p.y < height + 30) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = p.opacity;
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+
+          if (p.shape === "rect") {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      if (alive && elapsed < 4000) {
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    animId = requestAnimationFrame(render);
+
+    const handleResize = () => {
+      if (canvas && canvas.parentElement) {
+        width = canvas.width = canvas.parentElement.offsetWidth;
+        height = canvas.height = canvas.parentElement.offsetHeight;
+      }
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 pointer-events-none z-30 w-full h-full rounded-2xl sm:rounded-3xl"
+    />
+  );
+}
+
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
     name: "",
@@ -84,8 +197,13 @@ export default function RegistrationForm() {
     other_branch: "",
     section: "",
     year: "",
-    team: []
+    team: [],
+    idProof: null
   });
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [activeField, setActiveField] = useState(null);
   const [errors, setErrors] = useState({});
@@ -93,6 +211,16 @@ export default function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [submittedRecord, setSubmittedRecord] = useState(null);
+
+  // Clean up object URL when previewUrl changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   // Refs for GSAP animations
   const containerRef = useRef(null);
@@ -347,6 +475,13 @@ export default function RegistrationForm() {
           error = "Please select your academic year.";
         }
         break;
+      case "idProof":
+        if (!value) {
+          error = "Please upload your College ID or Admission document.";
+        } else if (value.size > 5 * 1024 * 1024) {
+          error = "File size must be under 5MB.";
+        }
+        break;
       case "team":
         if (!value || value.length === 0) {
           error = "Please select at least one team to join.";
@@ -356,6 +491,74 @@ export default function RegistrationForm() {
         break;
     }
     return error;
+  };
+
+  const handleFileSelect = (file) => {
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+      "application/pdf"
+    ];
+    const isAllowed = allowedTypes.includes(file.type) || file.name.match(/\.(jpg|jpeg|png|webp|pdf)$/i);
+
+    if (!isAllowed) {
+      const errMsg = "Please upload an image (JPG, PNG, WEBP) or PDF file.";
+      setErrors((prev) => ({ ...prev, idProof: errMsg }));
+      setLastSubmittedError(errMsg);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      const errMsg = "File size must be under 5MB.";
+      setErrors((prev) => ({ ...prev, idProof: errMsg }));
+      setLastSubmittedError(errMsg);
+      return;
+    }
+
+    if (file.type.startsWith("image/")) {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+    }
+
+    setFormData((prev) => ({ ...prev, idProof: file }));
+    setErrors((prev) => ({ ...prev, idProof: "" }));
+    if (lastSubmittedError === errors.idProof) {
+      setLastSubmittedError(null);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileSelect(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileSelect(file);
+  };
+
+  const handleRemoveFile = (e) => {
+    e?.stopPropagation?.();
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    setFormData((prev) => ({ ...prev, idProof: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleBlur = (fieldName) => {
@@ -419,12 +622,13 @@ export default function RegistrationForm() {
       ...(formData.branch === "Other" ? ["other_branch"] : []),
       "section",
       "year",
-      "team"
+      "team",
+      "idProof"
     ];
 
     const newErrors = {};
     for (const f of fieldsToValidate) {
-      const val = f === "team" ? formData.team : formData[f] || "";
+      const val = f === "team" ? formData.team : f === "idProof" ? formData.idProof : formData[f] || "";
       const err = validateField(f, val);
       if (err) newErrors[f] = err;
     }
@@ -452,60 +656,146 @@ export default function RegistrationForm() {
       ? formData.other_branch.trim()
       : formData.branch;
 
-    const payload = {
-      name: formData.name.trim(),
-      registration_number: formData.registration_number.trim(),
-      email: formData.email.trim(),
-      phone: normalizedPhone,
-      branch: finalBranch,
-      section: formData.section.trim(),
-      year: formData.year,
-      team: formData.team.join(", ")
-    };
+    // Build FormData to send both text fields and binary file to PocketBase
+    const data = new FormData();
+    data.append("name", formData.name.trim());
+    data.append("registration_number", formData.registration_number.trim());
+    data.append("email", formData.email.trim());
+    data.append("phone", normalizedPhone);
+    data.append("branch", finalBranch);
+    data.append("section", formData.section.trim());
+    data.append("year", formData.year);
+    data.append("team", formData.team.join(", "));
+    if (formData.idProof) {
+      data.append("idProof", formData.idProof);
+    }
 
     try {
+      let createdRecord = null;
       try {
-        await pb.collection("registrations").create(payload);
+        createdRecord = await pb.collection(COLLECTION_NAME).create(data);
       } catch (err) {
-        // Fallback for PB schema variances (e.g. if PB doesn't yet have 'phone' field or custom branch option)
+        // Fallback for PB schema variances (e.g. if PB doesn't yet have 'phone', custom branch, or 'idProof')
         const phoneError = err?.data?.data?.phone || err?.response?.data?.phone;
         const branchError = err?.data?.data?.branch || err?.response?.data?.branch;
+        const idProofError = err?.data?.data?.idProof || err?.response?.data?.idProof;
 
-        if (phoneError || branchError) {
-          const fallbackPayload = {
-            ...payload,
-            ...(phoneError ? { phone: undefined } : {}),
-            ...(branchError && formData.branch === "Other" ? { branch: "Other" } : {})
-          };
-          if (phoneError) {
-            fallbackPayload.section = `${formData.section.trim()} | Ph: ${normalizedPhone}`;
+        if (phoneError || branchError || idProofError) {
+          const fallbackData = new FormData();
+          fallbackData.append("name", formData.name.trim());
+          fallbackData.append("registration_number", formData.registration_number.trim());
+          fallbackData.append("email", formData.email.trim());
+          if (!phoneError) {
+            fallbackData.append("phone", normalizedPhone);
           }
-          await pb.collection("registrations").create(fallbackPayload);
+          fallbackData.append("branch", branchError && formData.branch === "Other" ? "Other" : finalBranch);
+          fallbackData.append("section", phoneError ? `${formData.section.trim()} | Ph: ${normalizedPhone}` : formData.section.trim());
+          fallbackData.append("year", formData.year);
+          fallbackData.append("team", formData.team.join(", "));
+          if (formData.idProof && !idProofError) {
+            fallbackData.append("idProof", formData.idProof);
+          }
+          createdRecord = await pb.collection(COLLECTION_NAME).create(fallbackData);
         } else {
           throw err;
         }
       }
 
-      setStatusMessage({ type: "success", title: "Registration Successful!", text: "Welcome to E-Cell." });
-      setFormData({
-        name: "",
-        registration_number: "",
-        email: "",
-        phone: "",
-        branch: "",
-        other_branch: "",
-        section: "",
-        year: "",
-        team: []
+      const firstName = formData.name.trim().split(" ")[0] || "Innovator";
+      const summary = {
+        id: createdRecord?.id || ("SOA-" + Math.random().toString(36).substring(2, 8).toUpperCase()),
+        name: formData.name.trim(),
+        registration_number: formData.registration_number.trim(),
+        email: formData.email.trim(),
+        phone: normalizedPhone,
+        branch: finalBranch,
+        section: formData.section.trim(),
+        year: formData.year,
+        team: [...formData.team],
+        hasIdProof: Boolean(formData.idProof),
+        fileName: formData.idProof?.name || null,
+        submittedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      };
+
+      setSubmittedRecord(summary);
+      setStatusMessage({
+        type: "success",
+        title: "Registration Confirmed!",
+        text: `Woohoo, ${firstName}! Welcome to E-Cell! 🎉`
       });
+
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
       setErrors({});
       setLastSubmittedError(null);
+
+      // Smooth scroll back to card top so user sees the confirmation immediately
+      if (cardRef.current) {
+        cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     } catch (err) {
       console.error("PocketBase registration error:", err);
-      setStatusMessage({ type: "error", title: "Registration failed.", text: err?.message || "Could not save registration." });
-      setLastSubmittedError(err?.message || "Could not save registration.");
+      let userFriendlyMsg = "Could not save registration. Please try again.";
+
+      // Extract specific validation errors from PocketBase
+      const fieldData = err?.data?.data || err?.response?.data;
+      if (fieldData && typeof fieldData === "object") {
+        if (fieldData.email) {
+          userFriendlyMsg = "This email address is already registered.";
+        } else if (fieldData.registration_number) {
+          userFriendlyMsg = "This registration number is already registered.";
+        } else if (fieldData.idProof) {
+          userFriendlyMsg = fieldData.idProof?.message || "Error with uploaded ID file.";
+        } else if (fieldData.phone) {
+          userFriendlyMsg = fieldData.phone?.message || "Please enter a valid phone number.";
+        } else {
+          const firstKey = Object.keys(fieldData)[0];
+          userFriendlyMsg = fieldData[firstKey]?.message || `Validation error in ${firstKey}.`;
+        }
+      } else if (err?.status === 404) {
+        userFriendlyMsg = `Collection '${COLLECTION_NAME}' not found in database. Please verify PocketBase setup.`;
+      } else if (err?.status === 403) {
+        userFriendlyMsg = "Permission denied: Ensure the collection's Create Rule is set to Public in PocketBase.";
+      } else if (err?.message) {
+        userFriendlyMsg = err.message;
+      }
+
+      setStatusMessage({ type: "error", title: "Registration failed.", text: userFriendlyMsg });
+      setLastSubmittedError(userFriendlyMsg);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRegisterAnother = () => {
+    setSubmittedRecord(null);
+    setStatusMessage(null);
+    setErrors({});
+    setLastSubmittedError(null);
+    setActiveField(null);
+    setFormData({
+      name: "",
+      registration_number: "",
+      email: "",
+      phone: "",
+      branch: "",
+      other_branch: "",
+      section: "",
+      year: "",
+      team: [],
+      idProof: null
+    });
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -528,7 +818,7 @@ export default function RegistrationForm() {
         <Mascot
           activeField={activeField}
           statusState={statusMessage}
-          selectedTeams={formData.team}
+          selectedTeams={submittedRecord ? submittedRecord.team : formData.team}
           errors={errors}
           lastSubmittedError={lastSubmittedError}
           isFloating={true}
@@ -551,8 +841,11 @@ export default function RegistrationForm() {
       {/* Main Card */}
       <div ref={cardRef} className="w-full max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-black/15 flex flex-col lg:flex-row gsap-hidden">
 
-        {/* LEFT: Form */}
-        <div ref={leftColRef} className="w-full lg:w-[58%] p-5 sm:p-8 md:p-10 flex flex-col justify-between rounded-t-2xl sm:rounded-t-3xl lg:rounded-t-none lg:rounded-l-2xl lg:sm:rounded-l-3xl">
+        {/* LEFT: Form / Success View */}
+        <div ref={leftColRef} className="w-full lg:w-[58%] p-5 sm:p-8 md:p-10 flex flex-col justify-between rounded-t-2xl sm:rounded-t-3xl lg:rounded-t-none lg:rounded-l-2xl lg:sm:rounded-l-3xl relative">
+          {/* If submitted, show celebratory Confetti */}
+          {submittedRecord && <ConfettiCanvas />}
+
           <div>
             {/* Logo */}
             <div ref={(el) => addFieldRef(el, 0)} className="flex items-center gap-2.5 mb-5">
@@ -565,36 +858,189 @@ export default function RegistrationForm() {
               <span className="font-bold text-sm sm:text-base text-slate-800 tracking-wide">E-CELL</span>
             </div>
 
-            <h2 ref={(el) => addFieldRef(el, 1)} className="text-xl sm:text-2xl md:text-[28px] font-bold text-slate-900 mb-1">
-              Registration Form
-            </h2>
-            <p ref={(el) => addFieldRef(el, 2)} className="text-xs sm:text-sm text-slate-400 mb-6">
-              Fill out your details below to join the E-Cell team.
-            </p>
+            {submittedRecord ? (
+              /* DEDICATED CONFIRMATION & SUCCESS SCREEN */
+              <div className="animate-success-in space-y-5">
+                {/* Celebration Header */}
+                <div className="flex items-start gap-3.5">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25 shrink-0 animate-bounce">
+                    <PartyPopper className="w-6 h-6 sm:w-7 sm:h-7" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Registration Confirmed
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        {submittedRecord.submittedAt}
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl md:text-[26px] font-extrabold text-slate-900 leading-tight">
+                      Welcome to E-Cell, {submittedRecord.name.split(" ")[0]}! 🎉
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      Your orientation registration has been successfully saved to our database. We are excited to meet you!
+                    </p>
+                  </div>
+                </div>
 
-            {/* Notification */}
-            {statusMessage && (
-              <div
-                className={`mb-5 p-3.5 sm:p-4 rounded-xl border flex items-start gap-3 ${
-                  statusMessage.type === "success"
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                    : "bg-rose-50 border-rose-200 text-rose-800"
-                }`}
-              >
-                {statusMessage.type === "success" ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                )}
-                <div>
-                  <h4 className="font-semibold text-sm">{statusMessage.title}</h4>
-                  <p className="text-xs opacity-80 mt-0.5">{statusMessage.text}</p>
+                {/* Verified Registration Details Card */}
+                <div className="bg-slate-50/90 rounded-2xl border border-purple-100 p-4 sm:p-5 shadow-sm space-y-3.5">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+                        Official Application Record
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 border border-purple-200/60">
+                      ID: #{submittedRecord.id.slice(-8).toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                    <div>
+                      <span className="text-[11px] font-medium text-slate-400 block">Candidate Name</span>
+                      <span className="font-bold text-slate-800 text-sm block mt-0.5">{submittedRecord.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-slate-400 block">Registration Number</span>
+                      <span className="font-bold text-slate-800 text-sm block mt-0.5">{submittedRecord.registration_number}</span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-slate-400 block">Registered Email</span>
+                      <span className="font-semibold text-slate-700 truncate block mt-0.5">{submittedRecord.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-slate-400 block">Contact Phone</span>
+                      <span className="font-semibold text-slate-700 block mt-0.5">{submittedRecord.phone}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-[11px] font-medium text-slate-400 block">Academic Details</span>
+                      <span className="font-semibold text-slate-800 block mt-0.5">
+                        {submittedRecord.branch} • {submittedRecord.year} (Section {submittedRecord.section})
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Applied Teams */}
+                  <div className="pt-2.5 border-t border-slate-200/80">
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                      Applied Teams ({submittedRecord.team.length})
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {submittedRecord.team.map((teamId) => {
+                        const teamObj = TEAMS.find((t) => t.id === teamId);
+                        const Icon = teamObj?.icon || Sparkles;
+                        return (
+                          <span
+                            key={teamId}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs"
+                          >
+                            <Icon className="w-3.5 h-3.5 text-indigo-600" />
+                            {teamId}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* College ID Status */}
+                  {submittedRecord.hasIdProof && (
+                    <div className="pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <FileText className="w-3.5 h-3.5 text-indigo-500" />
+                        College ID / Admission Slip:
+                      </span>
+                      <span className="font-semibold text-emerald-600 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Attached & Uploaded
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Next Steps Card */}
+                <div className="bg-gradient-to-r from-purple-50/80 to-indigo-50/80 rounded-2xl p-4 border border-purple-100 space-y-2.5">
+                  <div className="flex items-center gap-2 text-indigo-950 font-bold text-xs uppercase tracking-wider">
+                    <Calendar className="w-4 h-4 text-indigo-600" />
+                    <span>What Happens Next?</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-slate-600 leading-relaxed">
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        1
+                      </span>
+                      <p>
+                        <strong className="text-slate-800">Check Email & WhatsApp:</strong> Schedule details, orientation venue, and interview slots will be communicated shortly.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        2
+                      </span>
+                      <p>
+                        <strong className="text-slate-800">Stay Connected:</strong> Follow our official Instagram handle for instant shortlisted candidates lists and announcements.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                  <a
+                    href="https://www.instagram.com/ecellsoau/?hl=en"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3 px-5 rounded-full font-semibold text-xs sm:text-sm text-white bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:opacity-95 shadow-lg shadow-purple-500/25 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.01] active:scale-[0.98]"
+                  >
+                    <Instagram className="w-4 h-4" />
+                    <span>Follow @ecellsoau on Instagram</span>
+                    <ArrowRight className="w-3.5 h-3.5 opacity-80" />
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleRegisterAnother}
+                    className="py-3 px-5 rounded-full font-semibold text-xs sm:text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300/80 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Register Another Candidate</span>
+                  </button>
+                </div>
+
+                <div className="text-center pt-1">
+                  <a
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                  >
+                    <Home className="w-3.5 h-3.5" />
+                    <span>Return to E-Cell SOA Home</span>
+                  </a>
                 </div>
               </div>
-            )}
+            ) : (
+              <>
+                <h2 ref={(el) => addFieldRef(el, 1)} className="text-xl sm:text-2xl md:text-[28px] font-bold text-slate-900 mb-1">
+                  Registration Form
+                </h2>
+                <p ref={(el) => addFieldRef(el, 2)} className="text-xs sm:text-sm text-slate-400 mb-6">
+                  Fill out your details below to join the E-Cell team.
+                </p>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                {/* Error Notification */}
+                {statusMessage && statusMessage.type === "error" && (
+                  <div className="mb-5 p-3.5 sm:p-4 rounded-xl border flex items-start gap-3 bg-rose-50 border-rose-200 text-rose-800">
+                    <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-sm">{statusMessage.title}</h4>
+                      <p className="text-xs opacity-80 mt-0.5">{statusMessage.text}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
               {/* Full Name & Registration Number */}
               <div ref={(el) => addFieldRef(el, 3)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -839,6 +1285,109 @@ export default function RegistrationForm() {
                 {errors.team && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.team}</p>}
               </div>
 
+              {/* College ID / ID Proof Upload */}
+              <div ref={(el) => addFieldRef(el, 7)} className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5 text-indigo-500" /> College ID / Admission Slip <span className="text-rose-400">*</span>
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    JPG, PNG, PDF (Max 5MB)
+                  </span>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  name="idProof"
+                  accept="image/jpeg,image/png,image/webp,image/jpg,application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+
+                {!formData.idProof ? (
+                  <div
+                    onClick={() => {
+                      setActiveField("idProof");
+                      fileInputRef.current?.click();
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-xl p-3.5 sm:p-4 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 group ${
+                      isDragging
+                        ? "border-indigo-500 bg-indigo-50/80 scale-[1.01]"
+                        : errors.idProof
+                        ? "border-rose-300 bg-rose-50/40 hover:border-rose-400"
+                        : "border-slate-200 bg-slate-50/70 hover:border-indigo-300 hover:bg-slate-50/90"
+                    }`}
+                  >
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">
+                        <span className="text-indigo-600 underline underline-offset-2">Click to browse</span> or drag & drop
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        Student ID Card, Library Card, or Admission Letter
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border border-indigo-200 bg-indigo-50/60 rounded-xl p-3 flex items-center justify-between transition-all">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="ID Preview"
+                          className="w-11 h-11 object-cover rounded-lg border border-indigo-200 shrink-0 bg-white"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-slate-800 truncate max-w-[180px] sm:max-w-xs">
+                          {formData.idProof.name}
+                        </p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1.5">
+                          <span>{formatFileSize(formData.idProof.size)}</span>
+                          <span>•</span>
+                          <span className="text-emerald-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 inline" /> Ready
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 px-2.5 py-1 rounded-md hover:bg-indigo-100/60 transition-colors"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        className="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {errors.idProof && (
+                  <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.idProof}</p>
+                )}
+              </div>
+
               {/* Submit */}
               <div ref={submitRef} className="pt-2">
                 <button
@@ -862,8 +1411,10 @@ export default function RegistrationForm() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </>
+        )}
+      </div>
+    </div>
 
         {/* RIGHT: Desktop Mascot Panel */}
         <div
@@ -881,7 +1432,7 @@ export default function RegistrationForm() {
             <Mascot
               activeField={activeField}
               statusState={statusMessage}
-              selectedTeams={formData.team}
+              selectedTeams={submittedRecord ? submittedRecord.team : formData.team}
               errors={errors}
               lastSubmittedError={lastSubmittedError}
               isFloating={false}

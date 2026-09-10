@@ -15,7 +15,7 @@ export default function Mascot({
   const getGuidanceMessage = () => {
     if (statusState?.type === "success") {
       return {
-        text: "Registration Successful! 🎉 Welcome to the E-Cell team!",
+        text: statusState.text || "Registration Successful! 🎉 Welcome to the E-Cell team!",
         isError: false,
         isSuccess: true
       };
@@ -103,6 +103,12 @@ export default function Mascot({
       case "year":
         return {
           text: "Select your current year of study (1st, 2nd, 3rd, or 4th Year).",
+          isError: false,
+          isSuccess: false
+        };
+      case "idProof":
+        return {
+          text: "Upload your Student ID Card, Library Card, or Admission slip (Image or PDF) 🪪",
           isError: false,
           isSuccess: false
         };
