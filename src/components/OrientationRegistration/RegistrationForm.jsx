@@ -26,9 +26,7 @@ import {
   Sparkles,
   RotateCcw,
   Instagram,
-  PartyPopper,
-  ShieldCheck,
-  Home
+  PartyPopper
 } from "lucide-react";
 
 import bannerImg from "./assets/banner.png";
@@ -782,14 +780,14 @@ export default function RegistrationForm() {
         team: [...formData.team],
         hasIdProof: Boolean(formData.idProof),
         fileName: formData.idProof?.name || null,
-        submittedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        submittedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
       };
 
       setSubmittedRecord(summary);
       setStatusMessage({
         type: "success",
-        title: "Registration Confirmed!",
-        text: `Woohoo, ${firstName}! Welcome to E-Cell! 🎉`
+        title: "Registration Submitted!",
+        text: `Your registration details have been received, ${firstName}.`
       });
 
       if (previewUrl) {
@@ -955,11 +953,11 @@ export default function RegistrationForm() {
             <div ref={(el) => addFieldRef(el, 0)} className="flex items-center gap-2.5 mb-5">
               <img
                 src={logoImg}
-                alt="E-Cell Logo"
+                alt="IEC Logo"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm border border-slate-200"
                 onError={(e) => { e.target.onerror = null; e.target.src = monogramImg; }}
               />
-              <span className="font-bold text-sm sm:text-base text-slate-800 tracking-wide">E-CELL</span>
+              <span className="font-bold text-sm sm:text-base text-slate-800 tracking-wide">IEC</span>
             </div>
 
             {submittedRecord ? (
@@ -974,35 +972,23 @@ export default function RegistrationForm() {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Registration Confirmed
+                        Registration Submitted
                       </span>
                       <span className="text-[11px] text-slate-400 font-medium">
                         {submittedRecord.submittedAt}
                       </span>
                     </div>
                     <h2 className="text-xl sm:text-2xl md:text-[26px] font-extrabold text-slate-900 leading-tight">
-                      Welcome to E-Cell, {submittedRecord.name.split(" ")[0]}! 🎉
+                      Registration Received, {submittedRecord.name.split(" ")[0]}! 🎉
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                      Your orientation registration has been successfully saved to our database. We are excited to meet you!
+                      Your registration has been successfully submitted.
                     </p>
                   </div>
                 </div>
 
                 {/* Verified Registration Details Card */}
                 <div className="bg-slate-50/90 rounded-2xl border border-purple-100 p-4 sm:p-5 shadow-sm space-y-3.5">
-                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
-                        Official Application Record
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 border border-purple-200/60">
-                      ID: #{submittedRecord.id.slice(-8).toUpperCase()}
-                    </span>
-                  </div>
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                     <div>
                       <span className="text-[11px] font-medium text-slate-400 block">Candidate Name</span>
@@ -1076,7 +1062,7 @@ export default function RegistrationForm() {
                         1
                       </span>
                       <p>
-                        <strong className="text-slate-800">Check Email & WhatsApp:</strong> Schedule details, orientation venue, and interview slots will be communicated shortly.
+                        <strong className="text-slate-800">Check Email:</strong> Schedule details and interview slots will be communicated shortly.
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
@@ -1111,16 +1097,6 @@ export default function RegistrationForm() {
                     <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
                     <span>Register Another Candidate</span>
                   </button>
-                </div>
-
-                <div className="text-center pt-1">
-                  <a
-                    href="/"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-                  >
-                    <Home className="w-3.5 h-3.5" />
-                    <span>Return to E-Cell SOA Home</span>
-                  </a>
                 </div>
               </div>
             ) : (
