@@ -2,18 +2,17 @@
 
 .side-idcard-viewport {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  width: 100%;
+  min-height: 100vh;
   min-height: 100dvh;
   background: radial-gradient(circle at 50% 35%, #ffffff 0%, #faf8ff 55%, #f4edff 100%);
   color: #1e1b4b;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 /* Ambient purple background glows */
@@ -58,6 +57,7 @@
   margin: 0 auto;
   z-index: 25;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .side-nav-back {
@@ -74,6 +74,7 @@
   border: 1.5px solid #ede9fe;
   box-shadow: 0 2px 8px rgba(76, 29, 149, 0.05);
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .side-nav-back:hover {
@@ -90,6 +91,8 @@
 }
 
 .side-credential-tag {
+  display: inline-flex;
+  align-items: center;
   font-size: 0.78rem;
   color: #4c1d95;
   font-weight: 700;
@@ -99,6 +102,7 @@
   padding: 5px 12px;
   border-radius: 14px;
   border: 1.5px solid #ddd6fe;
+  white-space: nowrap;
 }
 
 .side-nav-btn {
@@ -115,6 +119,7 @@
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(76, 29, 149, 0.05);
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .side-nav-btn:hover {
@@ -129,9 +134,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 0.75rem 1.5rem 2.5rem 1.5rem;
   z-index: 10;
-  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 3D Perspective Card Container */
@@ -199,6 +205,7 @@
   border-right: 1.5px solid #ede9fe;
   position: relative;
   z-index: 5;
+  box-sizing: border-box;
 }
 
 .side-photo-container {
@@ -269,6 +276,7 @@
   margin: 0;
   letter-spacing: -0.015em;
   line-height: 1.2;
+  word-break: break-word;
 }
 
 .side-member-designation {
@@ -276,6 +284,7 @@
   font-weight: 700;
   color: #6b21a8;
   margin-top: 4px;
+  word-break: break-word;
 }
 
 .side-team-badge {
@@ -291,6 +300,8 @@
   font-weight: 700;
   margin-top: 8px;
   box-shadow: 0 2px 6px rgba(88, 28, 135, 0.05);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .side-picture-footer {
@@ -300,6 +311,7 @@
   width: 100%;
   padding-top: 14px;
   border-top: 1.5px solid #ede9fe;
+  gap: 8px;
 }
 
 .side-verified-chip {
@@ -313,6 +325,7 @@
   border: 1px solid #a7f3d0;
   padding: 3px 9px;
   border-radius: 12px;
+  white-space: nowrap;
 }
 
 .side-pulse-dot {
@@ -322,6 +335,7 @@
   background-color: #10b981;
   box-shadow: 0 0 6px #10b981;
   animation: pulse-dot 2s infinite;
+  flex-shrink: 0;
 }
 
 @keyframes pulse-dot {
@@ -348,6 +362,7 @@
   font-size: 0.84rem;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 /* ==================================================== */
@@ -363,6 +378,7 @@
   background: #ffffff;
   position: relative;
   z-index: 5;
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -372,18 +388,25 @@
   justify-content: space-between;
   padding-bottom: 14px;
   border-bottom: 1.5px solid #ede9fe;
+  gap: 10px;
 }
 
 .side-brand-group {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .side-brand-logo {
   width: 38px;
   height: 38px;
   object-fit: contain;
+  flex-shrink: 0;
+}
+
+.side-brand-text {
+  min-width: 0;
 }
 
 .side-brand-text h4 {
@@ -401,6 +424,7 @@
   color: #7c3aed;
   font-weight: 700;
   text-transform: uppercase;
+  display: block;
 }
 
 .side-session-badge {
@@ -412,9 +436,11 @@
   font-size: 0.76rem;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Details Grid (2x2 + LinkedIn) */
+/* Details Grid */
 .side-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -432,6 +458,7 @@
   gap: 10px;
   min-width: 0;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .side-detail-tile:hover {
@@ -513,6 +540,7 @@
   padding: 8px 14px;
   gap: 12px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .side-linkedin-tile:hover {
@@ -538,6 +566,7 @@
   flex-direction: column;
   text-align: left;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .side-linkedin-desc {
@@ -559,6 +588,8 @@
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(10, 102, 194, 0.25);
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .side-linkedin-btn:hover {
@@ -575,6 +606,7 @@
   justify-content: space-between;
   padding-top: 12px;
   border-top: 1.5px solid #ede9fe;
+  gap: 8px;
 }
 
 .side-footer-security {
@@ -592,6 +624,7 @@
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   color: #6b21a8;
+  white-space: nowrap;
 }
 
 /* Loading & Error States */
@@ -669,31 +702,47 @@
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 }
 
-/* Mobile & Tablet Responsiveness (< 820px) */
-@media (max-width: 819px) {
+/* ==================================================== */
+/* TABLET & MOBILE RESPONSIVENESS (< 860px) */
+/* ==================================================== */
+@media (max-width: 859px) {
+  .side-top-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .side-main-stage {
+    align-items: flex-start;
+    padding: 0.5rem 0.85rem 3.5rem 0.85rem;
+    overflow: visible;
+  }
+
   .side-card-perspective {
-    max-width: 430px;
+    max-width: 480px;
+    perspective: none;
   }
 
   .side-badge-card {
     flex-direction: column;
     min-height: auto;
+    transform: none !important;
+    box-shadow: 0 15px 40px -10px rgba(88, 28, 135, 0.16);
+    border-radius: 22px;
   }
 
   .side-panel-picture {
     width: 100%;
     border-right: none;
     border-bottom: 1.5px solid #ede9fe;
-    padding: 20px 20px 16px 20px;
+    padding: 22px 18px 18px 18px;
   }
 
   .side-photo-frame {
-    width: 115px;
-    height: 115px;
+    width: 120px;
+    height: 120px;
   }
 
   .side-member-name {
-    font-size: 1.35rem;
+    font-size: 1.38rem;
   }
 
   .side-member-designation {
@@ -707,20 +756,20 @@
 
   .side-panel-details {
     width: 100%;
-    padding: 16px 20px 18px 20px;
+    padding: 18px 18px 20px 18px;
   }
 
   .side-header-block {
-    padding-bottom: 10px;
+    padding-bottom: 12px;
   }
 
   .side-brand-logo {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
 
   .side-brand-text h4 {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   .side-details-grid {
@@ -733,19 +782,130 @@
   }
 
   .side-tile-icon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .side-tile-val,
+  .side-tile-link {
+    font-size: 0.82rem;
+  }
+}
+
+/* ==================================================== */
+/* SMARTPHONE RESPONSIVENESS (< 520px) */
+/* ==================================================== */
+@media (max-width: 519px) {
+  .side-credential-tag {
+    display: none;
+  }
+
+  .side-top-nav {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .side-main-stage {
+    padding: 0.4rem 0.6rem 4rem 0.6rem;
+  }
+
+  .side-badge-card {
+    border-radius: 18px;
+  }
+
+  .side-panel-picture {
+    padding: 18px 14px 14px 14px;
+  }
+
+  .side-photo-frame {
+    width: 105px;
+    height: 105px;
+    border-radius: 16px;
+  }
+
+  .side-photo-img,
+  .side-photo-fallback {
+    border-radius: 13px;
+  }
+
+  .side-member-name {
+    font-size: 1.25rem;
+  }
+
+  .side-member-designation {
+    font-size: 0.88rem;
+  }
+
+  .side-panel-details {
+    padding: 14px 14px 16px 14px;
+  }
+
+  .side-header-block {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .side-brand-logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .side-brand-text h4 {
+    font-size: 0.82rem;
+    line-height: 1.2;
+  }
+
+  .side-brand-text span {
+    font-size: 0.6rem;
+  }
+
+  .side-session-badge {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+
+  /* Single column grid for comfortable touch & read experience on phone */
+  .side-details-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .side-detail-tile {
+    padding: 7px 10px;
   }
 
   .side-tile-val,
   .side-tile-link {
     font-size: 0.8rem;
   }
-}
 
-/* Very small screens (< 360px) */
-@media (max-width: 359px) {
-  .side-details-grid {
-    grid-template-columns: 1fr;
+  .side-linkedin-tile {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .side-linkedin-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 7px 12px;
+    font-size: 0.78rem;
+  }
+
+  .side-footer-block {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .side-footer-security {
+    font-size: 0.62rem;
+    justify-content: center;
+  }
+
+  .side-id-number-tag {
+    font-size: 0.68rem;
   }
 }

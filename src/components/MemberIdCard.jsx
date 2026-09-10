@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getMemberById } from "../services/memberService";
+import { getMemberById, extractDriveFileId } from "../services/memberService";
 import logoImg from "./logo.png";
 import "./MemberIdCard.css";
 import {
@@ -19,19 +19,19 @@ import {
   ShieldCheck,
   Award,
 } from "lucide-react";
-import RohitPhoto from "./Assets/Team 2026/Rohit.png";
-import SubhamPhoto from "./Assets/Team 2026/Subham.jpeg";
-import SujayPhoto from "./Assets/Team 2026/Sujay.jpeg";
 import SanatPhoto from "./Assets/Team 2026/Sanat.jpg";
+import BibhuPhoto from "./Assets/Team 2026/Bibhu.jpeg";
+import EshanPhoto from "./Assets/Team 2026/Eshan.jpeg";
+import AbhinavPhoto from "./Assets/Team 2026/Abhinav.png";
 
 function getLocalPhoto(member) {
   if (!member) return null;
-  const name = (member.name || "").toLowerCase();
-  const id = String(member.id || "");
-  if (name.includes("rohit") || id === "116" || id === "102") return RohitPhoto;
-  if (name.includes("subham") || id === "105") return SubhamPhoto;
-  if (name.includes("sujay") || id === "114" || id === "103") return SujayPhoto;
-  if (name.includes("sanat") || id === "101") return SanatPhoto;
+  const id = String(member.id || "").trim();
+  // Only Secretariat members (101-104) who do not have form uploads
+  if (id === "101") return SanatPhoto;
+  if (id === "102") return BibhuPhoto;
+  if (id === "103") return EshanPhoto;
+  if (id === "104") return AbhinavPhoto;
   return null;
 }
 
@@ -94,6 +94,7 @@ export default function MemberIdCard() {
   };
 
   const handleMouseMove = (e) => {
+    if (window.innerWidth < 860) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -202,24 +203,33 @@ export default function MemberIdCard() {
                         alt={member.name}
                         className="side-photo-img"
                         referrerPolicy="no-referrer"
+                        loading="eager"
                         onError={(e) => {
+                          const fileId = extractDriveFileId(member.photo);
+                          const step = parseInt(e.target.dataset.fallbackStep || "0", 10);
+
+                          // Step 0: Tried primary thumbnail -> Try lh3 user content proxy
+                          if (fileId && step === 0) {
+                            e.target.dataset.fallbackStep = "1";
+                            e.target.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+                            return;
+                          }
+                          // Step 1: Tried lh3 -> Try direct UC export view
+                          if (fileId && step === 1) {
+                            e.target.dataset.fallbackStep = "2";
+                            e.target.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                            return;
+                          }
+
+                          // Next fallback: Local Secretariat Photo if applicable
                           const local = getLocalPhoto(member);
                           if (local && !e.target.dataset.triedLocal) {
                             e.target.dataset.triedLocal = "true";
                             e.target.src = local;
                             return;
                           }
-                          // Try Google user content proxy if thumbnail fails
-                          if (member.photo && !e.target.dataset.triedFallback) {
-                            e.target.dataset.triedFallback = "true";
-                            const match =
-                              member.photo.match(/id=([a-zA-Z0-9_-]+)/) ||
-                              member.photo.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                            if (match && match[1]) {
-                              e.target.src = `https://lh3.googleusercontent.com/d/${match[1]}`;
-                              return;
-                            }
-                          }
+
+                          // Final fallback: Show initials
                           e.target.style.display = "none";
                           if (e.target.nextSibling) {
                             e.target.nextSibling.style.display = "flex";
