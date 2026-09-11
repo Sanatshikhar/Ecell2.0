@@ -16,6 +16,7 @@ const RegistrationForm = ({ isOpen, onClose }) => {
     "Technical Team",
     "Design Team", 
     "Media Team",
+    "Social Media Team",
     "Event-Management Team",
     "Content Team",
     "Public-Relations Team",

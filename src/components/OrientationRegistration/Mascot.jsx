@@ -128,7 +128,7 @@ export default function Mascot({
           };
         }
         return {
-          text: "Pick the team(s) you'd like to join (Technical, Media, Design, PR, Content, Event Mgmt)!",
+          text: "Pick the team(s) you'd like to join (Technical, Media, Social Media, Design, PR, Content, Event Mgmt)!",
           isError: false,
           isSuccess: false
         };

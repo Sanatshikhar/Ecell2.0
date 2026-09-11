@@ -26,7 +26,8 @@ import {
   Sparkles,
   RotateCcw,
   Instagram,
-  PartyPopper
+  PartyPopper,
+  Share2
 } from "lucide-react";
 
 import bannerImg from "./assets/banner.png";
@@ -45,6 +46,7 @@ const pb = (process.env.REACT_APP_ORIENTATION_DB_URL && process.env.REACT_APP_OR
 const TEAMS = [
   { id: "Technical", label: "Technical", description: "Web, App & Dev", icon: Code2 },
   { id: "Media", label: "Media", description: "Photography & Reels", icon: Video },
+  { id: "Social Media", label: "Social Media", description: "Campaigns & Engagement", icon: Share2 },
   { id: "Event Management", label: "Event Management", description: "Logistics & Planning", icon: Calendar },
   { id: "Public Relation", label: "Public Relation", description: "Outreach & Corporate", icon: Users },
   { id: "Content", label: "Content", description: "Copywriting & Blogs", icon: FileText },
