@@ -90,6 +90,7 @@ async function main() {
     { name: 'email', type: 'email', required: true },
     { name: 'phone', type: 'text', required: true },
     { name: 'branch', type: 'text', required: true },
+    { name: 'campus', type: 'text', required: false },
     { name: 'section', type: 'text', required: true },
     { name: 'year', type: 'text', required: true },
     { name: 'team', type: 'text', required: true },

@@ -94,6 +94,12 @@ export default function Mascot({
           isError: false,
           isSuccess: false
         };
+      case "campus":
+        return {
+          text: "Select your campus (1, 2, 3, 4, or 5). 🏫",
+          isError: false,
+          isSuccess: false
+        };
       case "section":
         return {
           text: "Enter your section.",

@@ -18,6 +18,7 @@ import {
   User,
   Building2,
   GraduationCap,
+  School,
   Phone,
   Mail,
   Hash,
@@ -69,6 +70,7 @@ const BRANCHES = [
 ];
 
 const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+const CAMPUS_OPTIONS = ["1", "2", "3", "4", "5"];
 
 const normalizePhone = (value) => {
   const digits = String(value || "").replace(/\D/g, "");
@@ -195,6 +197,7 @@ export default function RegistrationForm() {
     phone: "",
     branch: "",
     other_branch: "",
+    campus: "",
     section: "",
     year: "",
     team: [],
@@ -490,6 +493,12 @@ export default function RegistrationForm() {
             error = "Branch name cannot exceed 60 characters.";
           }
         }
+      case "campus":
+        if (!value) {
+          error = "Please select your campus (1 to 5).";
+        } else if (!CAMPUS_OPTIONS.includes(String(value))) {
+          error = "Please select a valid campus (1 to 5).";
+        }
         break;
       case "section": {
         const trimmed = String(value || "").trim();
@@ -684,6 +693,7 @@ export default function RegistrationForm() {
       "phone",
       "branch",
       ...(formData.branch === "Other" ? ["other_branch"] : []),
+      "campus",
       "section",
       "year",
       "team",
@@ -731,6 +741,7 @@ export default function RegistrationForm() {
     data.append("email", normalizedEmail);
     data.append("phone", normalizedPhone);
     data.append("branch", finalBranch);
+    data.append("campus", formData.campus);
     data.append("section", normalizedSection);
     data.append("year", formData.year);
     data.append("team", formData.team.join(", "));
@@ -743,12 +754,13 @@ export default function RegistrationForm() {
       try {
         createdRecord = await pb.collection(COLLECTION_NAME).create(data);
       } catch (err) {
-        // Fallback for PB schema variances (e.g. if PB doesn't yet have 'phone', custom branch, or 'idProof')
+        // Fallback for PB schema variances (e.g. if PB doesn't yet have 'phone', custom branch, 'campus', or 'idProof')
         const phoneError = err?.data?.data?.phone || err?.response?.data?.phone;
         const branchError = err?.data?.data?.branch || err?.response?.data?.branch;
         const idProofError = err?.data?.data?.idProof || err?.response?.data?.idProof;
+        const campusError = err?.data?.data?.campus || err?.response?.data?.campus;
 
-        if (phoneError || branchError || idProofError) {
+        if (phoneError || branchError || idProofError || campusError) {
           const fallbackData = new FormData();
           fallbackData.append("name", normalizedName);
           fallbackData.append("registration_number", normalizedRegNo);
@@ -757,7 +769,13 @@ export default function RegistrationForm() {
             fallbackData.append("phone", normalizedPhone);
           }
           fallbackData.append("branch", branchError && formData.branch === "Other" ? "Other" : finalBranch);
-          fallbackData.append("section", phoneError ? `${normalizedSection} | Ph: ${normalizedPhone}` : normalizedSection);
+          if (!campusError) {
+            fallbackData.append("campus", formData.campus);
+          }
+          const sectionWithCampus = campusError
+            ? `${normalizedSection} | Campus ${formData.campus}`
+            : normalizedSection;
+          fallbackData.append("section", phoneError ? `${sectionWithCampus} | Ph: ${normalizedPhone}` : sectionWithCampus);
           fallbackData.append("year", formData.year);
           fallbackData.append("team", formData.team.join(", "));
           if (formData.idProof && !idProofError) {
@@ -777,6 +795,7 @@ export default function RegistrationForm() {
         email: normalizedEmail,
         phone: normalizedPhone,
         branch: finalBranch,
+        campus: formData.campus,
         section: normalizedSection,
         year: formData.year,
         team: [...formData.team],
@@ -886,6 +905,7 @@ export default function RegistrationForm() {
       phone: "",
       branch: "",
       other_branch: "",
+      campus: "",
       section: "",
       year: "",
       team: [],
@@ -1011,7 +1031,7 @@ export default function RegistrationForm() {
                     <div className="sm:col-span-2">
                       <span className="text-[11px] font-medium text-slate-400 block">Academic Details</span>
                       <span className="font-semibold text-slate-800 block mt-0.5">
-                        {submittedRecord.branch} • {submittedRecord.year} (Section {submittedRecord.section})
+                        {submittedRecord.branch} • {submittedRecord.year} • Campus {submittedRecord.campus} (Section {submittedRecord.section})
                       </span>
                     </div>
                   </div>
@@ -1227,9 +1247,9 @@ export default function RegistrationForm() {
                 </div>
               </div>
 
-              {/* Branch, Section, Year */}
-              <div ref={(el) => addFieldRef(el, 5)} className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-20">
-                <div className="order-1 sm:order-1 relative z-30">
+              {/* Branch & Year */}
+              <div ref={(el) => addFieldRef(el, 5)} className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-30">
+                <div className="relative z-30">
                   <CustomSelect
                     label="Branch"
                     name="branch"
@@ -1253,9 +1273,33 @@ export default function RegistrationForm() {
                   />
                 </div>
 
-                {/* In phone view, comes just under branch selector (order-2), on desktop spans row 2 (sm:order-4 sm:col-span-3) */}
+                <div className="relative z-20">
+                  <CustomSelect
+                    label="Year"
+                    name="year"
+                    value={formData.year}
+                    options={YEARS}
+                    placeholder="Select Year"
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, year: "" }));
+                        if (lastSubmittedError === errors.year) setLastSubmittedError(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      setActiveField("year");
+                      if (errors.year) setLastSubmittedError(errors.year);
+                    }}
+                    onBlur={() => handleBlur("year")}
+                    error={errors.year}
+                    icon={GraduationCap}
+                  />
+                </div>
+
+                {/* In phone view or desktop, if Other branch is selected, span full row */}
                 {formData.branch === "Other" && (
-                  <div className="order-2 sm:order-4 sm:col-span-3 animate-field-in relative z-10">
+                  <div className="sm:col-span-2 animate-field-in relative z-10">
                     <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-indigo-500" /> Specify Branch Name <span className="text-rose-400">*</span>
                     </label>
@@ -1280,9 +1324,36 @@ export default function RegistrationForm() {
                     )}
                   </div>
                 )}
+              </div>
 
-                <div className="order-3 sm:order-2 relative z-10">
-                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+              {/* Campus & Section */}
+              <div ref={(el) => addFieldRef(el, 6)} className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-20">
+                <div className="relative z-20">
+                  <CustomSelect
+                    label="Campus"
+                    name="campus"
+                    value={formData.campus}
+                    options={CAMPUS_OPTIONS}
+                    placeholder="Select Campus (1-5)"
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, campus: "" }));
+                        if (lastSubmittedError === errors.campus) setLastSubmittedError(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      setActiveField("campus");
+                      if (errors.campus) setLastSubmittedError(errors.campus);
+                    }}
+                    onBlur={() => handleBlur("campus")}
+                    error={errors.campus}
+                    icon={School}
+                  />
+                </div>
+
+                <div className="relative z-10">
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                     Section <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -1303,34 +1374,10 @@ export default function RegistrationForm() {
                   />
                   {errors.section && <p className="mt-1 text-[11px] text-rose-500 font-medium">{errors.section}</p>}
                 </div>
-
-                <div className="order-4 sm:order-3 relative z-20">
-                  <CustomSelect
-                    label="Year"
-                    name="year"
-                    value={formData.year}
-                    options={YEARS}
-                    placeholder="Select Year"
-                    onChange={(e) => {
-                      handleChange(e);
-                      if (e.target.value) {
-                        setErrors((prev) => ({ ...prev, year: "" }));
-                        if (lastSubmittedError === errors.year) setLastSubmittedError(null);
-                      }
-                    }}
-                    onFocus={() => {
-                      setActiveField("year");
-                      if (errors.year) setLastSubmittedError(errors.year);
-                    }}
-                    onBlur={() => handleBlur("year")}
-                    error={errors.year}
-                    icon={GraduationCap}
-                  />
-                </div>
               </div>
 
               {/* Team Selection */}
-              <div ref={(el) => addFieldRef(el, 6)}>
+              <div ref={(el) => addFieldRef(el, 7)}>
                 <div className="flex items-center justify-between mb-2.5">
                   <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                     Team(s) to Join <span className="text-rose-400">*</span>
@@ -1378,7 +1425,7 @@ export default function RegistrationForm() {
               </div>
 
               {/* College ID / ID Proof Upload */}
-              <div ref={(el) => addFieldRef(el, 7)} className="space-y-1.5">
+              <div ref={(el) => addFieldRef(el, 8)} className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <Upload className="w-3.5 h-3.5 text-indigo-500" /> College ID / Admission Slip <span className="text-rose-400">*</span>
