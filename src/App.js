@@ -30,6 +30,7 @@ import RegistrationSlider from "./components/RegistrationSlider/RegistrationSlid
 import OrientationRegistration from "./components/OrientationRegistration/OrientationRegistration";
 import MemberIdCard from "./components/MemberIdCard";
 import Quiz from "./components/Quiz/Quiz";
+import IdeathonRegistration from "./components/Ideathon/IdeathonRegistration";
 
 function AppContent() {
   const [auth, setAuth] = React.useState(pb.authStore.isValid);
@@ -65,6 +66,7 @@ function AppContent() {
     '/privacy',
     '/register',
     '/quiz',
+    '/ideathon',
   ];
 
   const shouldHideHeader =
@@ -72,7 +74,9 @@ function AppContent() {
     location.pathname.startsWith('/member');
 
   const showQueryBar =
-    hideHeaderPaths.includes(location.pathname) && location.pathname !== '/quiz';
+    hideHeaderPaths.includes(location.pathname) &&
+    location.pathname !== '/quiz' &&
+    location.pathname !== '/ideathon';
 
   return (
     <>
@@ -92,6 +96,7 @@ function AppContent() {
         <Route path="/join" element={<Join />} />
         <Route path="/register" element={<OrientationRegistration />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/ideathon" element={<IdeathonRegistration />} />
         <Route path="/scratchlabs" element={<ScratchLabsRegistration />} />
         <Route path="/scratchlabs/participant-portal" element={<ScratchLabsParticipantDashboard />} />
         <Route path="/scratchlabs/marketing-links" element={<ScratchLabsMarketingLinksForm />} />

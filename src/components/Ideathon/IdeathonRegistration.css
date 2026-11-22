@@ -1,0 +1,979 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap');
+
+:root {
+  --bg: #f5f0ff;
+  --panel: #ffffff;
+  --panel2: #ede4ff;
+  --line: #d9c8f3;
+  --muted: #625875;
+  --white: #ffffff;
+  --text: #281b3c;
+  --purple: #8b5cf6;
+  --violet: #6d28d9;
+  --violet-dark: #581db6;
+  --error: #a42856;
+}
+
+.ideathon-page {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ideathon-page * {
+  box-sizing: border-box;
+}
+
+.ideathon-page button,
+.ideathon-page input,
+.ideathon-page select,
+.ideathon-page textarea {
+  font-family: "DM Sans", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ideathon-page :focus-visible {
+  outline: 3px solid var(--purple);
+  outline-offset: 3px;
+}
+
+.ideathon-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ideathon-page button {
+  cursor: pointer;
+}
+
+.ideathon-shell {
+  width: min(1180px, calc(100% - 64px));
+  margin: auto;
+}
+
+/* Sticky Header */
+.ideathon-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(250, 247, 255, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+
+.ideathon-header-inner {
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.ideathon-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ideathon-brand-mark {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ideathon-brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.15);
+}
+
+.ideathon-brand-mark svg {
+  width: 37px;
+  height: 37px;
+}
+
+.ideathon-brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.ideathon-brand-copy strong {
+  font: 700 17px "Space Grotesk", sans-serif;
+  letter-spacing: 0.055em;
+  color: #321b55;
+}
+
+.ideathon-brand-copy small {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.045em;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.ideathon-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #625875;
+}
+
+.ideathon-nav a {
+  transition: color 0.2s ease;
+}
+
+.ideathon-nav a:hover,
+.ideathon-footer-links a:hover,
+.ideathon-help-link:hover {
+  color: var(--violet);
+}
+
+.ideathon-nav .active {
+  color: var(--violet);
+}
+
+.ideathon-contact-link {
+  border: 1px solid #c7b2e8;
+  border-radius: 9px;
+  padding: 9px 16px;
+  color: var(--text);
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.ideathon-contact-link:hover {
+  border-color: var(--purple);
+  background: #f1eaff;
+  color: var(--violet);
+}
+
+/* Main */
+.ideathon-main {
+  overflow: hidden;
+}
+
+/* Hero Section */
+.ideathon-hero {
+  position: relative;
+  padding: 90px 0 83px;
+  background: 
+    radial-gradient(ellipse 55% 75% at 82% 34%, rgba(139, 92, 246, 0.16), transparent 75%),
+    linear-gradient(180deg, #faf7ff 0%, var(--bg) 100%);
+}
+
+.ideathon-network {
+  position: absolute;
+  right: -4%;
+  top: 12px;
+  width: min(670px, 60vw);
+  height: 440px;
+  opacity: 0.44;
+  pointer-events: none;
+}
+
+.ideathon-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+}
+
+.ideathon-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--violet);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ideathon-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--purple);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+.ideathon-h1 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(70px, 10.5vw, 142px);
+  line-height: 0.96;
+  letter-spacing: -0.075em;
+  margin: 24px 0 21px;
+  font-weight: 700;
+  color: #321b55;
+}
+
+.ideathon-hero-tagline {
+  font: 600 clamp(24px, 3vw, 38px) / 1.17 "Space Grotesk", sans-serif;
+  letter-spacing: -0.035em;
+  margin: 0 0 18px 0;
+  color: #281b3c;
+}
+
+.ideathon-hero-description {
+  max-width: 570px;
+  color: #625875;
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 0 0 29px 0;
+}
+
+.ideathon-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 31px;
+  padding: 0;
+  list-style: none;
+}
+
+.ideathon-details li {
+  font-size: 12px;
+  color: #382850;
+  border: 1px solid #ddcff4;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 9px 13px;
+  border-radius: 7px;
+  font-weight: 500;
+}
+
+.ideathon-details span {
+  color: #6d607d;
+}
+
+/* Buttons */
+.ideathon-primary-btn,
+.ideathon-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  border-radius: 9px;
+  padding: 0 21px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.ideathon-primary-btn {
+  background: var(--violet);
+  border: 1px solid var(--violet);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.25);
+}
+
+.ideathon-primary-btn:hover {
+  background: var(--violet-dark);
+  border-color: var(--violet-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.35);
+}
+
+.ideathon-secondary-btn {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid #c7b2e8;
+}
+
+.ideathon-secondary-btn:hover:not(:disabled) {
+  border-color: var(--purple);
+  background: #f3edff;
+}
+
+.ideathon-secondary-btn:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.ideathon-primary-btn svg,
+.ideathon-secondary-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Form Section */
+.ideathon-form-section {
+  padding: 0 0 84px;
+  scroll-margin-top: 95px;
+}
+
+.ideathon-section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.ideathon-section-top h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(25px, 3vw, 35px);
+  letter-spacing: -0.045em;
+  margin: 10px 0 0;
+  color: #281b3c;
+  font-weight: 700;
+}
+
+.ideathon-section-top p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 3px;
+}
+
+.ideathon-form-card {
+  background: linear-gradient(145deg, #fff, #fbf9ff 72%);
+  border: 1px solid #ddd0f3;
+  border-radius: 20px;
+  box-shadow: 0 22px 70px rgba(73, 37, 125, 0.1);
+  overflow: hidden;
+  scroll-margin-top: 100px;
+}
+
+/* Progress Stepper */
+.ideathon-progress-wrap {
+  padding: 28px 39px 26px;
+  border-bottom: 1px solid #e4d9f5;
+  overflow-x: auto;
+  scrollbar-color: #b9a0e6 transparent;
+  background: #f8f4ff;
+}
+
+.ideathon-progress {
+  display: flex;
+  min-width: 690px;
+  justify-content: space-between;
+  position: relative;
+  gap: 8px;
+}
+
+.ideathon-progress::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 34px;
+  right: 34px;
+  height: 1px;
+  background: #d7c4f0;
+}
+
+.ideathon-step-tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  color: #716581;
+  padding: 0;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ideathon-step-tab .number {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid #baa5db;
+  border-radius: 50%;
+  font: 700 12px "Space Grotesk", sans-serif;
+  flex: none;
+  transition: all 0.2s ease;
+}
+
+.ideathon-step-tab.active {
+  color: var(--violet);
+}
+
+.ideathon-step-tab.active .number {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(109, 40, 217, 0.35);
+}
+
+.ideathon-step-tab.done {
+  color: #4d366d;
+}
+
+.ideathon-step-tab.done .number {
+  border-color: var(--purple);
+  color: var(--violet);
+  background: #f0e8ff;
+}
+
+.ideathon-step-tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Form Body */
+.ideathon-form-body {
+  padding: 37px 40px 35px;
+}
+
+.ideathon-step-kicker {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--violet);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ideathon-step-heading {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 27px;
+  letter-spacing: -0.04em;
+  margin: 0 0 7px;
+  color: #281b3c;
+  font-weight: 700;
+}
+
+.ideathon-step-description {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 27px;
+}
+
+.ideathon-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 24px;
+}
+
+.ideathon-field {
+  min-width: 0;
+}
+
+.ideathon-field.full {
+  grid-column: 1 / -1;
+}
+
+.ideathon-field label,
+.ideathon-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #362647;
+  margin-bottom: 9px;
+}
+
+.ideathon-required {
+  color: var(--violet);
+  margin-left: 2px;
+}
+
+.ideathon-control {
+  width: 100%;
+  min-height: 47px;
+  border: 1px solid #cbbce0;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ideathon-control::placeholder {
+  color: #81758f;
+}
+
+.ideathon-control:hover {
+  border-color: #a780df;
+}
+
+.ideathon-control:focus {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+select.ideathon-control {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236D28D9' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 42px;
+  cursor: pointer;
+}
+
+select.ideathon-control option {
+  color: #281b3c;
+  background: #fff;
+}
+
+textarea.ideathon-control {
+  min-height: 113px;
+  resize: vertical;
+}
+
+.ideathon-hint {
+  font-size: 11px;
+  color: #746683;
+  margin: 7px 0 0;
+}
+
+.ideathon-error {
+  color: var(--error);
+  font-size: 11px;
+  margin: 6px 0 0;
+  font-weight: 500;
+}
+
+.ideathon-field.invalid .ideathon-control {
+  border-color: var(--error);
+  background: #fff5f8;
+}
+
+/* Form Footer */
+.ideathon-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 34px;
+  padding-top: 23px;
+  border-top: 1px solid #e4d9f5;
+}
+
+.ideathon-form-footer > p {
+  font-size: 11px;
+  color: #6a5c7a;
+  margin: 0;
+}
+
+.ideathon-actions {
+  display: flex;
+  gap: 11px;
+}
+
+/* Choice Cards (Team vs Individual) */
+.ideathon-choice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.ideathon-choice {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #d5c5e9;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ideathon-choice:hover,
+.ideathon-choice.selected {
+  border-color: var(--purple);
+  background: #f3edff;
+}
+
+.ideathon-choice input {
+  accent-color: var(--violet);
+  margin: 3px 0 0;
+  width: 17px;
+  height: 17px;
+}
+
+.ideathon-choice strong {
+  display: block;
+  font-size: 13px;
+  color: #281b3c;
+}
+
+.ideathon-choice small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+/* Teammate Cards */
+.ideathon-team-fields {
+  margin-top: 26px;
+}
+
+.ideathon-teammate {
+  padding: 18px;
+  border: 1px solid #d5c5e9;
+  border-radius: 10px;
+  margin: 14px 0;
+  background: #fbf9ff;
+}
+
+.ideathon-teammate-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #321b55;
+}
+
+.ideathon-text-button {
+  border: 0;
+  background: none;
+  color: var(--violet);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.ideathon-text-button:hover {
+  text-decoration: underline;
+  color: var(--error);
+}
+
+.ideathon-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px dashed var(--purple);
+  background: transparent;
+  color: var(--violet);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ideathon-add-button:hover {
+  background: #f3edff;
+}
+
+.ideathon-add-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Review Grid */
+.ideathon-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.ideathon-review-block {
+  border: 1px solid #dacbf0;
+  border-radius: 10px;
+  padding: 19px;
+  background: #f8f4ff;
+}
+
+.ideathon-review-block h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 13px;
+  color: var(--violet);
+  font-weight: 700;
+}
+
+.ideathon-review-item {
+  margin: 0 0 10px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  color: #281b3c;
+}
+
+.ideathon-review-item:last-child {
+  margin-bottom: 0;
+}
+
+.ideathon-review-item span {
+  display: block;
+  color: #6d607d;
+  font-size: 11px;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.ideathon-check-list {
+  margin-top: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.ideathon-check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 12px;
+  color: #382850;
+  cursor: pointer;
+}
+
+.ideathon-check-label input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--violet);
+  margin: 1px 0 0;
+  flex: none;
+}
+
+.ideathon-privacy-small {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 18px 0 0;
+}
+
+/* Success / Preview Status Banner */
+.ideathon-status-banner {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: #ede4ff;
+  border: 1px solid #b995f2;
+  border-radius: 12px;
+  color: #4c1f8b;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.5;
+}
+
+.ideathon-success-screen {
+  text-align: center;
+  padding: 24px 0 12px;
+}
+
+.ideathon-success-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #f0e8ff;
+  border: 2px solid var(--purple);
+  color: var(--violet);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 28px rgba(109, 40, 217, 0.2);
+}
+
+.ideathon-success-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.ideathon-ref-badge {
+  display: inline-block;
+  background: #ede4ff;
+  border: 1px solid #cbbce0;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-family: "Space Grotesk", monospace;
+  font-weight: 700;
+  color: var(--violet);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  margin: 14px 0 20px;
+}
+
+/* Support Row */
+.ideathon-support {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding: 24px 4px 30px;
+  color: #625875;
+  font-size: 12px;
+}
+
+.ideathon-support p {
+  margin: 0;
+}
+
+.ideathon-help-link {
+  font-weight: 700;
+  color: var(--violet);
+  white-space: nowrap;
+}
+
+/* Footer */
+.ideathon-footer {
+  border-top: 1px solid #dfd0f3;
+  background: #ede4ff;
+}
+
+.ideathon-footer-inner {
+  min-height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.ideathon-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ideathon-footer-brand .brand-mark,
+.ideathon-footer-brand .brand-mark svg {
+  width: 28px;
+  height: 28px;
+}
+
+.ideathon-footer-brand span {
+  font-size: 12px;
+  color: #625875;
+}
+
+.ideathon-footer-brand strong {
+  color: #281b3c;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.ideathon-footer-links {
+  display: flex;
+  gap: 27px;
+  font-size: 12px;
+  color: #625875;
+  flex-wrap: wrap;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 760px) {
+  .ideathon-shell {
+    width: min(100% - 36px, 600px);
+  }
+  .ideathon-header-inner {
+    height: 66px;
+  }
+  .ideathon-brand-copy small {
+    display: none;
+  }
+  .ideathon-nav {
+    gap: 15px;
+    font-size: 11px;
+  }
+  .ideathon-contact-link {
+    padding: 8px 11px;
+  }
+  .ideathon-hero {
+    padding: 71px 0 66px;
+  }
+  .ideathon-network {
+    width: 100%;
+    right: -28%;
+    top: 25px;
+    opacity: 0.2;
+  }
+  .ideathon-h1 {
+    font-size: clamp(58px, 14vw, 92px);
+    margin-top: 20px;
+  }
+  .ideathon-hero-description {
+    font-size: 14px;
+  }
+  .ideathon-details {
+    gap: 8px;
+  }
+  .ideathon-details li {
+    font-size: 11px;
+  }
+  .ideathon-section-top {
+    display: block;
+  }
+  .ideathon-section-top p {
+    margin-top: 8px;
+  }
+  .ideathon-progress-wrap {
+    padding: 20px;
+  }
+  .ideathon-progress {
+    min-width: 655px;
+  }
+  .ideathon-form-body {
+    padding: 27px 20px;
+  }
+  .ideathon-field-grid,
+  .ideathon-review-grid {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+  .ideathon-field.full {
+    grid-column: auto;
+  }
+  .ideathon-support {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .ideathon-footer-inner {
+    padding: 25px 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 430px) {
+  .ideathon-brand-copy strong {
+    font-size: 14px;
+  }
+  .ideathon-nav {
+    gap: 11px;
+  }
+  .ideathon-hero-tagline {
+    font-size: 25px;
+  }
+  .ideathon-choice-row {
+    grid-template-columns: 1fr;
+  }
+  .ideathon-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .ideathon-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .ideathon-actions button {
+    padding: 0 9px;
+  }
+  .ideathon-footer-links {
+    gap: 16px;
+  }
+}
