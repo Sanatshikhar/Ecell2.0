@@ -26,12 +26,11 @@ const BRANCH_OPTIONS = [
 ];
 
 const YEAR_OPTIONS = [
-  "1st Year (Fresher)",
-  "2nd Year (Sophomore)",
-  "3rd Year (Junior)",
-  "4th Year (Senior)",
-  "Postgraduate / Masters",
-  "Other"
+  "1st Year",
+  "2nd Year",
+  "3rd Year",
+  "4th Year",
+  "Postgraduate / Masters"
 ];
 
 const DOMAIN_OPTIONS = [
@@ -471,20 +470,6 @@ export default function IdeathonRegistration() {
                       Reference ID: <strong>{referenceId}</strong>
                     </div>
 
-                    <div className="ideathon-status-banner" style={{ maxWidth: "580px", margin: "0 auto 28px", textAlign: "left" }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}>
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                      <div>
-                        <strong>What's Next?</strong>
-                        <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#542a91" }}>
-                          We will send the challenge statement rubric, workshop timeline, and mentor onboarding details to <strong>{formData.email}</strong>.
-                        </p>
-                      </div>
-                    </div>
-
                     <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
                       <button
                         type="button"
@@ -558,7 +543,7 @@ export default function IdeathonRegistration() {
                             {errors.phone && <p className="ideathon-error">{errors.phone}</p>}
                           </div>
 
-                          <div className={`ideathon-field ${errors.college ? "invalid" : ""}`}>
+                          <div className="ideathon-field">
                             <label htmlFor="college">
                               College / University <span className="ideathon-required">*</span>
                             </label>
@@ -567,11 +552,10 @@ export default function IdeathonRegistration() {
                               id="college"
                               name="college"
                               className="ideathon-control"
-                              placeholder="College Name"
                               value={formData.college}
-                              onChange={handleChange}
+                              readOnly
+                              style={{ background: "#f3edff", cursor: "not-allowed", color: "#4a3870" }}
                             />
-                            {errors.college && <p className="ideathon-error">{errors.college}</p>}
                           </div>
 
                           <div className={`ideathon-field ${errors.studentId ? "invalid" : ""}`}>
@@ -1089,13 +1073,6 @@ export default function IdeathonRegistration() {
               </div>
             </div>
 
-            {/* Support Box */}
-            <div className="ideathon-support">
-              <p>Have questions about the challenge tracks, eligibility, or mentor evaluation?</p>
-              <Link to="/contact" className="ideathon-help-link">
-                Contact the Organizing Team →
-              </Link>
-            </div>
           </div>
         </section>
       </main>
